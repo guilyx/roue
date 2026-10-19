@@ -66,6 +66,14 @@ class RoueApplication(Adw.Application):
         self._install_actions()
         self._apply_background_setting()
         self._start_shift_drag()
+        GLib.idle_add(self._prewarm)
+
+    def _prewarm(self) -> bool:
+        """Build the panel hidden, so the first hotkey press only has to map it."""
+        if self.panel is None:
+            self.panel = DropPanel(self)
+            self.panel.realize()
+        return GLib.SOURCE_REMOVE
 
     def do_activate(self) -> None:
         self.show_panel()

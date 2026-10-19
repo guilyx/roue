@@ -117,3 +117,9 @@ def test_query_matches_keywords() -> None:
     assert registry.get("share-10mb").matches_query("discord")
     assert registry.get("strip-metadata").matches_query("gps")
     assert not registry.get("jpg").matches_query("discord")
+
+
+def test_same_format_keeps_the_extension_case() -> None:
+    preset = load_presets(include_user=False).get("strip-metadata")
+    assert preset.output_extension(Path("IMG_0001.HEIC")) == "HEIC"
+    assert preset.output_extension(Path("photo.jpg")) == "jpg"

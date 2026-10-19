@@ -63,7 +63,8 @@ class Preset:
 
     def output_extension(self, source: Path) -> str:
         if self.output_ext == "same":
-            return source.suffix.lstrip(".").lower() or "out"
+            # Keep the original's spelling: IMG_0001.HEIC -> IMG_0001 (clean).HEIC
+            return source.suffix.lstrip(".") or "out"
         return self.output_ext
 
     @property
