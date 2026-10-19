@@ -90,3 +90,13 @@ def test_doctor_runs(capsys: pytest.CaptureFixture[str]) -> None:
     assert main(["doctor"]) == EXIT_OK
     out = capsys.readouterr().out
     assert "Tools" in out and "Presets:" in out and "Desktop" in out
+
+
+def test_gui_passes_gtk_options_through(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The D-Bus service file runs 'roue gui --gapplication-service'."""
+    import roue.cli
+
+    seen: list[list[str]] = []
+    monkeypatch.setattr(roue.cli, "_run_gui", lambda argv: seen.append(argv) or 0)
+    assert main(["gui", "--gapplication-service"]) == EXIT_OK
+    assert seen == [["roue", "--gapplication-service"]]

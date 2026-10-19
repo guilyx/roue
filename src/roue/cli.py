@@ -547,10 +547,8 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("quit", help="stop Roue running in the background")
     p.set_defaults(func=cmd_quit)
 
-    # Internal: pass raw arguments to the GTK application (D-Bus activation).
-    p = sub.add_parser("gui", help=argparse.SUPPRESS)
-    p.add_argument("gtk_args", nargs=argparse.REMAINDER)
-    p.set_defaults(func=lambda a: _run_gui(["roue", *a.gtk_args]))
+    # "roue gui ARGS..." (used by D-Bus activation) is handled in main(): argparse
+    # can't pass through options like --gapplication-service untouched.
     return parser
 
 
@@ -562,6 +560,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         build_parser().print_help()
         return EXIT_OK
     first = args_list[0]
+    if first == "gui":
+        # Internal: hand raw arguments to the GTK application.
+        return _run_gui(["roue", *args_list[1:]])
     if not first.startswith("-") and first not in COMMANDS and len(args_list) > 1:
         args_list = ["convert", *args_list]  # roue PRESET FILE...
     parser = build_parser()
