@@ -14,7 +14,7 @@ You need Ubuntu 24.04+ (or any distro with GTK 4.14+ and libadwaita 1.5+).
 
 ```bash
 # 1. System packages: GTK bindings and the conversion tools
-sudo apt install python3-gi gir1.2-gtk-4.0 gir1.2-adw-1 python3-venv \
+sudo apt install python3-gi python3-gi-cairo gir1.2-gtk-4.0 gir1.2-adw-1 python3-venv \
   ffmpeg libvips-tools libheif-plugin-libde265 ghostscript pandoc imagemagick
 # optional: libreoffice-writer (document tests), python3-nautilus, python3-xlib
 

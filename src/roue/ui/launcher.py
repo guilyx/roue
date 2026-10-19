@@ -15,9 +15,10 @@ from .. import APP_ID
 def _add_options(app: object) -> None:
     from gi.repository import GLib
 
-    app.add_main_option(  # type: ignore[attr-defined]
-        "preferences", 0, GLib.OptionFlags.NONE, GLib.OptionArg.NONE, "Open preferences", None
-    )
+    for name, description in (("preferences", "Open preferences"), ("wheel", "Show the wheel")):
+        app.add_main_option(  # type: ignore[attr-defined]
+            name, 0, GLib.OptionFlags.NONE, GLib.OptionArg.NONE, description, None
+        )
 
 
 def _is_running() -> bool:

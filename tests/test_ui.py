@@ -89,3 +89,93 @@ def test_preferences_open(monkeypatch: pytest.MonkeyPatch) -> None:
         results["ok"] = True
 
     assert run_app(check, monkeypatch) == {"ok": True}
+
+
+def test_wheel_with_files_offers_the_best_presets(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    photo = tmp_path / "IMG_0001.heic"
+    photo.write_bytes(b"not really a photo")
+
+    def check(app: RoueApplication, results: dict[str, object]) -> None:
+        wheel = app.show_wheel([photo], overlay=True)
+        results["titles"] = [s.title for s in wheel.view.slices]
+        results["overlay"] = wheel.overlay
+
+    results = run_app(check, monkeypatch)
+    titles = results["titles"]
+    assert titles[0] == "JPG" and titles[-1] == "More…" and len(titles) == 8  # type: ignore[index,arg-type]
+
+
+def test_picking_a_slice_converts_and_closes(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    photo = tmp_path / "IMG_0001.heic"
+    photo.write_bytes(b"x")
+    calls: list[tuple[str, list[Path]]] = []
+
+    def check(app: RoueApplication, results: dict[str, object]) -> None:
+        monkeypatch.setattr(app, "convert", lambda preset, paths: calls.append((preset.id, paths)))
+        wheel = app.show_wheel([photo], overlay=True)
+        wheel.choose(0)
+        results["chosen"] = wheel.view.chosen
+
+    results = run_app(check, monkeypatch)
+    assert calls == [("jpg", [photo])]
+    assert results["chosen"] == 0
+
+
+def test_more_opens_the_panel_with_the_files(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    photo = tmp_path / "IMG_0001.heic"
+    photo.write_bytes(b"x")
+
+    def check(app: RoueApplication, results: dict[str, object]) -> None:
+        wheel = app.show_wheel([photo], overlay=True)
+        wheel.choose(len(wheel.view.slices) - 1)
+        assert app.panel
+        results["staged"] = app.panel.staged
+        results["panel"] = app.panel.get_visible()
+
+    results = run_app(check, monkeypatch)
+    assert results == {"staged": [photo], "panel": True}
+
+
+def test_floating_wheel_without_files_shows_a_starter_set(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def check(app: RoueApplication, results: dict[str, object]) -> None:
+        wheel = app.show_wheel()
+        results["overlay"] = wheel.overlay
+        results["ids"] = [s.preset.id if s.preset else None for s in wheel.view.slices]
+
+    results = run_app(check, monkeypatch)
+    assert results["overlay"] is False
+    assert results["ids"] == ["jpg", "webp", "mp4", "gif", "share-10mb", "mp3", "pdf", None]
+
+
+def test_notifications_are_built_without_errors(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Conversions started from the wheel report back through notifications."""
+    from roue.engine.presets import parse_preset
+    from roue.engine.runner import Batch, Job, JobState
+
+    preset = parse_preset(
+        {"id": "p", "name": "P", "backend": "image", "accepts": "image/*", "output_ext": "png"}
+    )
+    out = tmp_path / "out.png"
+    out.write_bytes(b"x")
+    done = Job(source=tmp_path / "a.jpg", preset=preset, state=JobState.DONE, outputs=[out])
+    failed = Job(source=tmp_path / "b.jpg", preset=preset, state=JobState.FAILED, message="Nope.")
+    sent: list[str] = []
+
+    def check(app: RoueApplication, results: dict[str, object]) -> None:
+        monkeypatch.setattr(app, "send_notification", lambda key, n: sent.append(key))
+        app._notify(Batch(preset=preset, jobs=[done]))
+        app._notify(Batch(preset=preset, jobs=[failed]))
+        app._notify(Batch(preset=preset, jobs=[done, failed]))
+
+    run_app(check, monkeypatch)
+    assert len(sent) == 3

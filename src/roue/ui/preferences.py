@@ -144,7 +144,7 @@ class PreferencesDialog(Adw.PreferencesDialog):
         binding = hotkey.current_binding()
         if binding:
             accel = Gtk.accelerator_get_label(*Gtk.accelerator_parse(binding)[1:])
-            self.hotkey_row.set_subtitle(f"{accel} opens the panel")
+            self.hotkey_row.set_subtitle(f"{accel} opens the wheel")
             self.hotkey_button.set_label("Remove")
         else:
             self.hotkey_row.set_subtitle("Not set")
@@ -152,7 +152,7 @@ class PreferencesDialog(Adw.PreferencesDialog):
         self.hotkey_button.set_sensitive(hotkey.can_install())
         if not hotkey.can_install():
             self.hotkey_row.set_subtitle(
-                "Add a custom shortcut running “roue panel” in your keyboard settings"
+                "Add a custom shortcut running “roue wheel” in your keyboard settings"
             )
 
     def _on_hotkey_clicked(self, _button: Gtk.Button) -> None:
@@ -160,7 +160,7 @@ class PreferencesDialog(Adw.PreferencesDialog):
             if hotkey.current_binding():
                 hotkey.remove()
             else:
-                hotkey.install(f"{roue_command()} panel")
+                hotkey.install(f"{roue_command()} wheel")
         except hotkey.HotkeyError as exc:
             self.add_toast(Adw.Toast(title=GLib.markup_escape_text(str(exc))))
         self._refresh_hotkey()

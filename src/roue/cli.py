@@ -8,7 +8,8 @@ roue info FILE...            what Roue sees in a file
 roue doctor                  check which tools are installed
 roue history / roue undo     recent conversions, and undo the last one
 roue setup                   add the launcher, hotkey and Files menu
-roue panel [FILE...]         open the drop panel
+roue wheel [FILE...]         open the wheel (the hotkey runs this)
+roue panel [FILE...]         open the full panel
 """
 
 from __future__ import annotations
@@ -45,6 +46,7 @@ COMMANDS = (
     "undo",
     "setup",
     "panel",
+    "wheel",
     "gui",
     "quit",
 )
@@ -436,16 +438,16 @@ def cmd_setup(args: argparse.Namespace) -> int:
                 "then run roue setup again"
             )
     if not args.no_hotkey:
-        panel = f"{command} panel"
+        wheel = f"{command} wheel"
         if hotkey.can_install():
             try:
-                hotkey.install(panel, args.binding)
-                print(f"  {s.green('✓')} hotkey {args.binding} opens the panel")
+                hotkey.install(wheel, args.binding)
+                print(f"  {s.green('✓')} hotkey {args.binding} opens the wheel")
             except hotkey.HotkeyError as exc:
                 print(f"  {s.red('✗')} hotkey: {exc}")
         else:
             print(f"  {s.yellow('-')} hotkey: set it up by hand.")
-            print("    " + hotkey.manual_instructions(panel, args.binding).replace("\n", "\n    "))
+            print("    " + hotkey.manual_instructions(wheel, args.binding).replace("\n", "\n    "))
     print(f"\n{session.trigger_explanation()}")
     return EXIT_OK
 
@@ -474,6 +476,11 @@ def cmd_panel(args: argparse.Namespace) -> int:
         argv.append("--preferences")
     argv += [str(Path(f).expanduser().resolve()) for f in args.files]
     return _run_gui(argv)
+
+
+def cmd_wheel(args: argparse.Namespace) -> int:
+    files = [str(Path(f).expanduser().resolve()) for f in args.files]
+    return _run_gui(["roue", "--wheel", *files])
 
 
 def cmd_quit(args: argparse.Namespace) -> int:
@@ -539,7 +546,11 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--remove", action="store_true", help="undo 'roue setup'")
     p.set_defaults(func=cmd_setup)
 
-    p = sub.add_parser("panel", help="open the drop panel")
+    p = sub.add_parser("wheel", help="open the wheel (with files: at the pointer)")
+    p.add_argument("files", nargs="*", metavar="FILE", help="files to convert")
+    p.set_defaults(func=cmd_wheel)
+
+    p = sub.add_parser("panel", help="open the full panel")
     p.add_argument("files", nargs="*", metavar="FILE", help="files to stage in the panel")
     p.add_argument("--preferences", action="store_true", help="open preferences")
     p.set_defaults(func=cmd_panel)

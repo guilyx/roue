@@ -4,6 +4,8 @@ One instance per session, reachable on D-Bus as ``io.github.guilyx.Roue``.
 Actions exposed over ``org.gtk.Actions`` (used by the Files extension and
 the hotkey):
 
+- ``show-wheel``: the wheel as a small window to drop files on (the hotkey)
+- ``wheel-files`` (``as``): the wheel at the pointer for these files (Files menu)
 - ``show-panel``
 - ``stage-files`` (``as``): open the panel with files ready to convert
 - ``run-preset`` (``(sas)``): convert files right away
@@ -28,6 +30,7 @@ from ..engine.settings import Settings
 from ..integrations import session, x11_drag
 from ..integrations.desktop import package_data
 from .panel import DropPanel
+from .wheel import WheelWindow
 
 log = logging.getLogger(__name__)
 
@@ -43,6 +46,9 @@ class RoueApplication(Adw.Application):
         self.history = History()
         self.runner = self._make_runner()
         self.panel: DropPanel | None = None
+        self.wheel: WheelWindow | None = None
+        #: Files last taken from the clipboard, so they aren't offered twice.
+        self.clipboard_seen: tuple[str, ...] = ()
         self._background_hold = False
         self._watcher: x11_drag.ShiftDragWatcher | None = None
         self._drag_started_at = 0.0
@@ -88,9 +94,13 @@ class RoueApplication(Adw.Application):
         options = command_line.get_options_dict().end().unpack()
         cwd = Path(command_line.get_cwd() or ".")
         args = [a for a in command_line.get_arguments()[1:] if not a.startswith("--")]
+        files = [cwd / a for a in args]
+        if options.get("wheel"):
+            self.show_wheel(files, overlay=bool(files))
+            return 0
         self.show_panel()
-        if args and self.panel:
-            self.panel.stage([cwd / a for a in args])
+        if files and self.panel:
+            self.panel.stage(files)
         if options.get("preferences"):
             self.show_preferences()
         return 0
@@ -144,6 +154,7 @@ class RoueApplication(Adw.Application):
 
     def _install_actions(self) -> None:
         simple = {
+            "show-wheel": lambda *_: self.show_wheel(),
             "show-panel": lambda *_: self.show_panel(),
             "preferences": lambda *_: self.show_preferences(),
             "history": lambda *_: self.show_history(),
@@ -157,6 +168,7 @@ class RoueApplication(Adw.Application):
             action.connect("activate", callback)
             self.add_action(action)
         typed: dict[str, tuple[str, Any]] = {
+            "wheel-files": ("as", self._on_wheel_files),
             "stage-files": ("as", self._on_stage_files),
             "run-preset": ("(sas)", self._on_run_preset),
             "open-file": ("s", self._on_open_file),
@@ -175,6 +187,60 @@ class RoueApplication(Adw.Application):
             self.panel = DropPanel(self)
         self.panel.present()
         return self.panel
+
+    def show_wheel(
+        self,
+        files: list[Path] | None = None,
+        *,
+        overlay: bool = False,
+        pointer: tuple[int, int] | None = None,
+    ) -> WheelWindow:
+        """Show the wheel: at the pointer over everything (overlay), or as a
+        small window to drop files on."""
+        if self.wheel is not None:
+            self.wheel.dismiss()
+        x11 = session.session_type() == "x11"
+        if pointer is None and x11:
+            pointer = x11_drag.pointer_position()
+        wheel = WheelWindow(self, files=files, overlay=overlay, pointer=pointer)
+        wheel.connect("close-request", self._on_wheel_closed)
+        self.wheel = wheel
+        wheel.present()
+        if not wheel.overlay and not files:
+            wheel.paste_files()
+        if x11:
+            centre = None if wheel.overlay else pointer
+            GLib.timeout_add(60, self._keep_above, wheel, centre)
+        return wheel
+
+    def _on_wheel_closed(self, wheel: WheelWindow) -> bool:
+        if self.wheel is wheel:
+            self.wheel = None
+        return False
+
+    def _keep_above(self, window: Gtk.Window, centre: tuple[int, int] | None) -> bool:
+        """X11 only: keep the window on top, centred on ``centre`` if given."""
+        try:
+            import gi
+
+            gi.require_version("GdkX11", "4.0")
+            from gi.repository import GdkX11
+
+            surface = window.get_surface()
+            if isinstance(surface, GdkX11.X11Surface):
+                x, y = centre if centre else (None, None)
+                width, height = window.get_default_size()
+                x11_drag.keep_above_near(
+                    surface.get_xid(),
+                    x,
+                    y,
+                    window.get_width() or width,
+                    window.get_height() or height,
+                    center=True,
+                )
+        except Exception as exc:  # placement is a nicety; never break the wheel
+            log.debug("Couldn't place the wheel: %s", exc)
+        return GLib.SOURCE_REMOVE
 
     def show_preferences(self) -> None:
         from .preferences import PreferencesDialog
@@ -218,6 +284,9 @@ class RoueApplication(Adw.Application):
         if self.runner.busy:
             self.runner.cancel_all()
         self.quit()
+
+    def _on_wheel_files(self, _action: Gio.SimpleAction, param: GLib.Variant) -> None:
+        self.show_wheel([Path(p) for p in param.unpack()], overlay=True)
 
     def _on_stage_files(self, _action: Gio.SimpleAction, param: GLib.Variant) -> None:
         panel = self.show_panel()
@@ -299,10 +368,10 @@ class RoueApplication(Adw.Application):
         notification.set_icon(Gio.ThemedIcon.new(APP_ID))
         if batch.outputs:
             uri = GLib.Variant("s", batch.outputs[0].as_uri())
-            notification.set_default_action_and_target_value("app.show-in-folder", uri)
+            notification.set_default_action_and_target("app.show-in-folder", uri)
             if len(batch.outputs) == 1:
-                notification.add_button_with_target_value("Open", "app.open-file", uri)
-            notification.add_button_with_target_value("Show in Folder", "app.show-in-folder", uri)
+                notification.add_button_with_target("Open", "app.open-file", uri)
+            notification.add_button_with_target("Show in Folder", "app.show-in-folder", uri)
         self.send_notification(f"batch-{id(batch)}", notification)
 
     # -- X11 Shift-drag -----------------------------------------------------------
@@ -322,30 +391,15 @@ class RoueApplication(Adw.Application):
             on_drag_end=lambda: GLib.idle_add(self._on_drag_end),
         )
         self._watcher.start()
-        log.info("Shift-drag is on: hold Shift while dragging a file to open the panel")
+        log.info("Shift-drag is on: hold Shift while dragging a file to open the wheel")
 
     def _on_shift_drag(self, x: int, y: int) -> bool:
-        was_visible = bool(self.panel and self.panel.get_visible())
-        panel = self.show_panel()
+        """X11: a drag started with Shift held. Open the wheel around the pointer."""
+        if self.panel and self.panel.get_visible() and self.panel.is_active():
+            return GLib.SOURCE_REMOVE  # already dragging onto the panel
         self._drag_started_at = time.monotonic()
-        self._opened_by_drag = not was_visible
-        GLib.timeout_add(60, self._place_near_pointer, panel, x, y)
-        return GLib.SOURCE_REMOVE
-
-    def _place_near_pointer(self, panel: DropPanel, x: int, y: int) -> bool:
-        try:
-            import gi
-
-            gi.require_version("GdkX11", "4.0")
-            from gi.repository import GdkX11
-
-            surface = panel.get_surface()
-            if isinstance(surface, GdkX11.X11Surface):
-                x11_drag.keep_above_near(
-                    surface.get_xid(), x, y, panel.get_width(), panel.get_height()
-                )
-        except Exception as exc:  # placement is a nicety; never break the drop
-            log.debug("Couldn't place the panel: %s", exc)
+        self._opened_by_drag = True
+        self.show_wheel(overlay=True, pointer=(x, y))
         return GLib.SOURCE_REMOVE
 
     def _on_drag_end(self) -> bool:
@@ -354,9 +408,10 @@ class RoueApplication(Adw.Application):
         return GLib.SOURCE_REMOVE
 
     def _hide_if_unused(self) -> bool:
+        """Released somewhere else: put the wheel away again."""
         dropped = self._last_drop >= self._drag_started_at
-        if self.panel and not dropped and not self.runner.busy:
-            self.panel.close()
+        if self.wheel and not dropped:
+            self.wheel.dismiss()
         self._opened_by_drag = False
         return GLib.SOURCE_REMOVE
 

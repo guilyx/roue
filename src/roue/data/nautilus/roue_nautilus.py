@@ -1,11 +1,12 @@
-"""Roue for Files (Nautilus): right-click any files > Convert to…
+"""Roue for Files (Nautilus): right-click any files > Convert with Roue…
 
+The wheel opens at the pointer with the presets that fit the selection.
 Installed by ``roue setup`` (per user) or by the .deb (system-wide). Needs
 nautilus-python (``python3-nautilus`` on Debian/Ubuntu).
 
-Jobs run in the Roue app over D-Bus, so progress and notifications are
-shared with the panel. If the app can't be reached, the ``roue`` command
-runs instead and shows a notification when it's done.
+The menu talks to the Roue app over D-Bus (starting it if needed), so the
+wheel, progress and notifications all come from one place. If the app
+can't be reached, the ``roue`` command runs instead.
 """
 
 from __future__ import annotations
@@ -27,7 +28,6 @@ APP_ID = "io.github.guilyx.Roue"
 OBJECT_PATH = "/io/github/guilyx/Roue"
 # Filled in at install time with the absolute path of the roue command.
 ROUE_COMMAND = "@ROUE_COMMAND@"
-MAX_ITEMS = 6
 CACHE_SECONDS = 20
 
 
@@ -129,6 +129,27 @@ def _spawn(args: list[str]) -> None:
         )
 
 
+def _platform_data() -> dict[str, GLib.Variant]:
+    """An activation token, so the desktop lets the wheel take focus."""
+    try:
+        gi.require_version("Gdk", "4.0")
+        from gi.repository import Gdk
+
+        info = Gio.DesktopAppInfo.new(f"{APP_ID}.desktop")
+        display = Gdk.Display.get_default()
+        if info is None or display is None:
+            return {}
+        token = display.get_app_launch_context().get_startup_notify_id(info, [])
+    except (ValueError, TypeError, GLib.Error):
+        return {}
+    if not token:
+        return {}
+    return {
+        "activation-token": GLib.Variant("s", token),
+        "desktop-startup-id": GLib.Variant("s", token),
+    }
+
+
 def _activate(action: str, parameter: GLib.Variant, fallback: list[str]) -> None:
     """Ask the Roue app to run an action, starting it if needed."""
     try:
@@ -148,7 +169,7 @@ def _activate(action: str, parameter: GLib.Variant, fallback: list[str]) -> None
         OBJECT_PATH,
         "org.gtk.Actions",
         "Activate",
-        GLib.Variant("(sava{sv})", (action, [parameter], {})),
+        GLib.Variant("(sava{sv})", (action, [parameter], _platform_data())),
         None,
         Gio.DBusCallFlags.NONE,
         15000,
@@ -176,31 +197,13 @@ class RoueMenuProvider(GObject.GObject, Nautilus.MenuProvider):
         if not presets:
             return []
 
-        top = Nautilus.MenuItem(name="Roue::Convert", label="Convert to…", tip="Convert with Roue")
-        submenu = Nautilus.Menu()
-        top.set_submenu(submenu)
-        for preset in presets[:MAX_ITEMS]:
-            item = Nautilus.MenuItem(
-                name=f"Roue::{preset['id']}",
-                label=preset["name"],
-                tip=preset.get("description", ""),
-            )
-            item.connect("activate", self._run, preset["id"], paths)
-            submenu.append_item(item)
-        if len(presets) > MAX_ITEMS:
-            more = Nautilus.MenuItem(
-                name="Roue::More", label="More…", tip="Open the Roue panel with these files"
-            )
-            more.connect("activate", self._stage, paths)
-            submenu.append_item(more)
-        return [top]
-
-    def _run(self, _item: Nautilus.MenuItem, preset_id: str, paths: list[str]) -> None:
-        _activate(
-            "run-preset",
-            GLib.Variant("(sas)", (preset_id, paths)),
-            ["convert", "--notify", preset_id, *paths],
+        item = Nautilus.MenuItem(
+            name="Roue::Wheel",
+            label="Convert with Roue…",
+            tip=f"{len(presets)} ways to convert: " + ", ".join(p["name"] for p in presets[:4]),
         )
+        item.connect("activate", self._wheel, paths)
+        return [item]
 
-    def _stage(self, _item: Nautilus.MenuItem, paths: list[str]) -> None:
-        _activate("stage-files", GLib.Variant("as", paths), ["panel", *paths])
+    def _wheel(self, _item: Nautilus.MenuItem, paths: list[str]) -> None:
+        _activate("wheel-files", GLib.Variant("as", paths), ["wheel", *paths])

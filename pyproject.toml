@@ -75,7 +75,7 @@ ignore = ["RET504"]
 python_version = "3.12"
 strict = true
 warn_unreachable = true
-files = ["src/roue/engine", "src/roue/cli.py", "src/roue/integrations"]
+files = ["src/roue/engine", "src/roue/cli.py", "src/roue/integrations", "src/roue/radial.py"]
 
 [[tool.mypy.overrides]]
 module = ["gi", "gi.*", "Xlib", "Xlib.*"]

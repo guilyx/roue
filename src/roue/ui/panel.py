@@ -40,7 +40,6 @@ class DropPanel(Adw.ApplicationWindow):
         self.sections: dict[str, tuple[Gtk.Widget, Gtk.FlowBox]] = {}
         self.staged: list[Path] = []
         self.staged_from_clipboard = False
-        self._clipboard_seen: tuple[str, ...] = ()
         self._hover: PresetTile | None = None
         self._jobs: dict[str, dict[int, Job]] = {}
         self._running: set[Batch] = set()
@@ -229,9 +228,9 @@ class DropPanel(Adw.ApplicationWindow):
                 return
             paths = _paths_from(value.get_files()) if value else []
             signature = tuple(str(p) for p in paths)
-            if automatic and signature == self._clipboard_seen:
+            if automatic and signature == self.app.clipboard_seen:
                 return
-            self._clipboard_seen = signature
+            self.app.clipboard_seen = signature
             if paths:
                 self.stage(paths, from_clipboard=True)
 

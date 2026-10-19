@@ -43,27 +43,27 @@ class FakeInfo:
         return self._mime
 
 
-def labels(module: ModuleType, files: list[FakeInfo]) -> list[str]:
-    items = module.RoueMenuProvider().get_file_items(files)
-    if not items:
-        return []
-    return [item.props.label for item in items[0].props.menu.get_items()]
+def menu(module: ModuleType, files: list[FakeInfo]) -> list[str]:
+    return [item.props.label for item in module.RoueMenuProvider().get_file_items(files)]
 
 
-def test_menu_for_a_photo(extension: ModuleType) -> None:
-    found = labels(extension, [FakeInfo("/tmp/IMG.heic", "image/heif")])
-    assert found[0] == "JPG" and found[-1] == "More…" and len(found) == 7
+def test_one_item_opens_the_wheel_for_a_photo(extension: ModuleType) -> None:
+    assert menu(extension, [FakeInfo("/tmp/IMG.heic", "image/heif")]) == ["Convert with Roue…"]
+    [item] = extension.RoueMenuProvider().get_file_items([FakeInfo("/tmp/IMG.heic", "image/heif")])
+    assert item.props.tip.startswith("9 ways to convert: JPG")
 
 
-def test_menu_for_pdfs(extension: ModuleType) -> None:
-    assert labels(extension, [FakeInfo("/tmp/a.pdf", "application/pdf")]) == [
-        "Compress PDF",
-        "Pages to PNG",
-        "Text",
-    ]
+def test_pdfs_get_the_item_too(extension: ModuleType) -> None:
+    assert menu(extension, [FakeInfo("/tmp/a.pdf", "application/pdf")]) == ["Convert with Roue…"]
 
 
 def test_no_menu_for_mixed_or_folders(extension: ModuleType) -> None:
     mixed = [FakeInfo("/tmp/a.png", "image/png"), FakeInfo("/tmp/b.mp4", "video/mp4")]
-    assert labels(extension, mixed) == []
-    assert labels(extension, [FakeInfo("/tmp", "inode/directory", True)]) == []
+    assert menu(extension, mixed) == []
+    assert menu(extension, [FakeInfo("/tmp", "inode/directory", True)]) == []
+    assert menu(extension, [FakeInfo("/tmp/a.zip", "application/zip")]) == []
+
+
+def test_platform_data_is_safe_without_an_installed_app(extension: ModuleType) -> None:
+    # No io.github.guilyx.Roue.desktop in the test environment: no token, no crash.
+    assert extension._platform_data() == {}

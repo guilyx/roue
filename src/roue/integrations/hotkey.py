@@ -1,8 +1,8 @@
-"""The global hotkey that opens the panel.
+"""The global hotkey that opens the wheel.
 
 Wayland doesn't let apps grab keys, so on GNOME we register a regular
 "custom shortcut" (the same thing Settings > Keyboard creates) that runs
-``roue panel``. Other desktops get instructions instead.
+``roue wheel``. Other desktops get instructions instead.
 """
 
 from __future__ import annotations
@@ -75,7 +75,7 @@ def install(command: str, binding: str = DEFAULT_BINDING) -> None:
     if not can_install():
         raise HotkeyError("Automatic shortcut setup only works on GNOME for now.")
     entry = f"{_ENTRY_SCHEMA}:{_PATH}"
-    _gsettings("set", entry, "name", "Roue: open drop panel")
+    _gsettings("set", entry, "name", "Roue: open the wheel")
     _gsettings("set", entry, "command", command)
     _gsettings("set", entry, "binding", binding)
     paths = parse_string_array(_gsettings("get", _SCHEMA, "custom-keybindings"))

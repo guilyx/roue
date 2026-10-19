@@ -100,3 +100,16 @@ def test_gui_passes_gtk_options_through(monkeypatch: pytest.MonkeyPatch) -> None
     monkeypatch.setattr(roue.cli, "_run_gui", lambda argv: seen.append(argv) or 0)
     assert main(["gui", "--gapplication-service"]) == EXIT_OK
     assert seen == [["roue", "--gapplication-service"]]
+
+
+def test_wheel_command_opens_the_gui_with_files(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    import roue.cli
+
+    seen: list[list[str]] = []
+    monkeypatch.setattr(roue.cli, "_run_gui", lambda argv: seen.append(argv) or 0)
+    photo = tmp_path / "a.png"
+    assert main(["wheel", str(photo)]) == EXIT_OK
+    assert main(["wheel"]) == EXIT_OK
+    assert seen == [["roue", "--wheel", str(photo)], ["roue", "--wheel"]]

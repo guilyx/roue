@@ -100,17 +100,44 @@ class ShiftDragWatcher(threading.Thread):
             self.on_drag_end()
 
 
-def keep_above_near(xid: int, x: int, y: int, width: int, height: int) -> None:
-    """Move our own window next to the pointer and keep it above others."""
+def pointer_position() -> tuple[int, int] | None:
+    """Where the pointer is on the X screen, or None when that can't be known."""
+    try:
+        from Xlib import display
+    except ImportError:
+        return None
+    try:
+        disp: Any = display.Display()
+    except Exception:
+        return None
+    try:
+        pointer = disp.screen().root.query_pointer()
+        return int(pointer.root_x), int(pointer.root_y)
+    finally:
+        disp.close()
+
+
+def keep_above_near(
+    xid: int,
+    x: int | None,
+    y: int | None,
+    width: int,
+    height: int,
+    *,
+    center: bool = False,
+) -> None:
+    """Keep our own window above others, moved next to (or centred on) the pointer."""
     from Xlib import X, display, protocol
 
     disp: Any = display.Display()
     try:
         window = disp.create_resource_object("window", xid)
         screen = disp.screen()
-        left = max(0, min(x - width // 2, screen.width_in_pixels - width))
-        top = max(0, min(y + 24, screen.height_in_pixels - height))
-        window.configure(x=left, y=top)
+        if x is not None and y is not None:
+            top_y = y - height // 2 if center else y + 24
+            left = max(0, min(x - width // 2, screen.width_in_pixels - width))
+            top = max(0, min(top_y, screen.height_in_pixels - height))
+            window.configure(x=left, y=top)
         state = disp.intern_atom("_NET_WM_STATE")
         above = disp.intern_atom("_NET_WM_STATE_ABOVE")
         event = protocol.event.ClientMessage(

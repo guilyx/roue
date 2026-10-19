@@ -95,3 +95,35 @@
   font-size: 0.95em;
   opacity: 0.7;
 }
+
+/* The wheel ------------------------------------------------------------- */
+window.roue-wheel,
+window.roue-wheel.background {
+  background: none;
+  box-shadow: none;
+}
+window.roue-wheel.opaque { background-color: @window_bg_color; }
+
+.roue-wheel .wheel-slice {
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  min-height: 0;
+  min-width: 0;
+  outline: none;
+}
+.roue-wheel .wheel-slice .slice-title { font-weight: 700; font-size: 0.92em; }
+.roue-wheel .wheel-slice .slice-sub { font-size: 0.74em; opacity: 0.6; }
+.roue-wheel .wheel-slice.group-image image { color: @roue_image; }
+.roue-wheel .wheel-slice.group-video image { color: @roue_video; }
+.roue-wheel .wheel-slice.group-audio image { color: @roue_audio; }
+.roue-wheel .wheel-slice.group-document image { color: @roue_document; }
+.roue-wheel .wheel-slice.group-custom image { color: @roue_custom; }
+.roue-wheel .wheel-slice.hot,
+.roue-wheel .wheel-slice.hot image { color: white; }
+.roue-wheel .wheel-slice.hot .slice-sub { opacity: 0.85; }
+
+.roue-wheel .wheel-hub { color: white; }
+.roue-wheel .wheel-hub .hub-title { font-weight: 700; font-size: 0.95em; }
+.roue-wheel .wheel-hub .hub-text { font-size: 0.78em; opacity: 0.75; }
