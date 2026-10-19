@@ -13,17 +13,27 @@ First public release.
 
 ### Added
 
-- **Drop panel** (GTK 4 + libadwaita): preset tiles grouped by kind, dims the
-  tiles that can't take the dragged files, progress ring per tile, toasts with
-  "Show" and desktop notifications with "Open" / "Show in folder".
+- **The wheel**: a radial menu with the (up to) seven presets that fit your
+  files best, plus **More…** for the full panel. It opens at the pointer from
+  the Files menu and from Shift-drag on X11, and as a small round window to
+  drop files on from the hotkey. Keyboard: arrows/Tab, Enter, 1–8, Esc. A
+  desktop notification ("Open" / "Show in Folder") says when the conversion
+  is done.
 - **Ways to open it**: global hotkey (Super+Shift+D on GNOME, set by
-  `roue setup`), Shift-drag on X11, the app launcher, `roue panel`.
-- **Copied files**: copy files in Files (Ctrl+C), open the panel, click a
-  tile. Ctrl+V and Ctrl+O also stage files; type to search, Enter to run.
-- **Files (Nautilus) menu**: right-click > "Convert to…" with the presets
-  that fit every selected file.
+  `roue setup`, runs `roue wheel`), Shift-drag on X11 (the wheel springs open
+  around the pointer; release Shift, then drop), `roue wheel [FILE...]`.
+- **Full panel** (GTK 4 + libadwaita): every preset as a tile grouped by kind,
+  dims the tiles that can't take the dragged files, progress ring per tile,
+  search, toasts with "Show". Opens from the wheel's **More…**, the app
+  launcher and `roue panel`.
+- **Copied files**: copy files in Files (Ctrl+C), press the hotkey, click a
+  slice. In the panel, Ctrl+V and Ctrl+O also stage files; type to search,
+  Enter to run.
+- **Files (Nautilus) menu**: right-click > "Convert with Roue…" opens the
+  wheel at the pointer with the presets that fit every selected file.
 - **Command line**: `roue convert`, the `roue PRESET FILE...` shorthand,
-  `list`, `info`, `doctor`, `history`, `undo`, `setup`, `panel`, `quit`.
+  `list`, `info`, `doctor`, `history`, `undo`, `setup`, `wheel`, `panel`,
+  `quit`.
   `--json` output and meaningful exit codes for scripts.
 - **27 built-in presets**:
   - Images: JPG, PNG, WebP, AVIF, half size, 1080 px wide, double size,

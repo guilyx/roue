@@ -4,16 +4,29 @@
 
 | | Wayland (Ubuntu's default) | X11 |
 |---|---|---|
-| Hotkey (Super+Shift+D) | ✓ | ✓ |
-| Copy files, then open the panel | ✓ | ✓ |
-| Drag onto the panel | ✓ | ✓ |
-| Files right-click menu | ✓ | ✓ |
-| Shift-drag pops the panel anywhere | ✗ | ✓ |
-| Panel opens next to the pointer | ✗ (centred) | ✓ |
+| Hotkey (Super+Shift+D) opens the wheel | ✓ | ✓ |
+| Files right-click → wheel at the pointer | ✓ | ✓ |
+| Copy files, then press the hotkey | ✓ | ✓ |
+| Drag onto the wheel or the panel | ✓ | ✓ |
+| Shift-drag opens the wheel around the pointer | ✗ | ✓ |
+| The hotkey's wheel opens at the pointer | ✗ (the desktop places it) | ✓ |
 
 Wayland keeps each app's drags and window positions private, by design. Roue
 respects that instead of working around it. `roue doctor` tells you which
 session you're in.
+
+## Why isn't my preset on the wheel?
+
+The wheel holds up to seven presets: the ones that fit your files best, most
+relevant first. The rest are one click away under **More…**, which opens the
+full panel. Presets whose tools aren't installed, and presets you turned off
+in **Preferences > Presets**, are left off the wheel.
+
+## The wheel shows up in a plain square window
+
+Its see-through look needs a compositing desktop (GNOME, KDE and most others
+have one, always on under Wayland). Without one, Roue shows the wheel in a
+small ordinary window instead. Everything else works the same.
 
 ## Where do my converted files go?
 
@@ -56,15 +69,16 @@ The first one installed among `typst`, `weasyprint`, `wkhtmltopdf`,
 `tectonic`, `xelatex` and `pdflatex`. With none of them, Pandoc writes an ODT
 file and LibreOffice prints it to PDF. `roue doctor` shows which one you have.
 
-## Why is a tile greyed out?
+## Why is a tile greyed out in the panel?
 
 A tool it needs isn't installed. Hover the tile to see which, or open
 **Preferences > Tools** (or run `roue doctor`) for the exact install command.
 
-## Why is a tile faded while I drag?
+## Why is a tile faded while I drag onto the panel?
 
 It can't take the file you're dragging. The JPG tile fades for a JPG, video
-presets fade for a PDF, and so on.
+presets fade for a PDF, and so on. The wheel goes one step further: it only
+shows slices that fit the file.
 
 ## "Already as small as it gets: the original was kept."
 
@@ -87,13 +101,13 @@ Yes. Roue never uses the network.
 
 ## How do I stop it running in the background?
 
-`roue quit`, or **Quit** in the panel's menu. To never keep it running, turn
+`roue quit`, or **Quit** in the panel's main menu. To never keep it running, turn
 off **Preferences > General > Stay in the background**.
 
 ## Which desktops are supported?
 
-The panel and command line work on any Linux desktop with GTK 4 and
-libadwaita 1.5+. The automatic hotkey setup and the Files menu target GNOME;
+The wheel, the panel and the command line work on any Linux desktop with GTK 4
+and libadwaita 1.5+. The automatic hotkey setup and the Files menu target GNOME;
 on KDE, Xfce and others, add the hotkey by hand
 ([how](desktop-integration.md#the-hotkey)). Menus for Dolphin, Nemo and Thunar
 are planned.

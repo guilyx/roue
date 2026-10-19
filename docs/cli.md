@@ -1,10 +1,10 @@
 # Command line
 
-Everything the panel does, the `roue` command does too. Same presets, same
+Everything the wheel and the panel do, the `roue` command does too. Same presets, same
 engine, same rules: results go next to the originals, nothing is overwritten.
 
 ```text
-roue                         open the drop panel (or show help without a desktop)
+roue                         open the full panel (or show help without a desktop)
 roue PRESET FILE...          shorthand for 'roue convert PRESET FILE...'
 roue convert PRESET FILE...  convert files with a preset
 roue list                    list presets
@@ -13,7 +13,8 @@ roue doctor                  check installed tools and desktop integration
 roue history                 recent conversions
 roue undo                    move the results of the last conversion to the trash
 roue setup                   add the launcher, hotkey and Files menu
-roue panel [FILE...]         open the drop panel
+roue wheel [FILE...]         open the wheel (the hotkey runs this)
+roue panel [FILE...]         open the full panel
 roue quit                    stop Roue running in the background
 ```
 
@@ -110,7 +111,7 @@ clip.mov
 
 Lists every tool with its path or "not installed", the presets that can't run
 and what they need, the command that installs everything missing, and the state
-of the panel, hotkey and Files menu.
+of the drop panel (GTK), the hotkey and the Files menu.
 
 ## `roue history` and `roue undo`
 
@@ -127,7 +128,7 @@ Hooks Roue into your desktop, for your user only.
 
 | Option | What it does |
 |---|---|
-| `--binding KEYS` | Hotkey to set, default `<Super><Shift>d`. |
+| `--binding KEYS` | Hotkey to set, default `<Super><Shift>d`. It runs `roue wheel`. |
 | `--no-hotkey` | Don't set the hotkey. |
 | `--no-nautilus` | Don't add the Files right-click menu. |
 | `--restart-files` | Restart Files so the menu shows up right away. |
@@ -135,10 +136,22 @@ Hooks Roue into your desktop, for your user only.
 
 Parts already installed by your package are left alone.
 
+## `roue wheel`
+
+```sh
+roue wheel                     # the wheel, as a small window to drop files on
+roue wheel a.png b.png         # the wheel at the pointer, for these files
+```
+
+Without files, this is what the hotkey runs. It also picks up files you copied
+in Files with Ctrl+C. With files, the wheel opens at the pointer showing the
+presets that fit them: click a slice to convert, or **More…** for the panel.
+See [Desktop integration](desktop-integration.md#the-wheel).
+
 ## `roue panel`
 
 ```sh
-roue panel                     # open the panel
+roue panel                     # open the full panel
 roue panel a.png b.png         # open it with these files ready ("pick a tile")
 roue panel --preferences       # open Preferences
 ```

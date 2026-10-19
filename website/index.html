@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Roue · Drop a file, get the file you wanted</title>
-  <meta name="description" content="Roue is a free drag-and-drop file converter for Linux. Press a key, drop a file on a tile, get a JPG, MP4, GIF, MP3 or PDF next to the original. 100% local, no uploads.">
+  <meta name="description" content="Roue is a free drag-and-drop file converter for Linux. Press a key, drop a file on a slice of the wheel, get a JPG, MP4, GIF, MP3 or PDF next to the original. 100% local, no uploads.">
   <link rel="canonical" href="https://guilyx.github.io/roue/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Roue">
@@ -46,7 +46,7 @@
         <div class="hero-copy">
           <p class="eyebrow"><span class="pill">New</span> Free file converter for the Linux desktop</p>
           <h1 id="hero-title">Drop a file.<br><span class="wheel-text">Get the file you wanted.</span></h1>
-          <p class="lede">Press <kbd>Super</kbd>&nbsp;<kbd>Shift</kbd>&nbsp;<kbd>D</kbd>, drop a file on a tile, done. Roue turns HEIC into JPG, screen recordings into tiny MP4s, videos into GIFs and documents into PDFs, right next to the original. No dialogs, no uploads.</p>
+          <p class="lede">Press <kbd>Super</kbd>&nbsp;<kbd>Shift</kbd>&nbsp;<kbd>D</kbd>, drop a file on a slice of the wheel, done. Roue turns HEIC into JPG, screen recordings into tiny MP4s, videos into GIFs and documents into PDFs, right next to the original. No dialogs, no uploads.</p>
           <div class="cta-row">
             <a class="btn btn-primary" href="https://github.com/guilyx/roue/releases/latest">
               <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m0 0-5-5m5 5 5-5M5 21h14"/></svg>
@@ -63,46 +63,30 @@
 
         <div class="hero-visual">
           <div class="glow" aria-hidden="true"></div>
-          <div class="demo" role="img" aria-label="Animation: a HEIC photo is dragged onto the JPG tile of the Roue panel, a progress ring fills, and IMG_2041.jpg appears next to the original.">
-            <div class="demo-window">
-              <div class="demo-titlebar">
-                <span class="demo-search">
-                  <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m10.5 10.5 3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-                  Search presets
-                </span>
-                <span class="demo-menu" aria-hidden="true"></span>
-              </div>
-              <div class="demo-body">
-                <p class="demo-group"><span class="dot image"></span>IMAGES</p>
-                <div class="demo-tiles">
-                  <div class="dtile image target">
-                    <span class="dbadge">
-                      <svg class="ring" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" pathLength="100"/></svg>
-                      <svg class="glyph" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="6" cy="6.5" r="1.3" fill="currentColor"/><path d="m3 12 3.5-3.5L9 11l2-2 2 2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-                      <span class="check">✓</span>
-                    </span>
-                    <b>JPG</b><small>.jpg</small>
-                  </div>
-                  <div class="dtile image"><span class="dbadge"></span><b>PNG</b><small>.png</small></div>
-                  <div class="dtile image"><span class="dbadge"></span><b>WebP</b><small>.webp</small></div>
-                  <div class="dtile image"><span class="dbadge"></span><b>AVIF</b><small>.avif</small></div>
-                  <div class="dtile image"><span class="dbadge"></span><b>Half size</b><small>same</small></div>
-                  <div class="dtile image"><span class="dbadge"></span><b>No metadata</b><small>same</small></div>
-                </div>
-                <p class="demo-group fade"><span class="dot video"></span>VIDEO</p>
-                <div class="demo-tiles fade">
-                  <div class="dtile video"><span class="dbadge"></span><b>MP4</b><small>.mp4</small></div>
-                  <div class="dtile video"><span class="dbadge"></span><b>GIF</b><small>.gif</small></div>
-                  <div class="dtile video"><span class="dbadge"></span><b>Under 10 MB</b><small>.mp4</small></div>
-                </div>
-              </div>
+          <div class="wheel-demo" role="img" aria-label="Animation: a HEIC photo is dragged onto the JPG slice of the Roue wheel. The slice lights up, the wheel says Converting, then a notification says IMG_2041.jpg is ready.">
+            <div class="wd-stage">
+            <svg class="wd-wheel" viewBox="-215 -215 430 430" aria-hidden="true">
+            <g class="wd-slice wd-target"><path d="M-22.9 -57.6L-63.6 -159.8A172 172 0 0 1 63.6 -159.8L22.9 -57.6A62 62 0 0 0 -22.9 -57.6Z"/><g transform="translate(0.0 -121.0)"><g class="wd-ico" transform="translate(-9 -24) scale(1.125)"><rect x="2" y="3" width="12" height="10" rx="2" class="o"/><circle cx="6" cy="6.5" r="1.3" class="f"/><path d="m3 12 3.5-3.5L9 11l2-2 2 2" class="o"/></g><text class="wd-t" y="10">JPG</text><text class="wd-s" y="24">.jpg</text></g></g>
+            <g class="wd-slice"><path d="M24.5 -56.9L68.0 -158.0A172 172 0 0 1 158.0 -68.0L56.9 -24.5A62 62 0 0 0 24.5 -56.9Z"/><g transform="translate(85.6 -85.6)"><g class="wd-ico" transform="translate(-9 -24) scale(1.125)"><rect x="2" y="3" width="12" height="10" rx="2" class="o"/><circle cx="6" cy="6.5" r="1.3" class="f"/><path d="m3 12 3.5-3.5L9 11l2-2 2 2" class="o"/></g><text class="wd-t" y="10">PNG</text><text class="wd-s" y="24">.png</text></g></g>
+            <g class="wd-slice"><path d="M57.6 -22.9L159.8 -63.6A172 172 0 0 1 159.8 63.6L57.6 22.9A62 62 0 0 0 57.6 -22.9Z"/><g transform="translate(121.0 0.0)"><g class="wd-ico" transform="translate(-9 -24) scale(1.125)"><circle cx="8" cy="8" r="6" class="o"/><path d="M2 8h12M8 2c-2.2 2.4-2.2 9.6 0 12M8 2c2.2 2.4 2.2 9.6 0 12" class="o"/></g><text class="wd-t" y="10">WebP</text><text class="wd-s" y="24">.webp</text></g></g>
+            <g class="wd-slice"><path d="M56.9 24.5L158.0 68.0A172 172 0 0 1 68.0 158.0L24.5 56.9A62 62 0 0 0 56.9 24.5Z"/><g transform="translate(85.6 85.6)"><g class="wd-ico" transform="translate(-9 -24) scale(1.125)"><circle cx="8" cy="8" r="6" class="o"/><path d="M2 8h12M8 2c-2.2 2.4-2.2 9.6 0 12M8 2c2.2 2.4 2.2 9.6 0 12" class="o"/></g><text class="wd-t" y="10">AVIF</text><text class="wd-s" y="24">.avif</text></g></g>
+            <g class="wd-slice"><path d="M22.9 57.6L63.6 159.8A172 172 0 0 1 -63.6 159.8L-22.9 57.6A62 62 0 0 0 22.9 57.6Z"/><g transform="translate(0.0 121.0)"><g class="wd-ico" transform="translate(-9 -24) scale(1.125)"><rect x="2" y="2" width="12" height="12" rx="3" class="f"/><path d="M5 8h6" class="k"/></g><text class="wd-t" y="10">Half size</text><text class="wd-s" y="24">same format</text></g></g>
+            <g class="wd-slice"><path d="M-24.5 56.9L-68.0 158.0A172 172 0 0 1 -158.0 68.0L-56.9 24.5A62 62 0 0 0 -24.5 56.9Z"/><g transform="translate(-85.6 85.6)"><g class="wd-ico" transform="translate(-9 -31) scale(1.125)"><path d="M9.5 2.5H13.5V6.5M13.5 2.5 9 7M6.5 13.5H2.5V9.5M2.5 13.5 7 9" class="o"/></g><text class="wd-t" y="3">1080 px</text><text class="wd-t" y="18">wide</text><text class="wd-s" y="32">same format</text></g></g>
+            <g class="wd-slice"><path d="M-57.6 22.9L-159.8 63.6A172 172 0 0 1 -159.8 -63.6L-57.6 -22.9A62 62 0 0 0 -57.6 22.9Z"/><g transform="translate(-121.0 0.0)"><g class="wd-ico" transform="translate(-9 -24) scale(1.125)"><rect x="2" y="2" width="12" height="12" rx="3" class="f"/><path d="M5 8h6M8 5v6" class="k"/></g><text class="wd-t" y="10">Double size</text><text class="wd-s" y="24">.png</text></g></g>
+            <g class="wd-slice wd-more"><path d="M-56.9 -24.5L-158.0 -68.0A172 172 0 0 1 -68.0 -158.0L-24.5 -56.9A62 62 0 0 0 -56.9 -24.5Z"/><g transform="translate(-85.6 -85.6)"><g class="wd-ico" transform="translate(-9 -24) scale(1.125)"><circle cx="3" cy="8" r="1.5" class="f"/><circle cx="8" cy="8" r="1.5" class="f"/><circle cx="13" cy="8" r="1.5" class="f"/></g><text class="wd-t" y="10">More…</text><text class="wd-s" y="24">all presets</text></g></g>
+            <circle class="wd-hub" r="56"/>
+            <g class="wd-hub-text wd-idle"><text class="wd-ht" y="-2">Drop a file</text><text class="wd-hs" y="15">on a slice</text></g>
+            <g class="wd-hub-text wd-hover"><text class="wd-ht" y="-8">JPG</text><text class="wd-hs" y="9">Photos that open</text><text class="wd-hs" y="22">everywhere</text></g>
+            <g class="wd-hub-text wd-done"><circle cx="0" cy="-10" r="15" class="wd-ok"/><path d="m-7 -10 5 5 9-10" class="wd-tick"/><text class="wd-hs" y="21">Converting…</text></g>
+            </svg>
             </div>
-            <div class="demo-file drag">
+            <div class="wd-file">
               <span class="fic heic">HEIC</span><span class="fname">IMG_2041.HEIC</span>
               <svg class="cursor" viewBox="0 0 16 20" aria-hidden="true"><path d="M1 1v15l4-3.5 2.7 6 2.3-1-2.6-5.8H13z" fill="#fff" stroke="#1d1b22" stroke-width="1.3" stroke-linejoin="round"/></svg>
             </div>
-            <div class="demo-file result">
-              <span class="fic jpg">JPG</span><span class="fname">IMG_2041.jpg</span><span class="fsize">2.1 MB</span>
+            <div class="wd-note">
+              <img src="assets/icon.svg" alt="" width="40" height="40">
+              <span class="wd-note-text"><b>IMG_2041.jpg is ready</b><span class="wd-note-buttons"><span>Open</span><span>Show in Folder</span></span></span>
             </div>
           </div>
         </div>
@@ -126,16 +110,16 @@
       <div class="wrap">
         <header class="section-head">
           <p class="kicker">See it in action</p>
-          <h2 id="demo-title">50 seconds, four conversions</h2>
-          <p>A phone photo to JPG, a screen recording under 10&nbsp;MB, metadata stripped with Shift-drag, and a GIF from the terminal. Recorded live, nothing staged.</p>
+          <h2 id="demo-title">About 50 seconds, four conversions</h2>
+          <p>A phone photo to JPG with the hotkey's wheel, a screen recording under 10&nbsp;MB from the Files menu, a WebP with Shift-drag, and a GIF from the terminal. Recorded live, nothing staged.</p>
         </header>
-        <figure class="demo">
+        <figure class="demo-video">
           <video controls muted playsinline preload="none" width="1280" height="800"
                  poster="assets/demo-poster.jpg"
                  aria-describedby="demo-caption">
             <source src="assets/demo.webm" type="video/webm">
             <source src="assets/demo.mp4" type="video/mp4">
-            <a href="assets/demo.mp4">Download the demo video (MP4, 1.2&nbsp;MB)</a>
+            <a href="assets/demo.mp4">Download the demo video (MP4)</a>
           </video>
           <figcaption id="demo-caption">Roue 0.1 on GNOME Files (X11). Every result in the video is a real conversion.</figcaption>
         </figure>
@@ -153,22 +137,20 @@
         <div class="cards three">
           <article class="card way">
             <div class="way-art keys" aria-hidden="true"><kbd>Super</kbd><span>+</span><kbd>Shift</kbd><span>+</span><kbd>D</kbd></div>
-            <h3>The drop panel</h3>
-            <p>A hotkey opens a panel of tiles. Drag files in, or copy them in Files and click a tile. Tiles that can't take your file fade out. On X11, just hold <kbd>Shift</kbd> while dragging.</p>
+            <h3>The wheel</h3>
+            <p>A hotkey opens the wheel. Drop a file on a slice, or copy files in Files and click one. It only shows presets that fit, and <strong>More…</strong> opens every preset. On X11, hold <kbd>Shift</kbd> while dragging and it opens around the pointer.</p>
           </article>
           <article class="card way">
             <div class="way-art menu" aria-hidden="true">
               <div class="ctx">
                 <span>Open With…</span>
-                <span class="hl">Convert to… <i>›</i></span>
                 <span>Rename…</span>
+                <span class="hl">Convert with Roue…</span>
               </div>
-              <div class="ctx sub">
-                <span class="hl">WebP</span><span>JPG</span><span>Remove metadata</span>
-              </div>
+              <svg class="mini-wheel" viewBox="-180 -180 360 360" aria-hidden="true"><path class="mw-slice" d="M-21.4 -53.9L-62.9 -158.0A170 170 0 0 1 62.9 -158.0L21.4 -53.9A58 58 0 0 0 -21.4 -53.9Z"/><path class="mw-slice" d="M22.9 -53.3L67.2 -156.1A170 170 0 0 1 156.1 -67.2L53.3 -22.9A58 58 0 0 0 22.9 -53.3Z"/><path class="mw-slice" d="M53.9 -21.4L158.0 -62.9A170 170 0 0 1 158.0 62.9L53.9 21.4A58 58 0 0 0 53.9 -21.4Z"/><path class="mw-slice mw-lit" d="M53.3 22.9L156.1 67.2A170 170 0 0 1 67.2 156.1L22.9 53.3A58 58 0 0 0 53.3 22.9Z"/><path class="mw-slice" d="M21.4 53.9L62.9 158.0A170 170 0 0 1 -62.9 158.0L-21.4 53.9A58 58 0 0 0 21.4 53.9Z"/><path class="mw-slice" d="M-22.9 53.3L-67.2 156.1A170 170 0 0 1 -156.1 67.2L-53.3 22.9A58 58 0 0 0 -22.9 53.3Z"/><path class="mw-slice" d="M-53.9 21.4L-158.0 62.9A170 170 0 0 1 -158.0 -62.9L-53.9 -21.4A58 58 0 0 0 -53.9 21.4Z"/><path class="mw-slice" d="M-53.3 -22.9L-156.1 -67.2A170 170 0 0 1 -67.2 -156.1L-22.9 -53.3A58 58 0 0 0 -53.3 -22.9Z"/><circle class="mw-hub" r="50"/></svg>
             </div>
             <h3>Right-click in Files</h3>
-            <p>Select one photo or forty, right-click, <strong>Convert to…</strong>. The menu only lists presets that fit everything you selected. One notification at the end.</p>
+            <p>Select one photo or forty, right-click, <strong>Convert with Roue…</strong>. The wheel opens right at the pointer, with the presets that fit everything you selected. One notification at the end.</p>
           </article>
           <article class="card way">
             <div class="way-art term" aria-hidden="true">
@@ -196,37 +178,37 @@
             <div class="flow"><span class="chip image">HEIC</span><span class="arrow" aria-hidden="true">→</span><span class="chip image">JPG</span></div>
             <h3>Photos from your iPhone</h3>
             <p>HEIC files nothing else opens become JPGs that open everywhere.</p>
-            <p class="tile-ref">Tile: <b>JPG</b></p>
+            <p class="tile-ref">Preset: <b>JPG</b></p>
           </article>
           <article class="card use">
             <div class="flow"><span class="chip video">MOV · 300 MB</span><span class="arrow" aria-hidden="true">→</span><span class="chip video">MP4 · 9.6 MB</span></div>
             <h3>Too big for chat</h3>
             <p>A two-pass encode that lands under 10 MB, sized from the video's length.</p>
-            <p class="tile-ref">Tile: <b>Under 10 MB</b></p>
+            <p class="tile-ref">Preset: <b>Under 10 MB</b></p>
           </article>
           <article class="card use">
             <div class="flow"><span class="chip image">JPG + GPS</span><span class="arrow" aria-hidden="true">→</span><span class="chip image">JPG, clean</span></div>
             <h3>Post without your location</h3>
             <p>Drops GPS, camera and date details before you share a photo.</p>
-            <p class="tile-ref">Tile: <b>Remove metadata</b></p>
+            <p class="tile-ref">Preset: <b>Remove metadata</b></p>
           </article>
           <article class="card use">
             <div class="flow"><span class="chip video">MP4</span><span class="arrow" aria-hidden="true">→</span><span class="chip video">GIF</span></div>
             <h3>A GIF for your README</h3>
             <p>15 fps, palette-optimised, loops forever. Looks good, stays small.</p>
-            <p class="tile-ref">Tile: <b>GIF</b></p>
+            <p class="tile-ref">Preset: <b>GIF</b></p>
           </article>
           <article class="card use">
             <div class="flow"><span class="chip document">PDF · 40 MB</span><span class="arrow" aria-hidden="true">→</span><span class="chip document">PDF · 6 MB</span></div>
             <h3>A scan too big to email</h3>
             <p>Ghostscript shrinks image-heavy PDFs. Kept only if it's actually smaller.</p>
-            <p class="tile-ref">Tile: <b>Compress PDF</b></p>
+            <p class="tile-ref">Preset: <b>Compress PDF</b></p>
           </article>
           <article class="card use">
             <div class="flow"><span class="chip video">Video</span><span class="arrow" aria-hidden="true">→</span><span class="chip audio">MP3</span></div>
             <h3>Just the audio</h3>
             <p>Pull the soundtrack out of a talk or a clip, or turn a recording into a tiny Opus voice note.</p>
-            <p class="tile-ref">Tile: <b>MP3</b></p>
+            <p class="tile-ref">Preset: <b>MP3</b></p>
           </article>
         </div>
       </div>
@@ -310,16 +292,16 @@
 roue setup</code></pre>
           </li>
           <li>
-            <h3>Open the panel</h3>
-            <p>Press <kbd>Super</kbd>&nbsp;<kbd>Shift</kbd>&nbsp;<kbd>D</kbd>. Tiles are grouped into Images, Video, Audio and Documents.</p>
+            <h3>Open the wheel</h3>
+            <p>Press <kbd>Super</kbd>&nbsp;<kbd>Shift</kbd>&nbsp;<kbd>D</kbd>. Each slice is a preset; drag a file over it and the slices change to the ones that fit.</p>
           </li>
           <li>
             <h3>Drop, or copy and click</h3>
-            <p>Drag a file onto a tile. Or select files in Files, press <kbd>Ctrl</kbd>&nbsp;<kbd>C</kbd>, open the panel and click a tile.</p>
+            <p>Drop a file on a slice. Or select files in Files, press <kbd>Ctrl</kbd>&nbsp;<kbd>C</kbd>, open the wheel and click a slice.</p>
           </li>
           <li>
             <h3>Find it next to the original</h3>
-            <p><code>IMG_2041.HEIC</code> gives <code>IMG_2041.jpg</code>. Changed your mind? <strong>Undo</strong> moves it to the trash.</p>
+            <p><code>IMG_2041.HEIC</code> gives <code>IMG_2041.jpg</code>, and a notification says when it's ready. Changed your mind? <code>roue undo</code> moves it to the trash.</p>
           </li>
         </ol>
         <p class="center"><a class="btn btn-primary" href="docs/getting-started.html">Read the full tutorial</a></p>
@@ -335,12 +317,16 @@ roue setup</code></pre>
           <p>Built with GTK&nbsp;4 and libadwaita. Follows your light or dark style.</p>
         </header>
         <div class="shots">
+          <figure class="shot wide">
+            <img src="assets/screenshots/wheel.png" width="1280" height="720" loading="lazy" alt="The Roue wheel open over GNOME Files after right-clicking a screen recording: slices for MP4, GIF, WebM, Under 10 MB, Under 25 MB, Smaller video, Mute and More…, around a dark centre showing the file name.">
+            <figcaption>The wheel, opened from Files on a screen recording</figcaption>
+          </figure>
           <figure class="shot main">
             <picture>
               <source srcset="assets/screenshots/panel-dark.png" media="(prefers-color-scheme: dark)">
-              <img src="assets/screenshots/panel-light.png" width="800" height="640" loading="lazy" alt="The Roue drop panel: a search box, then tiles grouped into Images, Video, Audio and Documents, each with a coloured icon, a name and the output format.">
+              <img src="assets/screenshots/panel-light.png" width="800" height="640" loading="lazy" alt="The Roue full panel: a search box, then tiles grouped into Images, Video, Audio and Documents, each with a coloured icon, a name and the output format.">
             </picture>
-            <figcaption>The drop panel</figcaption>
+            <figcaption>The full panel, behind <strong>More…</strong></figcaption>
           </figure>
           <figure class="shot">
             <picture>
@@ -359,7 +345,7 @@ roue setup</code></pre>
         <div>
           <p class="kicker">Make it yours</p>
           <h2 id="custom-title">Presets are just YAML</h2>
-          <p>Drop a file in <code>~/.config/roue/presets/</code> and a new tile appears in the panel, the Files menu and the command line. Use the built-in image, video, document and PDF backends, or wrap any tool with <code>{in}</code> and <code>{out}</code>.</p>
+          <p>Drop a file in <code>~/.config/roue/presets/</code> and a new preset joins the wheel, the panel and the command line. Use the built-in image, video, document and PDF backends, or wrap any tool with <code>{in}</code> and <code>{out}</code>.</p>
           <ul class="ticks" role="list">
             <li>Override a built-in preset by reusing its id</li>
             <li>Mistakes are explained in plain words, never fatal</li>
@@ -394,18 +380,18 @@ roue setup</code></pre>
           <article class="card session">
             <h3>Wayland <span class="tag">Ubuntu's default</span></h3>
             <ul class="ticks" role="list">
-              <li><kbd>Super</kbd>&nbsp;<kbd>Shift</kbd>&nbsp;<kbd>D</kbd> opens the panel</li>
-              <li>Copy files with <kbd>Ctrl</kbd>&nbsp;<kbd>C</kbd>, open the panel, click a tile</li>
-              <li>Drag files onto the panel</li>
-              <li>Right-click <strong>Convert to…</strong> in Files</li>
+              <li><kbd>Super</kbd>&nbsp;<kbd>Shift</kbd>&nbsp;<kbd>D</kbd> opens the wheel</li>
+              <li>Copy files with <kbd>Ctrl</kbd>&nbsp;<kbd>C</kbd>, press the hotkey, click a slice</li>
+              <li>Drag files onto the wheel</li>
+              <li>Right-click <strong>Convert with Roue…</strong> in Files: the wheel opens at the pointer</li>
             </ul>
           </article>
           <article class="card session">
             <h3>X11</h3>
             <ul class="ticks" role="list">
               <li>Everything Wayland gets, plus:</li>
-              <li><strong>Shift-drag</strong>: hold <kbd>Shift</kbd> while dragging any file and the panel pops up next to the pointer</li>
-              <li>The panel stays on top while you drop</li>
+              <li><strong>Shift-drag</strong>: hold <kbd>Shift</kbd> while dragging any file and the wheel springs open around the pointer. Release Shift, drop on a slice.</li>
+              <li>The hotkey's wheel opens centred on the pointer and stays on top</li>
             </ul>
           </article>
         </div>
@@ -448,7 +434,7 @@ roue setup</code></pre>
           </details>
           <details>
             <summary>Why can't I Shift-drag on Wayland?</summary>
-            <p>Wayland doesn't let one app see another app's drags. That's a privacy feature, not a bug. On Wayland, use the hotkey, copy-then-click, or the Files menu.</p>
+            <p>Wayland doesn't let one app see another app's drags. That's a privacy feature, not a bug. On Wayland, use the Files menu, the hotkey, or copy-then-click.</p>
           </details>
           <details>
             <summary>My HEIC photos won't convert.</summary>

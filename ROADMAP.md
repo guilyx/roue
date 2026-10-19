@@ -17,10 +17,12 @@ Want something here sooner? 👍 the matching issue, or open a
       Downloads fallback for read-only folders
 - [x] 27 presets across images, video, audio and documents (HEIC → JPG,
       under 10/25 MB, video → GIF, office → PDF, strip metadata...)
-- [x] Drop panel (GTK 4 + libadwaita): grouped tiles, dims tiles that don't
-      fit, progress rings, search, copied-files staging, toasts, notifications
+- [x] The wheel: a radial menu of the presets that fit, at the pointer (Files
+      menu, X11 Shift-drag) or as a drop target (hotkey), with notifications
+- [x] Full panel (GTK 4 + libadwaita) behind the wheel's "More…": grouped
+      tiles, dims tiles that don't fit, progress rings, search, toasts
 - [x] Hotkey (GNOME custom shortcut, `roue setup`), X11 Shift-drag
-- [x] Files (Nautilus) right-click "Convert to…", routed through the app
+- [x] Files (Nautilus) right-click "Convert with Roue…", routed through the app
 - [x] CLI: `convert`, shorthand, `list`, `info`, `doctor`, `history`, `undo`
 - [x] Custom presets, including raw commands with `{in}` / `{out}`
 - [x] Preferences: hotkey, output folder, notifications, parallel jobs,
@@ -38,10 +40,11 @@ Want something here sooner? 👍 the matching issue, or open a
 - [ ] Merge PDFs and images → one PDF (multi-file drops into one result)
 - [ ] Favicon / app icon set from one image
 
-**Panel and desktop**
+**Wheel, panel and desktop**
 
 - [ ] First-run onboarding: what it does, set your hotkey, try it on a sample
-- [ ] Tray icon (Ayatana AppIndicator): open panel, recent, preferences
+- [ ] Choose which presets sit on the wheel, per file kind
+- [ ] Tray icon (Ayatana AppIndicator): open the wheel or panel, recent, preferences
 - [ ] XDG GlobalShortcuts portal for the hotkey (KDE, newer GNOME)
 - [ ] Pin mode: keep the panel as a small shelf docked to a screen edge
 - [ ] Recent conversions with re-run
@@ -58,13 +61,13 @@ Want something here sooner? 👍 the matching issue, or open a
 - [ ] Nemo, Dolphin and Thunar menus
 - [ ] Preset import/export and a community preset gallery
 - [ ] Per-preset output rules (fixed folder, replace original with trash backup)
-- [ ] Panel under the pointer on Wayland, if compositors ever allow it
+- [ ] The hotkey's wheel under the pointer on Wayland, if compositors ever allow it
 
 ## Success metrics
 
 | What | Target |
 |---|---|
-| Hotkey → panel visible | < 150 ms with Roue running in the background |
+| Hotkey → wheel visible | < 150 ms with Roue running in the background |
 | Image conversion | < 1 s for a typical photo |
 | First conversion for a new user | < 60 s from install |
 | Data loss bugs | Zero. Never overwrite, never delete without the trash |

@@ -1,6 +1,7 @@
 # Install
 
-Roue needs Linux, Python 3.12+, and GTK 4 with libadwaita 1.5+ for the panel.
+Roue needs Linux, Python 3.12+, and GTK 4 with libadwaita 1.5+ for the wheel
+and the panel.
 Ubuntu 24.04, Debian 13, Fedora 40 and newer all qualify. The command line and
 the conversion engine work without GTK.
 
@@ -16,15 +17,15 @@ roue setup
 
 The package installs the app, the launcher, the D-Bus service and the Files
 right-click menu, and pulls in FFmpeg and libvips. `roue setup` only adds your
-personal hotkey (**Super+Shift+D**).
+personal hotkey (**Super+Shift+D**, which opens the wheel).
 
 ## Any distribution, from source
 
 Install the dependencies with your package manager. On Ubuntu:
 
 ```sh
-sudo apt install ffmpeg libvips-tools ghostscript python3-gi gir1.2-gtk-4.0 \
-  gir1.2-adw-1 python3-nautilus libheif-plugin-libde265 pipx
+sudo apt install ffmpeg libvips-tools ghostscript python3-gi python3-gi-cairo \
+  gir1.2-gtk-4.0 gir1.2-adw-1 python3-nautilus libheif-plugin-libde265 pipx
 ```
 
 Then install Roue for your user and hook it into the desktop:
@@ -48,13 +49,14 @@ Other package names:
 | Ghostscript | `ghostscript` | `ghostscript` | `ghostscript` |
 | Pandoc | `pandoc` | `pandoc` | `pandoc` |
 | LibreOffice | `libreoffice` | `libreoffice-fresh` | `libreoffice` |
-| PyGObject, GTK 4, libadwaita | `python3-gobject gtk4 libadwaita` | `python-gobject gtk4 libadwaita` | `python3-gobject typelib-1_0-Gtk-4_0 typelib-1_0-Adw-1` |
+| PyGObject (with cairo), GTK 4, libadwaita | `python3-gobject gtk4 libadwaita` | `python-gobject python-cairo gtk4 libadwaita` | `python3-gobject-cairo typelib-1_0-Gtk-4_0 typelib-1_0-Adw-1` |
 | Files extension host | `nautilus-python` | `python-nautilus` | `python3-nautilus` |
 
 ## What each tool does
 
-Roue drives existing command-line tools. Install the ones you need; tiles
-whose tools are missing are greyed out with a hint.
+Roue drives existing command-line tools. Install the ones you need. Presets
+whose tools are missing stay off the wheel, and their tiles in the panel are
+greyed out with a hint.
 
 | Tool | Used for | Needed by |
 |---|---|---|
@@ -66,7 +68,8 @@ whose tools are missing are greyed out with a hint.
 | LibreOffice | office documents | PDF from DOCX, XLSX, PPTX, ODT… |
 
 **HEIC photos** need the HEVC decoder plugin for libheif. On Ubuntu and
-Debian: `sudo apt install libheif-plugin-libde265`.
+Debian: `sudo apt install libheif-plugin-libde265`. Writing **AVIF** needs the
+AV1 encoder plugin: `sudo apt install libheif-plugin-aomenc`.
 
 **Markdown to PDF** uses the first PDF engine it finds (`typst`, `weasyprint`,
 `wkhtmltopdf`, `tectonic`, `xelatex`, `pdflatex`). With none installed, Pandoc

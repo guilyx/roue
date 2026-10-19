@@ -17,7 +17,12 @@ FFmpeg, libvips (or ImageMagick), Ghostscript, Pandoc and LibreOffice.
 .PP
 Without arguments in a desktop session,
 .B roue
-opens the drop panel.
+opens the full panel. The everyday way in is the wheel: a radial menu of the
+presets that fit your files, opened by the hotkey (Super+Shift+D, which runs
+.BR "roue wheel" ),
+by "Convert with Roue..." in the Files right-click menu, or by holding Shift
+while dragging a file on X11.
+.PP
 .B roue PRESET FILE...
 is a shorthand for
 .BR "roue convert PRESET FILE..." .
@@ -66,11 +71,17 @@ Move the results of the last conversion to the trash.
 .TP
 .BR "setup " [ \-\-binding " KEYS] [" \-\-no\-hotkey "] [" \-\-no\-nautilus "] [" \-\-restart\-files "] [" \-\-remove ]
 Add the app launcher, the D-Bus service, the Files right-click menu and the
-hotkey (GNOME) for the current user. Parts already installed by a system
-package are skipped.
+hotkey (GNOME) for the current user. The hotkey runs
+.BR "roue wheel" .
+Parts already installed by a system package are skipped.
+.TP
+.BR "wheel " [FILE...]
+Open the wheel. Without files, a small round window to drop files on (it also
+uses files copied with Ctrl+C); with files, the wheel at the pointer, showing
+the presets that fit them. Its last slice, More..., opens the full panel.
 .TP
 .BR "panel " [ \-\-preferences "] [FILE...]"
-Open the drop panel, optionally with files ready to convert.
+Open the full panel, optionally with files ready to convert.
 .TP
 .B quit
 Stop Roue running in the background.
@@ -80,7 +91,7 @@ preset), 130 when interrupted.
 .SH FILES
 .TP
 .I ~/.config/roue/settings.yaml
-Settings shared by the panel, the CLI and the Files menu.
+Settings shared by the wheel, the panel, the CLI and the Files menu.
 .TP
 .I ~/.config/roue/presets/*.yaml
 Your own presets. A preset with the same id as a built-in one replaces it.

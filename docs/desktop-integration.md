@@ -1,16 +1,49 @@
 # Desktop integration
 
-Roue has three front doors: the **drop panel**, the **Files right-click
-menu**, and the **command line**. This page covers how the first two plug into
-your desktop.
+Roue has three front doors: the **wheel** (opened by the hotkey, by Shift-drag
+on X11, or from the Files menu), the **Files right-click menu**, and the
+**command line**. This page covers how they plug into your desktop.
+
+## The wheel
+
+The wheel is a ring of slices, one per preset. It shows up to seven presets
+that fit your files best, most relevant first, and a last slice, **More…**,
+that opens the full panel with every preset.
+
+It comes in two forms:
+
+- **At the pointer**, over a lightly dimmed screen, when Roue already knows
+  the files: **Convert with Roue…** in Files, or Shift-drag on X11. Click a
+  slice to convert. Click outside the wheel, or press **Esc**, to cancel.
+- **As a small round window** you drop files onto, when you press the hotkey.
+  It starts with a handful of popular presets and re-arranges itself to fit
+  the file you drag over it. Files you copied with **Ctrl+C** are picked up
+  when it opens (once per copy), and **Ctrl+V** reads the clipboard again.
+  Click a slice with no files to pick some with a file chooser.
+
+After you pick a slice, the wheel closes and the conversion runs in the
+background. A notification says when it's done.
+
+| Key | Action |
+|---|---|
+| Arrows, Tab | Move between slices |
+| Enter, Space | Pick the highlighted slice |
+| 1–8 | Pick a slice directly (1 is the top one, then clockwise) |
+| Ctrl+V | Use copied files |
+| Esc | Close the wheel |
+
+On Wayland, the wheel at the pointer is a transparent full-screen layer: the
+desktop doesn't let apps place windows, but it does tell a full-screen
+window where the pointer is. On X11 the hotkey's wheel opens centred on the
+pointer and stays on top; on Wayland the desktop decides where it goes.
 
 ## The hotkey
 
-The panel opens with **Super+Shift+D**.
+**Super+Shift+D** opens the wheel.
 
 Wayland doesn't let apps grab keys for themselves, so Roue registers an
 ordinary custom shortcut, exactly like the ones you'd create in Settings, that
-runs `roue panel`.
+runs `roue wheel`.
 
 ### GNOME (and Ubuntu, Pop!_OS)
 
@@ -21,24 +54,30 @@ roue setup --binding '<Super><Alt>c'
 ```
 
 You'll find it in **Settings > Keyboard > Keyboard Shortcuts > Custom
-Shortcuts** as "Roue: open drop panel". Turn it on or off from
+Shortcuts** as "Roue: open the wheel". Turn it on or off from
 **Preferences > General** in Roue.
 
 ### KDE Plasma
 
 **System Settings > Shortcuts > Add New > Command or Script**. Command:
-`roue panel`. Shortcut: **Meta+Shift+D**.
+`roue wheel`. Shortcut: **Meta+Shift+D**.
 
 ### Xfce
 
-**Settings > Keyboard > Application Shortcuts > Add**. Command: `roue panel`.
+**Settings > Keyboard > Application Shortcuts > Add**. Command: `roue wheel`.
 
 ### Cinnamon, MATE, others
 
-Add a custom shortcut running `roue panel` in your keyboard settings.
+Add a custom shortcut running `roue wheel` in your keyboard settings.
 `roue setup` prints these instructions when it can't set the key itself.
 
+Prefer the full panel? Point the shortcut at `roue panel` instead.
+
 ## The panel
+
+The full panel shows every preset as a tile, grouped into Images, Video, Audio
+and Documents. Open it with the wheel's **More…** slice, from the app
+launcher, or with `roue panel`.
 
 - **Drop** files on a tile. Tiles that can't take them fade out while you drag.
 - **Copy, then open**: files you copied in Files (Ctrl+C) are picked up when
@@ -50,53 +89,56 @@ Add a custom shortcut running `roue panel` in your keyboard settings.
 
 | Shortcut | Action |
 |---|---|
-| Super+Shift+D | Open the panel |
 | Ctrl+O | Choose files |
 | Ctrl+V | Use copied files |
 | Ctrl+F | Search presets |
 | Enter | Run the first matching preset |
 | Esc, Ctrl+W | Hide the panel |
 
-### Why the panel doesn't close when you click elsewhere
+### Why the drop targets don't close when you click elsewhere
 
-On Wayland, starting a drag in Files gives Files the focus. If the panel
-closed when it lost focus, it would vanish exactly when you need it. So it
-stays open until you press **Esc**, drop something, or close it.
+On Wayland, starting a drag in Files gives Files the focus. If the hotkey's
+wheel, or the panel, closed when it lost focus, it would vanish exactly when
+you need it. So it stays open until you press **Esc**, drop something, or
+close it.
 
-### Dragging onto a covered panel (GNOME)
+### Dragging onto a covered window (GNOME)
 
-If a maximised window covers the panel, start dragging your file, press
-**Super** to open the Activities overview, hover the Roue window until it comes
-forward, then drop. Or skip the drag: **Ctrl+C**, **Super+Shift+D**, click.
+If a maximised window covers the wheel or the panel, start dragging your file,
+press **Super** to open the Activities overview, hover the Roue window until it
+comes forward, then drop. Or skip the drag: **Ctrl+C**, **Super+Shift+D**,
+click a slice.
 
 ### Staying in the background
 
-After the first open, Roue keeps running quietly so the hotkey shows the panel
+After the first open, Roue keeps running quietly so the hotkey shows the wheel
 instantly. Turn this off in **Preferences > General > Stay in the background**,
-or stop it any time with `roue quit` (or **Quit** in the main menu).
+or stop it any time with `roue quit` (or **Quit** in the panel's main menu).
 
 ## Shift-drag (X11 only)
 
 On an X11 session, hold **Shift** while dragging any file, from any app. The
-panel pops up next to the pointer and stays on top. **Release Shift**, then
-drop on a tile; let go anywhere else and it hides again.
+wheel springs open around the pointer, with the presets that fit that file.
+**Release Shift**, then drop on a slice; let go anywhere else and it goes away
+again.
 
 Why release Shift? To file managers, Shift means "move this file". Roue only
 ever copies, so it refuses a drop while Shift is held instead of letting the
-source app think the file was moved.
+source app think the file was moved. The middle of the wheel says
+"Release Shift to drop" until you do.
 
 It works by noticing when a drag starts on the X server, so it needs
 `python3-xlib` (pulled in by the `.deb`). Turn it off in
 **Preferences > General > Shift-drag**.
 
 Wayland keeps each app's drags private by design, so no app can see a drag
-start elsewhere. There, use the hotkey or the Files menu.
+start elsewhere. There, use the Files menu or the hotkey.
 
 ## Files (Nautilus) right-click menu
 
-Right-click files and open **Convert to…**. You get up to six presets that fit
-every selected file, most relevant first, and **More…** to open the panel with
-those files ready.
+Right-click files and choose **Convert with Roue…**. The wheel opens at the
+pointer with the presets that fit every selected file, most relevant first.
+The item only appears when at least one preset fits.
 
 - Needs the Nautilus Python extension host: `python3-nautilus` on
   Debian/Ubuntu, `nautilus-python` on Fedora, `python-nautilus` on Arch.
@@ -105,17 +147,18 @@ those files ready.
 - Restart Files once to load it: `nautilus -q`.
 - Folders and remote locations without a local path don't get the menu.
 
-Conversions started from the menu run inside the Roue app, so progress and
-notifications match the panel. If the app can't start, the menu falls back to
-`roue convert --notify`.
+The menu asks the Roue app (over D-Bus, starting it if needed) to show the
+wheel, so the wheel, progress and notifications all come from one place. It
+passes along an activation token so the desktop lets the wheel come to the
+front. If the app can't be reached, the menu runs `roue wheel` instead.
 
 Nemo, Dolphin and Thunar menus are on the [roadmap](https://github.com/guilyx/roue/blob/main/ROADMAP.md).
 
 ## Notifications
 
-When a conversion finishes and the panel isn't in front, you get a desktop
-notification with **Open** and **Show in folder**. Turn them off in
-**Preferences > Results**.
+When a conversion finishes and the panel isn't in front (always the case
+after the wheel), you get a desktop notification with **Open** and
+**Show in Folder**. Turn them off in **Preferences > Results**.
 
 ## D-Bus
 
@@ -127,7 +170,9 @@ Actions you can trigger from scripts:
 
 | Action | Parameter | What it does |
 |---|---|---|
-| `show-panel` | none | Open the panel. |
+| `show-wheel` | none | Open the wheel to drop files on (what the hotkey does). |
+| `wheel-files` | `as` (paths) | Open the wheel at the pointer for these files. |
+| `show-panel` | none | Open the full panel. |
 | `stage-files` | `as` (paths) | Open the panel with these files ready. |
 | `run-preset` | `(sas)` (preset id, paths) | Convert files in the background. |
 | `quit` | none | Stop Roue. |

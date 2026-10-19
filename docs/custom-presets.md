@@ -1,8 +1,15 @@
 # Custom presets
 
 Presets are data, not code. A preset is a few lines of YAML in
-`~/.config/roue/presets/`. Drop a file there, reopen the panel, and your tile
-is there, in the Files menu and on the command line too.
+`~/.config/roue/presets/`. Drop a file there and it works on the command line
+right away. Roue keeps running in the background, so restart it once
+(`roue quit`) and your preset shows up in the wheel, the panel and the Files
+menu too.
+
+The wheel shows the first seven presets that fit a file, built-in ones first.
+To put yours on it, turn off a built-in you never use in
+**Preferences > Presets**, or give your preset the id of a built-in to replace
+it. Otherwise it waits under **More…**, in the full panel.
 
 **Preferences > Presets > Open presets folder** creates the folder for you,
 with a commented example.
@@ -81,7 +88,7 @@ copy one as a starting point.
 | Key | Required | What it does |
 |---|---|---|
 | `id` | yes | Lowercase letters, digits and dashes, like `video-to-gif`. Used on the command line. |
-| `name` | yes | The tile label. Keep it short. |
+| `name` | yes | The label on the wheel and the panel. Keep it short. |
 | `backend` | yes | `image`, `ffmpeg`, `document`, `ghostscript` or `command`. |
 | `accepts` | yes | MIME patterns this preset takes: `image/*`, `application/pdf`… |
 | `output_ext` | yes | Extension of the result, like `mp4`, or `same` to keep the original's. |

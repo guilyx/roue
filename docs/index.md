@@ -1,7 +1,7 @@
 # Roue documentation
 
 Roue is a drag-and-drop file converter for the Linux desktop. Drop a file on a
-tile, get the file you wanted next to the original. Everything runs on your
+slice of the wheel, get the file you wanted next to the original. Everything runs on your
 computer, with tools you already trust: FFmpeg, libvips, Ghostscript, Pandoc
 and LibreOffice.
 
@@ -13,11 +13,11 @@ and LibreOffice.
 
 ## Use it
 
-- **[Presets](presets.md)**: every built-in tile, what it takes and what it gives.
+- **[Presets](presets.md)**: every built-in preset, what it takes and what it gives.
 - **[Custom presets](custom-presets.md)**: write your own in a few lines of YAML.
 - **[Command line](cli.md)**: `roue convert`, `roue list`, `roue doctor` and friends.
-- **[Desktop integration](desktop-integration.md)**: the hotkey, the Files menu,
-  Shift-drag on X11, and D-Bus.
+- **[Desktop integration](desktop-integration.md)**: the wheel, the hotkey, the
+  Files menu, Shift-drag on X11, and D-Bus.
 
 ## Good to know
 

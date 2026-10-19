@@ -1,7 +1,7 @@
 # Presets
 
-A preset is one tile in the panel, one entry in the Files menu, and one id on
-the command line. Roue ships with the presets below. You can turn any of them
+A preset is one slice on the wheel (when it fits your files), one tile in the
+full panel, and one id on the command line. Roue ships with the presets below. You can turn any of them
 off in **Preferences > Presets**, change them, or [add your own](custom-presets.md).
 
 Run `roue list` to see them on your machine, or `roue list --for FILE` to see
@@ -66,10 +66,13 @@ would be pointless).
 
 - Roue works out a file's type from its extension first, then from its
   content when the extension is unknown.
-- When you drop several files, a tile lights up only if it takes **all** of them.
-  In the Files menu, the same rule picks which presets to list.
+- When you drop several files, a preset is offered only if it takes **all** of
+  them. The wheel shows only those, and in the panel the other tiles fade out.
 - Presets for the file's own kind come first: a video lists video presets
   before the audio ones that can extract its soundtrack.
+- The wheel shows the first seven; the rest are under **More…**. For a video,
+  that's MP4, GIF, WebM, Under 10 MB, Under 25 MB, Smaller video and Mute, with
+  the audio presets one click away.
 - If a drop mixes kinds, files the preset can't take are **skipped** with a
   note, and the rest are converted.
 
@@ -97,7 +100,7 @@ kept. You never end up with a "compressed" file that's bigger.
 ## Turning presets off
 
 **Preferences > Presets** has a switch for every preset. Turned-off presets
-disappear from the panel and the Files menu. They still work from the command
+disappear from the wheel and the panel. They still work from the command
 line, and `roue list --all` shows them.
 
 The same list lives in `~/.config/roue/settings.yaml`:

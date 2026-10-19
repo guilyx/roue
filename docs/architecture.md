@@ -1,12 +1,12 @@
 # Architecture
 
-**One engine, three front doors.** The panel, the Files menu and the command
-line are thin layers over the same engine. No conversion logic lives in UI
-code.
+**One engine, three front doors.** The wheel (and the full panel behind its
+**More…**), the Files menu and the command line are thin layers over the same
+engine. No conversion logic lives in UI code.
 
 ```text
             ┌──────────────┐  ┌─────────────────┐  ┌──────────────┐
-            │  Drop panel  │  │ Files (Nautilus) │  │   roue CLI   │
+            │ Wheel, panel │  │ Files (Nautilus) │  │   roue CLI   │
             │ GTK 4 + Adw  │  │  menu extension  │  │   argparse   │
             └──────┬───────┘  └────────┬────────┘  └──────┬───────┘
                    │      D-Bus actions│                  │
@@ -35,7 +35,8 @@ src/roue/
 │   ├── tools.py       which tools exist, how to install them
 │   └── backends/      one module per family of tools
 ├── presets/           built-in presets, as YAML
-├── ui/                the GTK 4 / libadwaita app (panel, tiles, preferences)
+├── radial.py          wheel geometry and which presets it shows (no GTK)
+├── ui/                the GTK 4 / libadwaita app (wheel, panel, preferences)
 ├── integrations/      hotkey, desktop files, notifications, X11 Shift-drag
 ├── data/              .desktop and D-Bus templates, icons, Files extension
 └── cli.py             the roue command
@@ -104,18 +105,30 @@ translated: "No space left on device" becomes "The disk is full."
 ## The app
 
 The GTK app is a single-instance `Adw.Application` (`io.github.guilyx.Roue`).
-The hotkey runs `roue panel`, which forwards to the running instance over
+The hotkey runs `roue wheel`, which forwards to the running instance over
 D-Bus, and the D-Bus service file starts it on demand. The Files extension
-calls the app's `run-preset` action, falling back to `roue convert --notify`
+calls the app's `wheel-files` action with the selected paths (and an
+activation token, so the wheel may take focus), falling back to `roue wheel`
 when the app can't be reached.
+
+The wheel (`ui/wheel.py`) is one view in two windows: a transparent
+full-screen layer that centres the wheel on the pointer when the files are
+known (on Wayland the pointer position arrives with the first pointer event
+on that layer), and a small round window to drop files on for the hotkey.
+Which presets it shows, and where each slice sits, is plain Python in
+`radial.py`, tested without a display. After a pick, the wheel closes and the
+app sends a notification when the batch is done.
 
 On X11, a background thread watches for `XdndSelection` ownership changes
 (every drag source takes it when a drag starts) through XFixes, then polls the
-pointer for Shift. Wayland deliberately offers nothing like this.
+pointer for Shift and opens the wheel around it. Wayland deliberately offers
+nothing like this.
 
 ## Tests
 
 `pytest` runs every built-in preset on generated sample files (no binary
 fixtures in the repo), plus unit tests for naming, presets, the runner,
-history, settings and the CLI. Tests skip when a tool is missing; CI installs
+history, settings, the wheel's geometry and the CLI. GTK tests (the panel, the
+wheel, the Files extension) run under a virtual display in CI
+(`xvfb-run pytest`). Tests skip when a tool is missing; CI installs
 everything so nothing is skipped there.

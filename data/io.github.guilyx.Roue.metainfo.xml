@@ -14,8 +14,8 @@
 
   <description>
     <p>
-      Roue converts files by dropping them on preset tiles. Press a hotkey,
-      drop a file, done. No dialogs, no editors, no uploads.
+      Roue converts files with a wheel of presets. Press a hotkey, drop a file
+      on a slice, done. No dialogs, no editors, no uploads.
     </p>
     <p>Presets include:</p>
     <ul>
@@ -26,10 +26,14 @@
     </ul>
     <p>Three ways in:</p>
     <ul>
-      <li>The drop panel, opened with a hotkey (Super+Shift+D by default), or by Shift-dragging any file on X11</li>
-      <li>"Convert to…" in the right-click menu of Files</li>
+      <li>The wheel, opened with a hotkey (Super+Shift+D by default), or around the pointer by Shift-dragging any file on X11</li>
+      <li>"Convert with Roue…" in the right-click menu of Files, which opens the wheel at the pointer</li>
       <li>The roue command, for scripts</li>
     </ul>
+    <p>
+      The wheel shows the presets that fit your files best. Its last slice
+      opens the full panel with every preset.
+    </p>
     <p>
       Results are saved next to the originals and never overwrite anything.
       Everything runs on your computer with FFmpeg, libvips, Ghostscript,
@@ -41,7 +45,11 @@
 
   <screenshots>
     <screenshot type="default">
-      <caption>The drop panel</caption>
+      <caption>The wheel, opened from Files on a screen recording</caption>
+      <image>https://raw.githubusercontent.com/guilyx/roue/main/website/assets/screenshots/wheel.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>The full panel, with every preset</caption>
       <image>https://raw.githubusercontent.com/guilyx/roue/main/website/assets/screenshots/panel-light.png</image>
     </screenshot>
   </screenshots>
@@ -90,7 +98,7 @@
   <releases>
     <release version="0.1.0" date="2026-10-19">
       <description>
-        <p>First release: drop panel, Files menu, command line and 27 built-in presets.</p>
+        <p>First release: the wheel, the full panel, the Files menu, the command line and 27 built-in presets.</p>
       </description>
     </release>
   </releases>
