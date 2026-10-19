@@ -1,0 +1,113 @@
+# Built-in image presets. See docs/presets.md for the format.
+presets:
+  - id: jpg
+    name: JPG
+    description: Photos that open everywhere. Transparent areas become white.
+    group: image
+    icon: image-x-generic-symbolic
+    accepts: ["image/*"]
+    rejects: ["image/jpeg"]
+    output_ext: jpg
+    backend: image
+    keywords: [jpeg, photo, heic, iphone]
+    params: { quality: 90 }
+
+  - id: png
+    name: PNG
+    description: Lossless, keeps transparency. Good for screenshots and graphics.
+    group: image
+    icon: image-x-generic-symbolic
+    accepts: ["image/*"]
+    rejects: ["image/png"]
+    output_ext: png
+    backend: image
+    keywords: [lossless, transparent, svg]
+
+  - id: webp
+    name: WebP
+    description: Small files for the web, with transparency.
+    group: image
+    icon: web-browser-symbolic
+    accepts: ["image/*"]
+    rejects: ["image/webp", "image/svg+xml"]
+    output_ext: webp
+    backend: image
+    keywords: [web, small]
+    params: { quality: 82 }
+
+  - id: avif
+    name: AVIF
+    description: Next-generation format, the smallest files at the same quality.
+    group: image
+    icon: web-browser-symbolic
+    accepts: ["image/*"]
+    rejects: ["image/avif", "image/svg+xml"]
+    output_ext: avif
+    backend: image
+    keywords: [web, small, av1]
+    params: { quality: 60 }
+
+  - id: resize-half
+    name: Half size
+    description: Scale the image down to 50%.
+    group: image
+    icon: zoom-out-symbolic
+    accepts: ["image/*"]
+    rejects: ["image/svg+xml", "image/gif"]
+    output_ext: same
+    suffix: " (50%)"
+    backend: image
+    keywords: [resize, smaller, scale]
+    params: { scale: 0.5, quality: 90 }
+
+  - id: resize-1080
+    name: 1080 px wide
+    description: Shrink wide images to 1080 pixels across. Smaller images are left as is.
+    group: image
+    icon: view-fullscreen-symbolic
+    accepts: ["image/*"]
+    rejects: ["image/svg+xml", "image/gif"]
+    output_ext: same
+    suffix: " (1080px)"
+    backend: image
+    keywords: [resize, smaller, instagram, social]
+    params: { width: 1080, quality: 90 }
+
+  - id: resize-double
+    name: Double size
+    description: Scale up to 200%. Vector images are re-rendered sharp.
+    group: image
+    icon: zoom-in-symbolic
+    accepts: ["image/*"]
+    rejects: ["image/gif"]
+    output_ext: png
+    suffix: " (2x)"
+    backend: image
+    keywords: [resize, bigger, retina, scale, svg]
+    params: { scale: 2 }
+
+  - id: compress-image
+    name: Compress
+    description: Smaller JPG at quality 75. Kept only if it's actually smaller.
+    group: image
+    icon: package-x-generic-symbolic
+    accepts: ["image/*"]
+    rejects: ["image/svg+xml", "image/gif"]
+    output_ext: jpg
+    suffix: " (compressed)"
+    only_if_smaller: true
+    backend: image
+    keywords: [smaller, email, size]
+    params: { quality: 75 }
+
+  - id: strip-metadata
+    name: Remove metadata
+    description: Drop location, camera and date details before sharing.
+    group: image
+    icon: preferences-system-privacy-symbolic
+    accepts: ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif", "image/avif", "image/tiff"]
+    output_ext: same
+    suffix: " (clean)"
+    backend: image
+    keywords: [privacy, exif, gps, location, clean]
+    params: { strip: true, quality: 95 }

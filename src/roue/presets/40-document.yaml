@@ -1,0 +1,85 @@
+# Built-in document presets. See docs/presets.md for the format.
+presets:
+  - id: pdf
+    name: PDF
+    description: Word, Excel, PowerPoint, LibreOffice and Markdown files to PDF.
+    group: document
+    icon: x-office-document-symbolic
+    accepts:
+      - "application/msword"
+      - "application/rtf"
+      - "application/vnd.ms-*"
+      - "application/vnd.openxmlformats-officedocument.*"
+      - "application/vnd.oasis.opendocument.*"
+      - "text/markdown"
+      - "text/x-rst"
+      - "text/org"
+      - "text/plain"
+      - "text/csv"
+    output_ext: pdf
+    backend: document
+    keywords: [docx, xlsx, pptx, odt, markdown, print]
+
+  - id: docx
+    name: Word
+    description: Markdown, OpenDocument and RTF to .docx.
+    group: document
+    icon: x-office-document-symbolic
+    accepts:
+      - "application/vnd.oasis.opendocument.text"
+      - "application/rtf"
+      - "application/msword"
+      - "text/markdown"
+      - "text/x-rst"
+      - "text/org"
+      - "text/html"
+    output_ext: docx
+    backend: document
+    keywords: [word, office, markdown]
+
+  - id: html
+    name: Web page
+    description: Markdown to a single self-contained HTML file.
+    group: document
+    icon: text-html-symbolic
+    accepts: ["text/markdown", "text/x-rst", "text/org"]
+    output_ext: html
+    backend: document
+    keywords: [markdown, web, html]
+
+  - id: compress-pdf
+    name: Compress PDF
+    description: Shrink scans and image-heavy PDFs for email. Kept only if smaller.
+    group: document
+    icon: package-x-generic-symbolic
+    accepts: ["application/pdf"]
+    output_ext: pdf
+    suffix: " (compressed)"
+    only_if_smaller: true
+    backend: ghostscript
+    keywords: [smaller, email, scan, shrink]
+    params: { mode: compress, quality: ebook }
+
+  - id: pdf-to-png
+    name: Pages to PNG
+    description: One PNG image per page, in a new folder.
+    group: document
+    icon: image-x-generic-symbolic
+    accepts: ["application/pdf"]
+    output_ext: png
+    output: folder
+    suffix: " (pages)"
+    backend: ghostscript
+    keywords: [images, split, pages, slides]
+    params: { mode: images, dpi: 150 }
+
+  - id: pdf-to-text
+    name: Text
+    description: Pull the text out of a PDF (no OCR yet).
+    group: document
+    icon: text-x-generic-symbolic
+    accepts: ["application/pdf"]
+    output_ext: txt
+    backend: ghostscript
+    keywords: [extract, copy, txt]
+    params: { mode: text }

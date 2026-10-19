@@ -1,0 +1,100 @@
+# Built-in video presets. See docs/presets.md for the format.
+presets:
+  - id: mp4
+    name: MP4
+    description: H.264 + AAC, plays on every phone, browser and chat app.
+    group: video
+    icon: video-x-generic-symbolic
+    accepts: ["video/*"]
+    output_ext: mp4
+    backend: ffmpeg
+    keywords: [h264, mov, mkv, avi, webm, compatible]
+    params:
+      video_codec: libx264
+      crf: 22
+      speed: medium
+      audio_codec: aac
+      audio_bitrate: 160k
+
+  - id: gif
+    name: GIF
+    description: Looping GIF at 15 fps, up to 720 px wide. Great for READMEs.
+    group: video
+    icon: media-playlist-repeat-symbolic
+    accepts: ["video/*"]
+    output_ext: gif
+    backend: ffmpeg
+    keywords: [animation, loop, readme]
+    params: { mode: gif, fps: 15, max_width: 720 }
+
+  - id: webm
+    name: WebM
+    description: VP9 + Opus, open formats for the web.
+    group: video
+    icon: web-browser-symbolic
+    accepts: ["video/*"]
+    rejects: ["video/webm"]
+    output_ext: webm
+    backend: ffmpeg
+    keywords: [vp9, web, open]
+    params:
+      video_codec: libvpx-vp9
+      crf: 33
+      audio_codec: libopus
+      audio_bitrate: 128k
+      extra_args: ["-row-mt", "1", "-deadline", "good", "-cpu-used", "4"]
+
+  - id: share-10mb
+    name: Under 10 MB
+    description: Fits free chat upload limits (Discord). Sized with a two-pass encode.
+    group: video
+    icon: mail-send-symbolic
+    accepts: ["video/*"]
+    output_ext: mp4
+    suffix: " (10MB)"
+    backend: ffmpeg
+    keywords: [discord, chat, share, compress, small]
+    params: { mode: target-size, target_size_mb: 10, max_height: 720, audio_kbps: 96 }
+
+  - id: share-25mb
+    name: Under 25 MB
+    description: Fits most email attachment limits.
+    group: video
+    icon: mail-attachment-symbolic
+    accepts: ["video/*"]
+    output_ext: mp4
+    suffix: " (25MB)"
+    backend: ffmpeg
+    keywords: [email, gmail, share, compress]
+    params: { mode: target-size, target_size_mb: 25, max_height: 1080, audio_kbps: 128 }
+
+  - id: compress-video
+    name: Smaller video
+    description: 720p H.264 at a lower bitrate. Kept only if it's actually smaller.
+    group: video
+    icon: package-x-generic-symbolic
+    accepts: ["video/*"]
+    output_ext: mp4
+    suffix: " (small)"
+    only_if_smaller: true
+    backend: ffmpeg
+    keywords: [compress, smaller, 720p]
+    params:
+      video_codec: libx264
+      crf: 28
+      speed: medium
+      max_height: 720
+      audio_codec: aac
+      audio_bitrate: 96k
+
+  - id: mute
+    name: Mute
+    description: Remove the sound. The picture is copied untouched, so it's instant.
+    group: video
+    icon: audio-volume-muted-symbolic
+    accepts: ["video/*"]
+    output_ext: same
+    suffix: " (muted)"
+    backend: ffmpeg
+    keywords: [silent, no audio, remove sound]
+    params: { video_codec: copy, mute: true }
