@@ -1,0 +1,4 @@
+# Shell used in the terminal scene of the demo.
+cd ~/Pictures || exit
+PS1='\[\e[1;35m\]~/Pictures\[\e[0m\] \[\e[2m\]$\[\e[0m\] '
+clear
