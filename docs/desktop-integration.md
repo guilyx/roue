@@ -78,8 +78,12 @@ or stop it any time with `roue quit` (or **Quit** in the main menu).
 ## Shift-drag (X11 only)
 
 On an X11 session, hold **Shift** while dragging any file, from any app. The
-panel pops up next to the pointer and stays on top. Drop on a tile; let go
-anywhere else and it hides again.
+panel pops up next to the pointer and stays on top. **Release Shift**, then
+drop on a tile; let go anywhere else and it hides again.
+
+Why release Shift? To file managers, Shift means "move this file". Roue only
+ever copies, so it refuses a drop while Shift is held instead of letting the
+source app think the file was moved.
 
 It works by noticing when a drag starts on the X server, so it needs
 `python3-xlib` (pulled in by the `.deb`). Turn it off in

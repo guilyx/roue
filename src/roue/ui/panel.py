@@ -240,7 +240,12 @@ class DropPanel(Adw.ApplicationWindow):
     # -- drag and drop --------------------------------------------------------
 
     def _install_drop_target(self) -> None:
-        target = Gtk.DropTarget.new(Gdk.FileList.__gtype__, Gdk.DragAction.COPY)
+        # Shift (the X11 trigger) also means "move" to drag sources, and GTK then
+        # offers the drop as MOVE only. Listening for MOVE keeps the target engaged
+        # so the drop works once Shift is released; we only ever accept COPY.
+        target = Gtk.DropTarget.new(
+            Gdk.FileList.__gtype__, Gdk.DragAction.COPY | Gdk.DragAction.MOVE
+        )
         target.set_preload(True)
         target.connect("notify::value", self._on_drag_value)
         target.connect("motion", self._on_drag_motion)
@@ -272,7 +277,18 @@ class DropPanel(Adw.ApplicationWindow):
                 tile.set_hover(True)
             self._hover = tile
 
-    def _on_drag_motion(self, _target: Gtk.DropTarget, x: float, y: float) -> Gdk.DragAction:
+    @staticmethod
+    def _offers_copy(target: Gtk.DropTarget) -> bool:
+        drop = target.get_current_drop()
+        return bool(drop and drop.get_actions() & Gdk.DragAction.COPY)
+
+    def _on_drag_motion(self, target: Gtk.DropTarget, x: float, y: float) -> Gdk.DragAction:
+        if not self._offers_copy(target):
+            # Never accept a move: the source app could then delete the original.
+            self._set_hover(None)
+            self.status_label.set_text("Release Shift to drop. Roue copies, never moves.")
+            return Gdk.DragAction(0)
+        self._update_status()
         tile = self._tile_at(x, y)
         usable = tile if tile and tile.compatible and tile.available else None
         self._set_hover(usable)
@@ -284,8 +300,12 @@ class DropPanel(Adw.ApplicationWindow):
         self._set_hover(None)
         self._refresh_compatibility()
 
-    def _on_drop(self, _target: Gtk.DropTarget, value: Gdk.FileList, x: float, y: float) -> bool:
+    def _on_drop(self, target: Gtk.DropTarget, value: Gdk.FileList, x: float, y: float) -> bool:
         self._set_hover(None)
+        if not self._offers_copy(target):
+            self.toast("Release Shift before dropping: Shift asks to move the file.")
+            self._refresh_compatibility()
+            return False
         paths = _paths_from(value.get_files())
         if not paths:
             self.toast("Only local files can be converted.")

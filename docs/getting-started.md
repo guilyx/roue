@@ -55,7 +55,8 @@ match: **Ctrl+C**, **Super+Shift+D**, type `gif`, **Enter**.
 ### On X11: Shift-drag
 
 On an X11 session, hold **Shift** while dragging any file. The panel pops up
-next to the pointer. Drop on a tile, or let go anywhere else to dismiss it.
+next to the pointer. Release Shift, then drop on a tile, or let go anywhere
+else to dismiss it.
 
 ## 3. Right-click in Files
 
