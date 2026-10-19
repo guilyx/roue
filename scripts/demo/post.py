@@ -36,10 +36,9 @@ captions = [
     ("B", ev["hotkey"], ev["drag"]),
     ("C", ev["drag"], ev["rightclick"]),
     ("D", ev["rightclick"], ev["converting"]),
-    ("E", ev["converting"], ev["esc"]),
-    ("F", ev["esc"], ev["shiftdrag"]),
-    ("G", ev["shiftdrag"], ev["pre-drop"]),
-    ("H", ev["pre-drop"], ev["cli"]),
+    ("E", ev["converting"], ev["shiftdrag"]),
+    ("G", ev["shiftdrag"], ev["wheel-popped"] + 0.4),
+    ("H", ev["wheel-popped"] + 0.4, ev["cli"]),
     ("I", ev["cli"], ev["end"] + 0.4),
 ]
 

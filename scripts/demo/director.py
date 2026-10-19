@@ -188,79 +188,88 @@ def main() -> None:
         (OUT / "events.json").write_text(json.dumps(events, indent=1))
 
 
+# Wheel geometry (src/roue/radial.py): slice labels sit about this far out.
+SLICE_RADIUS = 121
+WHEEL_HALF = 206  # half the wheel's size: centres are kept this far from screen edges
+
+
+def wheel_centre(x: float, y: float) -> tuple[float, float]:
+    return min(max(x, WHEEL_HALF), 1280 - WHEEL_HALF), min(max(y, WHEEL_HALF), 720 - WHEEL_HALF)
+
+
+def slice_point(centre: tuple[float, float], index: int, count: int = 8) -> tuple[float, float]:
+    """Middle of a slice; slice 0 is at 12 o'clock and they go clockwise."""
+    angle = -math.pi / 2 + index * 2 * math.pi / count
+    return centre[0] + SLICE_RADIUS * math.cos(angle), centre[1] + SLICE_RADIUS * math.sin(angle)
+
+
 def scenes() -> None:
     time.sleep(1.0)
     mark("intro")
     time.sleep(2.2)
 
-    # 1. The hotkey opens the panel.
+    # 1. The hotkey opens the wheel at the pointer.
+    move(*C["hotkey_pointer"], 0.8)
     mark("hotkey")
-    time.sleep(0.9)
-    subprocess.Popen(["roue", "panel"])
-    time.sleep(1.9)
+    time.sleep(0.6)
+    subprocess.Popen(["roue", "wheel"])
+    time.sleep(1.6)
 
-    # 2. Drag a phone photo from Files onto the JPG tile.
+    # 2. Drag a phone photo from Files onto the JPG slice (slice 0 once a photo is over it).
     mark("drag")
-    drag(C["heic_a"], C["tile_jpg"])
-    move(*C["rest"], 0.6)  # out of the way, so no tooltip pops up
+    floating = wheel_centre(*C["hotkey_pointer"])
+    drag(C["heic_a"], slice_point(floating, 0))
+    move(*C["rest"], 0.6)
     mark("dropped")
     wait_for(PICS / "IMG_2041.jpg", 15)
-    time.sleep(2.6)
+    time.sleep(2.4)
 
-    # 3. Right-click a screen recording > Convert to… > Under 10 MB.
+    # 3. Right-click a screen recording > Convert with Roue… > Under 10 MB.
     mark("rightclick")
     move(*C["mov"], 0.9)
     time.sleep(0.2)
     click(3)
     time.sleep(1.0)
     mark("menu")
-    move(*C["menu_convert"], 0.7)
+    move(*C["menu_wheel"], 0.7)
     time.sleep(0.3)
     click(1)
     time.sleep(0.9)
-    mark("submenu")
-    move(*C["menu_10mb"], 0.6)
-    time.sleep(0.4)
+    mark("wheel")
+    overlay = wheel_centre(*C["menu_wheel"])
+    move(*slice_point(overlay, 3), 0.8)  # MP4, GIF, WebM, Under 10 MB…
+    time.sleep(0.6)
     click(1)
     mark("converting")
     time.sleep(1.5)
     mark("converting-mid")
     wait_for(PICS / "Screen recording (10MB).mp4", 90)
     mark("converted")
-    time.sleep(2.6)
+    time.sleep(4.2)  # let the notification go before the next scene
 
-    # 4. Esc hides the panel.
-    mark("esc")
-    move(*C["panel_status"], 0.7)
-    click(1)
-    time.sleep(0.3)
-    key("Escape")
-    time.sleep(1.4)
-
-    # 5. X11: hold Shift while dragging, the panel comes to you.
+    # 4. X11: hold Shift while dragging, the wheel comes to you.
     mark("shiftdrag")
     move(*C["heic_b"], 0.8)
     time.sleep(0.3)
     key("Shift_L", True)
     time.sleep(0.25)
     button(1, True)
-    move(C["heic_b"][0] + 14, C["heic_b"][1] + 10, 0.2)
-    move(*C["shift_waypoint"], 0.7)
-    jiggle(0.9)
-    mark("panel-popped")
+    start = (C["heic_b"][0] + 14, C["heic_b"][1] + 10)
+    move(*start, 0.2)
+    jiggle(0.8)
+    mark("wheel-popped")
     key("Shift_L", False)
-    time.sleep(0.2)
-    px, py = window_origin("Roue")
-    move(px + C["strip_offset"][0], py + C["strip_offset"][1], 0.9)
-    jiggle(0.5)
+    time.sleep(0.3)
+    move(*slice_point(wheel_centre(*start), 2), 0.9)  # JPG, PNG, WebP…
+    jiggle(0.6)
     mark("pre-drop")
     button(1, False)
-    move(px + 300, py + 640, 0.5)
+    move(*C["rest"], 0.5)
     mark("shiftdropped")
-    wait_for(PICS / "IMG_2047 (clean).HEIC", 20)  # same case as the original
+    wait_for(PICS / "IMG_2047.webp", 20)
     time.sleep(2.4)
 
-    # 6. Same presets from the terminal.
+    # 5. Same presets from the terminal.
     mark("cli")
     rc = HERE / "bashrc"
     subprocess.Popen(

@@ -11,32 +11,16 @@
     318,
     300
   ],
-  "tile_jpg": [
-    726,
-    156
-  ],
-  "menu_convert": [
+  "menu_wheel": [
     374,
     649
   ],
-  "menu_10mb": [
-    377,
-    450
-  ],
-  "panel_status": [
-    960,
-    668
-  ],
-  "shift_waypoint": [
-    430,
-    300
+  "hotkey_pointer": [
+    930,
+    380
   ],
   "rest": [
     629,
     420
-  ],
-  "strip_offset": [
-    416,
-    262
   ]
 }

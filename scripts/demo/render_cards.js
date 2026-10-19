@@ -31,13 +31,12 @@ const card = (inner) => `<html><head><style>${base}
 
 const captions = {
   A: 'Your files in Files. Roue waits quietly in the background.',
-  B: 'Press <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd> to open the panel',
-  C: 'Drag a photo onto a tile. <b>HEIC</b><span class="arrow">→</span><b>JPG</b>, saved right next to it.',
-  D: 'Or right-click in Files<span class="arrow">→</span><b>Convert to…</b>',
-  E: '<b>Under 10 MB</b> sizes a screen recording for chat apps',
-  F: '<kbd>Esc</kbd> hides the panel. Reopening is instant.',
-  G: 'On X11, hold <kbd>Shift</kbd> while dragging: the panel comes to you',
-  H: '<b>Remove metadata</b> strips location and camera details',
+  B: 'Press <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd>: the wheel opens at your pointer',
+  C: 'Drop a photo on a slice. <b>HEIC</b><span class="arrow">→</span><b>JPG</b>, saved right next to it.',
+  D: 'Or right-click in Files<span class="arrow">→</span><b>Convert with Roue…</b>',
+  E: 'The wheel shows what fits. <b>Under 10 MB</b> sizes a video for chat.',
+  G: 'On X11, hold <kbd>Shift</kbd> while dragging: the wheel comes to you',
+  H: 'Release <kbd>Shift</kbd> and drop on a slice',
   I: 'The same presets work from the terminal',
 };
 
