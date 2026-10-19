@@ -313,10 +313,10 @@ kbd {
 }
 .wd-stage {
   position: absolute;
-  left: 4cqw;
-  top: 6cqw;
-  width: 92cqw;
-  height: 92cqw;
+  left: 0;
+  top: 2cqw;
+  width: 100cqw;
+  height: 100cqw;
   transform-origin: 50% 50%;
 }
 .wd-wheel {
@@ -350,6 +350,11 @@ kbd {
 }
 .wd-hover,
 .wd-done { opacity: 0; }
+@container (max-width: 380px) {
+  .wd-t { font-size: 15.5px; }
+  .wd-s { font-size: 12px; }
+  .wd-hs { font-size: 11.5px; }
+}
 
 .wd-file {
   position: absolute;
@@ -366,7 +371,7 @@ kbd {
   font-size: 2.9cqw;
   font-weight: 600;
   white-space: nowrap;
-  transform: translate(58cqw, 84cqw);
+  transform: translate(60cqw, 86cqw);
   transform-origin: 0 0;
   opacity: 0;
 }
@@ -428,11 +433,11 @@ kbd {
 .wd-note { animation: wd-note 8s ease infinite; }
 
 @keyframes wd-drag {
-  0%, 4% { transform: translate(58cqw, 84cqw); opacity: 0; }
-  9% { transform: translate(58cqw, 84cqw); opacity: 1; }
-  32% { transform: translate(53cqw, 32cqw) scale(0.92); opacity: 1; }
-  40% { transform: translate(53cqw, 32cqw) scale(0.92); opacity: 1; }
-  45%, 100% { transform: translate(53cqw, 32cqw) scale(0.4); opacity: 0; }
+  0%, 4% { transform: translate(60cqw, 86cqw); opacity: 0; }
+  9% { transform: translate(60cqw, 86cqw); opacity: 1; }
+  32% { transform: translate(54cqw, 32.6cqw) scale(0.92); opacity: 1; }
+  40% { transform: translate(54cqw, 32.6cqw) scale(0.92); opacity: 1; }
+  45%, 100% { transform: translate(54cqw, 32.6cqw) scale(0.4); opacity: 0; }
 }
 @keyframes wd-pop {
   0%, 29% { transform: translate(0, 0); }
@@ -574,13 +579,14 @@ kbd {
   width: 112px;
   height: 112px;
   margin: 26px 0 0 -16px;
+  overflow: visible;
   filter: drop-shadow(0 3px 8px rgb(0 0 0 / 18%));
 }
 @media (prefers-color-scheme: dark) {
   .mini-wheel { --wd-slice: #303036; --wd-edge: rgb(255 255 255 / 10%); }
 }
 .mw-slice { fill: var(--wd-slice); stroke: var(--wd-edge); stroke-width: 3; }
-.mw-slice.mw-lit { fill: #26a269; }
+.mw-slice.mw-lit { fill: #26a269; transform: translate(7px, 7px); }
 .mw-hub { fill: #242429; stroke: rgb(255 255 255 / 14%); stroke-width: 6; }
 .way-art.term {
   flex-direction: column;
