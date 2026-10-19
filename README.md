@@ -16,7 +16,9 @@ Press a key, drop a file on a tile, done. No dialogs, no editors, no uploads.
 
 [Website](https://guilyx.github.io/roue/) · [Docs](https://guilyx.github.io/roue/docs/) · [Install](#install) · [Presets](#presets) · [Contributing](CONTRIBUTING.md)
 
-<img src="website/assets/screenshots/panel-light.png" width="720" alt="The Roue drop panel: preset tiles grouped into Images, Video, Audio and Documents">
+<img src="website/assets/demo.gif" width="720" alt="Demo: a HEIC photo is dragged from GNOME Files onto the JPG tile of the Roue panel; a progress ring fills and the JPG appears next to the original">
+
+▶️ **[Watch the 50-second demo](https://guilyx.github.io/roue/#demo)** (photo to JPG, video under 10 MB, Shift-drag, terminal)
 
 </div>
 

@@ -27,6 +27,7 @@
     <div class="wrap header-row">
       <a class="brand" href="./"><img src="assets/icon.svg" alt="" width="28" height="28"><span>Roue</span></a>
       <nav class="top-nav" aria-label="Site">
+        <a href="#demo" class="hide-sm">Demo</a>
         <a href="#ways" class="hide-sm">How it works</a>
         <a href="#presets" class="hide-sm">Presets</a>
         <a href="docs/index.html">Docs</a>
@@ -118,6 +119,27 @@
         <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 7v5c0 5 3.5 8 8 9 4.5-1 8-4 8-9V7z"/><path d="m9 12 2 2 4-4"/></svg>Never overwrites</li>
         <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg>GPL-3.0 free software</li>
       </ul>
+    </section>
+
+    <!-- Demo video -->
+    <section id="demo" class="section alt" aria-labelledby="demo-title">
+      <div class="wrap">
+        <header class="section-head">
+          <p class="kicker">See it in action</p>
+          <h2 id="demo-title">50 seconds, four conversions</h2>
+          <p>A phone photo to JPG, a screen recording under 10&nbsp;MB, metadata stripped with Shift-drag, and a GIF from the terminal. Recorded live, nothing staged.</p>
+        </header>
+        <figure class="demo">
+          <video controls muted playsinline preload="none" width="1280" height="800"
+                 poster="assets/demo-poster.jpg"
+                 aria-describedby="demo-caption">
+            <source src="assets/demo.webm" type="video/webm">
+            <source src="assets/demo.mp4" type="video/mp4">
+            <a href="assets/demo.mp4">Download the demo video (MP4, 1.2&nbsp;MB)</a>
+          </video>
+          <figcaption id="demo-caption">Roue 0.1 on GNOME Files (X11). Every result in the video is a real conversion.</figcaption>
+        </figure>
+      </div>
     </section>
 
     <!-- Three ways in -->

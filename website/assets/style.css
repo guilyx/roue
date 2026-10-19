@@ -715,6 +715,18 @@ kbd {
   font-size: 0.82rem;
 }
 
+/* demo video */
+.demo { margin: 0 auto; max-width: 1040px; }
+.demo video {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  background: #0d0f17;
+  box-shadow: var(--shadow-lg);
+}
+.demo figcaption { text-align: center; color: var(--muted); font-size: 0.92rem; margin-top: 12px; }
+
 /* screenshots */
 .shots { display: grid; gap: 22px; align-items: start; }
 @media (min-width: 900px) { .shots { grid-template-columns: 1.6fr 1fr; } }
