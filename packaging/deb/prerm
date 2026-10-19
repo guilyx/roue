@@ -1,0 +1,15 @@
+#!/bin/sh
+set -e
+
+# Remove the byte-compiled files created by postinst.
+if command -v py3clean >/dev/null 2>&1; then
+    py3clean -p roue
+else
+    dpkg -L roue | grep '\.py$' | while read -r file; do
+        rm -f "${file}"[co] >/dev/null 2>&1 || true
+        dir=$(dirname "$file")
+        rm -rf "$dir/__pycache__" >/dev/null 2>&1 || true
+    done
+fi
+
+exit 0

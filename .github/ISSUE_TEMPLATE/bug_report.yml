@@ -1,0 +1,75 @@
+name: Bug report
+description: Something doesn't work, or a conversion fails.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time! Please don't attach private files: a description of the file
+        (type, size, where it came from) is usually enough.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+      placeholder: I dropped a .mov from my phone on "MP4" and got "FFmpeg couldn't convert this video."
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open the panel with Super+Shift+D
+        2. Drop clip.mov on "GIF"
+        3. ...
+  - type: input
+    id: version
+    attributes:
+      label: Roue version
+      description: Output of `roue --version`
+      placeholder: roue 0.1.0
+    validations:
+      required: true
+  - type: input
+    id: distro
+    attributes:
+      label: Distribution and version
+      placeholder: Ubuntu 24.04
+    validations:
+      required: true
+  - type: dropdown
+    id: session
+    attributes:
+      label: Session type
+      description: "`echo $XDG_SESSION_TYPE`"
+      options:
+        - Wayland
+        - X11
+        - Not sure
+    validations:
+      required: true
+  - type: dropdown
+    id: entry
+    attributes:
+      label: Where did it happen?
+      multiple: true
+      options:
+        - Drop panel
+        - Files right-click menu
+        - Command line
+        - Preferences
+        - Installation
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Output of `roue doctor`
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: verbose
+    attributes:
+      label: Error details
+      description: If a conversion failed, run it again from a terminal with `--verbose`, e.g. `roue convert gif clip.mov --verbose`, and paste the output.
+      render: text

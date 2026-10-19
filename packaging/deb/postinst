@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+
+# Byte-compile the Python package (what dh_python3 would generate).
+if [ "$1" = "configure" ] && command -v py3compile >/dev/null 2>&1; then
+    py3compile -p roue
+fi
+
+exit 0

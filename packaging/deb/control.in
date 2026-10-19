@@ -1,0 +1,21 @@
+Package: roue
+Version: @VERSION@
+Section: graphics
+Priority: optional
+Architecture: all
+Maintainer: guilyx <guilyx@users.noreply.github.com>
+Installed-Size: @INSTALLED_SIZE@
+Depends: python3 (>= 3.12), python3-yaml, python3-gi, gir1.2-gtk-4.0, gir1.2-adw-1 (>= 1.5), ffmpeg, libvips-tools | imagemagick, libglib2.0-bin, libnotify-bin
+Recommends: libvips-tools, libheif-plugin-libde265, ghostscript, python3-nautilus, python3-xlib, pandoc
+Suggests: libreoffice-writer, libreoffice-calc, libreoffice-impress, libheif-plugin-x265
+Homepage: https://guilyx.github.io/roue/
+Description: drag-and-drop file converter for the Linux desktop
+ Roue converts files by dropping them on preset tiles: HEIC to JPG, MOV to
+ MP4, video to GIF, Word to PDF, "under 10 MB" for chat apps, and more.
+ .
+ Open the drop panel with a hotkey, right-click files in Files (Nautilus)
+ and pick "Convert to…", or use the roue command in scripts. Results land
+ next to the originals and never overwrite anything.
+ .
+ Everything runs locally with FFmpeg, libvips, Ghostscript, Pandoc and
+ LibreOffice. No uploads, no accounts, no telemetry.

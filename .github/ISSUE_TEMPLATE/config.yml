@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and ideas
+    url: https://github.com/guilyx/roue/discussions
+    about: Ask how to do something, share presets, or discuss ideas.
+  - name: Documentation
+    url: https://guilyx.github.io/roue/docs/
+    about: Install, tutorial, presets reference, Wayland vs X11 FAQ.
+  - name: Security issue
+    url: https://github.com/guilyx/roue/security/advisories/new
+    about: Report a vulnerability privately. Please don't open a public issue.

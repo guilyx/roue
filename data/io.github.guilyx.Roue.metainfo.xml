@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2026 Erwin Lejeune -->
+<component type="desktop-application">
+  <id>io.github.guilyx.Roue</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+
+  <name>Roue</name>
+  <summary>Drop a file, get the file you wanted</summary>
+
+  <developer id="io.github.guilyx">
+    <name>Erwin Lejeune</name>
+  </developer>
+
+  <description>
+    <p>
+      Roue converts files by dropping them on preset tiles. Press a hotkey,
+      drop a file, done. No dialogs, no editors, no uploads.
+    </p>
+    <p>Presets include:</p>
+    <ul>
+      <li>Images: JPG, PNG, WebP, AVIF, HEIC to JPG, resize, compress, remove location and camera metadata</li>
+      <li>Video: MP4, GIF, WebM, under 10 MB or 25 MB for chat and email, mute</li>
+      <li>Audio: MP3, Opus, WAV, FLAC, even out loudness, extract the sound of a video</li>
+      <li>Documents: Word, Excel, PowerPoint and Markdown to PDF, compress PDF, PDF pages to images or text</li>
+    </ul>
+    <p>Three ways in:</p>
+    <ul>
+      <li>The drop panel, opened with a hotkey (Super+Shift+D by default), or by Shift-dragging any file on X11</li>
+      <li>"Convert to…" in the right-click menu of Files</li>
+      <li>The roue command, for scripts</li>
+    </ul>
+    <p>
+      Results are saved next to the originals and never overwrite anything.
+      Everything runs on your computer with FFmpeg, libvips, Ghostscript,
+      Pandoc and LibreOffice. Add your own presets as small YAML files.
+    </p>
+  </description>
+
+  <launchable type="desktop-id">io.github.guilyx.Roue.desktop</launchable>
+
+  <screenshots>
+    <screenshot type="default">
+      <caption>The drop panel</caption>
+      <image>https://raw.githubusercontent.com/guilyx/roue/main/website/assets/screenshots/panel-light.png</image>
+    </screenshot>
+  </screenshots>
+
+  <url type="homepage">https://guilyx.github.io/roue/</url>
+  <url type="bugtracker">https://github.com/guilyx/roue/issues</url>
+  <url type="vcs-browser">https://github.com/guilyx/roue</url>
+  <url type="help">https://guilyx.github.io/roue/docs/</url>
+  <url type="contribute">https://github.com/guilyx/roue/blob/main/CONTRIBUTING.md</url>
+
+  <provides>
+    <binary>roue</binary>
+    <dbus type="user">io.github.guilyx.Roue</dbus>
+  </provides>
+
+  <categories>
+    <category>Utility</category>
+    <category>Graphics</category>
+    <category>AudioVideo</category>
+  </categories>
+
+  <keywords>
+    <keyword>convert</keyword>
+    <keyword>converter</keyword>
+    <keyword>heic</keyword>
+    <keyword>gif</keyword>
+    <keyword>pdf</keyword>
+    <keyword>compress</keyword>
+  </keywords>
+
+  <requires>
+    <display_length compare="ge">360</display_length>
+  </requires>
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+  </supports>
+
+  <content_rating type="oars-1.1"/>
+
+  <branding>
+    <color type="primary" scheme_preference="light">#d9d5e3</color>
+    <color type="primary" scheme_preference="dark">#3d3846</color>
+  </branding>
+
+  <releases>
+    <release version="0.1.0" date="2026-10-19">
+      <description>
+        <p>First release: drop panel, Files menu, command line and 27 built-in presets.</p>
+      </description>
+    </release>
+  </releases>
+</component>
