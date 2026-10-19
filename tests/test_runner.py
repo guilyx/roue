@@ -9,6 +9,7 @@ from typing import Any
 
 import pytest
 
+from roue.engine.backends.base import friendly_failure
 from roue.engine.presets import Preset, parse_preset
 from roue.engine.runner import Job, JobState, Runner, expand_inputs, human_size
 
@@ -58,6 +59,17 @@ def test_known_tool_errors_are_translated(workdir: Path) -> None:
     preset = command_preset('echo "write error: No space left on device" >&2; exit 1')
     [job] = Runner().run(preset, [write(workdir / "a.txt")]).jobs
     assert job.message == "The disk is full."
+
+
+@pytest.mark.parametrize(
+    ("output", "package"),
+    [
+        ("heifsave: Unsupported compression", "libheif-plugin-aomenc"),
+        ("heif: Unsupported feature: Unsupported codec (4.3000)", "libheif-plugin-libde265"),
+    ],
+)
+def test_missing_heif_plugins_are_named(output: str, package: str) -> None:
+    assert package in friendly_failure(output, "generic failure", "image/heic")
 
 
 def test_wrong_kind_of_file_is_skipped(workdir: Path) -> None:

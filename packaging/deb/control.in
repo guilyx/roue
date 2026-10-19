@@ -6,7 +6,7 @@ Architecture: all
 Maintainer: guilyx <guilyx@users.noreply.github.com>
 Installed-Size: @INSTALLED_SIZE@
 Depends: python3 (>= 3.12), python3-yaml, python3-gi, gir1.2-gtk-4.0, gir1.2-adw-1 (>= 1.5), ffmpeg, libvips-tools | imagemagick, libglib2.0-bin, libnotify-bin
-Recommends: libvips-tools, libheif-plugin-libde265, ghostscript, python3-nautilus, python3-xlib, pandoc
+Recommends: libvips-tools, libheif-plugin-libde265, libheif-plugin-aomenc, ghostscript, python3-nautilus, python3-xlib, pandoc
 Suggests: libreoffice-writer, libreoffice-calc, libreoffice-impress, libheif-plugin-x265
 Homepage: https://guilyx.github.io/roue/
 Description: drag-and-drop file converter for the Linux desktop

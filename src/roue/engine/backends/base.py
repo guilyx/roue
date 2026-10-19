@@ -30,6 +30,17 @@ class Backend(Protocol):
 
 
 _FRIENDLY_FAILURES: tuple[tuple[str, str], ...] = (
+    # libheif without codec plugins (they're separate packages on Debian/Ubuntu).
+    (
+        "heifsave: Unsupported compression",
+        "Saving this format needs an encoder that isn't installed. "
+        "For AVIF install libheif-plugin-aomenc, for HEIC libheif-plugin-x265.",
+    ),
+    (
+        "Unsupported codec",
+        "Opening this image needs a decoder that isn't installed. "
+        "For HEIC photos install libheif-plugin-libde265.",
+    ),
     ("No space left on device", "The disk is full."),
     ("Permission denied", "Roue isn't allowed to read or write one of the files."),
     ("Invalid data found when processing input", "This file seems damaged or isn't a real {noun}."),
