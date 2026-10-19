@@ -354,6 +354,8 @@ kbd {
   .wd-t { font-size: 15.5px; }
   .wd-s { font-size: 12px; }
   .wd-hs { font-size: 11.5px; }
+  .wd-note { font-size: 3.4cqw; }
+  .wd-note-buttons span { font-size: 3cqw; }
 }
 
 .wd-file {

@@ -31,10 +31,10 @@ def has_display() -> bool:
 
 
 def trigger_explanation() -> str:
-    """One line telling people how they'll open the panel in this session."""
+    """One line telling people how they'll open the wheel in this session."""
     kind = session_type()
     if kind == "x11":
-        return "Hold Shift while dragging a file to pop the panel up, or press the hotkey."
+        return "Hold Shift while dragging a file to open the wheel, or press the hotkey."
     if kind == "wayland":
-        return "Press the hotkey, then drag your file in. Or right-click it in Files."
+        return "Right-click files in Files > Convert with Roue…, or press the hotkey and drop."
     return "No desktop session detected: use 'roue convert' from the terminal."

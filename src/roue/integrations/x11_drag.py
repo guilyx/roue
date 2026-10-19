@@ -1,4 +1,4 @@
-"""Shift-drag on X11: pop the panel up when a drag starts with Shift held.
+"""Shift-drag on X11: open the wheel when a drag starts with Shift held.
 
 Every X11 drag-and-drop source takes ownership of the ``XdndSelection``
 selection when a drag starts. XFixes tells us when that happens; we then

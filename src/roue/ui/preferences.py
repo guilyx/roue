@@ -1,4 +1,4 @@
-"""Preferences: how the panel opens, where results go, presets, and tools."""
+"""Preferences: how Roue opens, where results go, presets, and tools."""
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from .application import RoueApplication
 
 EXAMPLE_PRESET = """\
-# A custom preset. Copy this file, change it, and reopen the panel.
+# A custom preset. Copy this file, change it, and reopen the wheel.
 # Full reference: {website}docs/custom-presets.html
 id: my-webp-thumbnail
 name: Thumbnail
@@ -65,7 +65,7 @@ class PreferencesDialog(Adw.PreferencesDialog):
         page = Adw.PreferencesPage(title="General", icon_name="preferences-system-symbolic")
 
         opening = Adw.PreferencesGroup(
-            title="Opening the Panel", description=session.trigger_explanation()
+            title="Opening Roue", description=session.trigger_explanation()
         )
         self.hotkey_row = Adw.ActionRow(title="Keyboard shortcut")
         self.hotkey_button = Gtk.Button(valign=Gtk.Align.CENTER)
@@ -76,7 +76,7 @@ class PreferencesDialog(Adw.PreferencesDialog):
 
         shift = self._switch(
             "Shift-drag",
-            "Hold Shift while dragging any file to pop the panel up",
+            "Hold Shift while dragging any file to open the wheel around it",
             "shift_drag",
         )
         if session.session_type() != "x11":
@@ -89,7 +89,7 @@ class PreferencesDialog(Adw.PreferencesDialog):
         opening.add(
             self._switch(
                 "Stay in the background",
-                "Keeps Roue ready so the panel opens instantly",
+                "Keeps Roue ready so the wheel opens instantly",
                 "stay_in_background",
             )
         )
