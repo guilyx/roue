@@ -109,6 +109,42 @@ def system_installed(key: str) -> bool:
     return desktop_targets(SYSTEM_DATA)[key].exists()
 
 
+def _boot_time() -> float:
+    for line in Path("/proc/stat").read_text().splitlines():
+        if line.startswith("btime "):
+            return float(line.split()[1])
+    return 0.0
+
+
+def nautilus_started_before(moment: float) -> bool:
+    """True if Files is running and started before ``moment`` (a timestamp).
+
+    Files loads extensions when it starts, so it needs a restart to show a
+    menu installed after that.
+    """
+    try:
+        boot = _boot_time()
+        ticks = os.sysconf("SC_CLK_TCK")
+        entries = list(Path("/proc").iterdir())
+    except (OSError, ValueError):
+        return False
+    uid = os.getuid()
+    for entry in entries:
+        if not entry.name.isdigit():
+            continue
+        try:
+            if entry.stat().st_uid != uid or (entry / "comm").read_text().strip() != "nautilus":
+                continue
+            # Field 22 of /proc/PID/stat: start time in clock ticks after boot.
+            fields = (entry / "stat").read_text().rsplit(")", 1)[1].split()
+            started = boot + int(fields[19]) / ticks
+        except (OSError, IndexError, ValueError):
+            continue
+        if started < moment:
+            return True
+    return False
+
+
 def restart_nautilus() -> None:
     if shutil.which("nautilus"):
         subprocess.run(["nautilus", "-q"], capture_output=True, timeout=10, check=False)

@@ -316,7 +316,7 @@ def _gui_status() -> tuple[bool, str]:
 
 
 def cmd_doctor(args: argparse.Namespace) -> int:
-    from .integrations import desktop, hotkey
+    from .integrations import desktop, gnome_shell, hotkey
 
     s = Style(sys.stdout)
     print(s.bold(f"{APP_NAME} {__version__}") + s.dim(" · checking your system\n"))
@@ -363,6 +363,13 @@ def cmd_doctor(args: argparse.Namespace) -> int:
     if not desktop.nautilus_python_available():
         detail += " (needs python3-nautilus)"
     print(f"  {mark} {'Files menu':<12} {s.dim(detail)}")
+    if gnome_shell.wanted():
+        state = gnome_shell.state()
+        mark = s.green("✓") if state is gnome_shell.State.ACTIVE else s.yellow("-")
+        detail = gnome_shell.describe(state)
+        if state in (gnome_shell.State.OFF, gnome_shell.State.MISSING):
+            detail += " · run: roue setup"
+        print(f"  {mark} {'GNOME helper':<12} {s.dim(detail)}")
     return EXIT_OK
 
 
@@ -402,11 +409,13 @@ def cmd_undo(args: argparse.Namespace) -> int:
 
 
 def cmd_setup(args: argparse.Namespace) -> int:
-    from .integrations import desktop, hotkey
+    from .integrations import desktop, gnome_shell, hotkey
 
     s = Style(sys.stdout)
     if args.remove:
         removed = desktop.uninstall()
+        gnome_shell.disable()
+        removed += gnome_shell.uninstall()
         hotkey_removed = hotkey.remove()
         for path in removed:
             print(f"  removed {path}")
@@ -423,20 +432,32 @@ def cmd_setup(args: argparse.Namespace) -> int:
         for item in desktop.install_desktop_files(command):
             print(f"  {s.green('✓')} {item.what}: {s.dim(str(item.path))}")
     if not args.no_nautilus:
-        if desktop.system_installed("nautilus"):
-            print(f"  {s.green('✓')} Files right-click menu: installed by your package")
-        elif desktop.nautilus_python_available():
-            item = desktop.install_nautilus_extension(command)
-            print(f"  {s.green('✓')} {item.what}: {s.dim(str(item.path))}")
-            if args.restart_files:
-                desktop.restart_nautilus()
-            else:
-                print(s.dim("    Restart Files to see it: nautilus -q"))
-        else:
+        if not desktop.nautilus_python_available():
             print(
                 f"  {s.yellow('-')} Files menu skipped: install python3-nautilus, "
                 "then run roue setup again"
             )
+        else:
+            if desktop.system_installed("nautilus"):
+                print(f"  {s.green('✓')} Files right-click menu: installed by your package")
+            else:
+                item = desktop.install_nautilus_extension(command)
+                print(f"  {s.green('✓')} {item.what}: {s.dim(str(item.path))}")
+            menu = desktop.desktop_targets(
+                desktop.SYSTEM_DATA if desktop.system_installed("nautilus") else None
+            )["nautilus"]
+            if desktop.nautilus_started_before(menu.stat().st_mtime):
+                if args.restart_files:
+                    desktop.restart_nautilus()
+                else:
+                    print(s.dim("    Restart Files to see the menu: nautilus -q"))
+    if gnome_shell.wanted() and not args.no_gnome_helper:
+        if not gnome_shell.installed():
+            item = gnome_shell.install()
+            print(f"  {s.green('✓')} {item.what}: {s.dim(str(item.path))}")
+        state = gnome_shell.enable()
+        mark = s.green("✓") if state is gnome_shell.State.ACTIVE else s.yellow("-")
+        print(f"  {mark} GNOME helper: {gnome_shell.describe(state)}")
     if not args.no_hotkey:
         wheel = f"{command} wheel"
         if hotkey.can_install():
@@ -543,6 +564,11 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--no-hotkey", action="store_true", help="don't set up the hotkey")
     p.add_argument("--no-nautilus", action="store_true", help="don't add the Files menu")
     p.add_argument("--restart-files", action="store_true", help="restart Files to load the menu")
+    p.add_argument(
+        "--no-gnome-helper",
+        action="store_true",
+        help="don't turn on the GNOME helper (wheel on top, at the pointer)",
+    )
     p.add_argument("--remove", action="store_true", help="undo 'roue setup'")
     p.set_defaults(func=cmd_setup)
 

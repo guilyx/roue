@@ -1,7 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-  <circle cx="8" cy="8" r="5.5" fill="none" stroke="#241f31" stroke-width="2.4" stroke-dasharray="7.439 34.558" transform="rotate(-83.75 8 8)"/>
-  <circle cx="8" cy="8" r="5.5" fill="none" stroke="#241f31" stroke-width="2.4" stroke-dasharray="7.439 34.558" transform="rotate(6.25 8 8)"/>
-  <circle cx="8" cy="8" r="5.5" fill="none" stroke="#241f31" stroke-width="2.4" stroke-dasharray="7.439 34.558" transform="rotate(96.25 8 8)"/>
-  <circle cx="8" cy="8" r="5.5" fill="none" stroke="#241f31" stroke-width="2.4" stroke-dasharray="7.439 34.558" transform="rotate(186.25 8 8)"/>
+  <!-- Fills only: GNOME recolours symbolic icons by fill and drops strokes. -->
+  <path fill="#241f31" d="M8.729 1.340A6.7 6.7 0 0 1 14.660 7.271L12.274 7.532A4.3 4.3 0 0 0 8.468 3.726ZM14.660 8.729A6.7 6.7 0 0 1 8.729 14.660L8.468 12.274A4.3 4.3 0 0 0 12.274 8.468ZM7.271 14.660A6.7 6.7 0 0 1 1.340 8.729L3.726 8.468A4.3 4.3 0 0 0 7.532 12.274ZM1.340 7.271A6.7 6.7 0 0 1 7.271 1.340L7.532 3.726A4.3 4.3 0 0 0 3.726 7.532Z"/>
   <circle cx="8" cy="8" r="1.8" fill="#241f31"/>
 </svg>

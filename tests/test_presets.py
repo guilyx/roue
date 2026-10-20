@@ -123,3 +123,14 @@ def test_same_format_keeps_the_extension_case() -> None:
     preset = load_presets(include_user=False).get("strip-metadata")
     assert preset.output_extension(Path("IMG_0001.HEIC")) == "HEIC"
     assert preset.output_extension(Path("photo.jpg")) == "jpg"
+
+
+def test_pdf_preset_needs_libreoffice_or_a_pdf_engine(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Pandoc alone can't make PDFs: the tile mustn't look ready."""
+    from roue.engine import tools
+    from roue.engine.backends import missing_tools
+
+    pdf = load_presets().get("pdf")
+    monkeypatch.setenv("ROUE_DISABLE_TOOLS", ",".join(["libreoffice", *tools.PDF_ENGINES]))
+    tools.which.cache_clear()
+    assert ("libreoffice", *tools.PDF_ENGINES) in missing_tools(pdf)

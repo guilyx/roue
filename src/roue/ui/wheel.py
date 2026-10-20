@@ -2,9 +2,10 @@
 
 It comes in two forms, sharing one view:
 
-- **overlay**: a transparent full-screen layer with the wheel centred on the
-  pointer. Used when the files are already known (Files > Convert with
-  Roue…) and for Shift-drag on X11. Clicking outside the wheel closes it.
+- **overlay**: a transparent layer over the screen with the wheel centred on
+  the pointer. Used when the files are already known (Files > Convert with
+  Roue…) and for Shift-drag on X11. Clicking outside the wheel, or switching
+  to another window, closes it.
 - **floating**: a small round window to drop files on (the hotkey). It also
   picks up files copied with Ctrl+C.
 
@@ -317,6 +318,8 @@ class WheelWindow(Gtk.Window):
         self._dragged: list[Path] = []  # files hovering over the wheel in a drag
         self.overlay = overlay
         self._closing = False
+        self._was_active = False
+        self._guessed_center = False  # centred on the screen, pointer still unknown
         self.add_css_class("roue-wheel")
         if not self._transparent_ok():
             self.overlay = overlay = False
@@ -335,22 +338,38 @@ class WheelWindow(Gtk.Window):
                 self.fullscreen_on_monitor(monitor)
                 self.view.set_center(pointer[0] - geo.x, pointer[1] - geo.y)
             else:
-                self.fullscreen()
+                if self._on_wayland():
+                    # GNOME paints black behind full-screen Wayland windows,
+                    # transparent or not; a maximised window stays see-through.
+                    self.maximize()
+                else:
+                    self.fullscreen()
                 # On Wayland the pointer position arrives with the first enter
-                # event; if it never does (keyboard use), centre on screen.
-                GLib.timeout_add(220, self._center_fallback)
+                # event, shortly after the window maps. If it doesn't (keyboard
+                # use), centre on the screen until the pointer shows up.
+                self.connect("map", lambda _w: GLib.timeout_add(400, self._center_fallback))
         else:
             size = self.view.geometry.size
             self.set_default_size(size, size)
             self.set_resizable(False)
             self.view.set_center(size / 2, size / 2)
         self._install_controllers()
+        self.connect("notify::is-active", self._on_active_changed)
+        # On Wayland the clipboard is only readable once the window has focus,
+        # and copied files may arrive after the wheel opened: look again then.
+        clipboard = self.get_clipboard()
+        handler = clipboard.connect("changed", lambda _cb: self._maybe_paste())
+        self.connect("destroy", lambda _w: clipboard.disconnect(handler))
 
     # -- setup ------------------------------------------------------------------
 
     def _transparent_ok(self) -> bool:
         display = self.get_display() or Gdk.Display.get_default()
         return bool(display and display.is_composited())
+
+    def _on_wayland(self) -> bool:
+        display = self.get_display() or Gdk.Display.get_default()
+        return bool(display and display.__gtype__.name.startswith("GdkWayland"))
 
     def _monitor_at(self, point: tuple[float, float]) -> Gdk.Monitor | None:
         display = self.get_display() or Gdk.Display.get_default()
@@ -367,6 +386,7 @@ class WheelWindow(Gtk.Window):
     def _center_fallback(self) -> bool:
         if self.view.center is None:
             self.view.set_center(self.view.get_width() / 2, self.view.get_height() / 2)
+            self._guessed_center = True
         return GLib.SOURCE_REMOVE
 
     def _install_controllers(self) -> None:
@@ -426,6 +446,10 @@ class WheelWindow(Gtk.Window):
     def stage(self, files: list[Path]) -> None:
         self.files = [p for p in files if p.exists()]
         self._rebuild()
+
+    def _maybe_paste(self) -> None:
+        if not self.overlay and not self.files and not self._closing:
+            self.paste_files()
 
     def paste_files(self) -> None:
         """Use files copied in Files, unless they were already used once."""
@@ -507,8 +531,23 @@ class WheelWindow(Gtk.Window):
 
     # -- events -----------------------------------------------------------------------
 
+    def _on_active_changed(self, _window: Gtk.Window, _pspec: object) -> None:
+        if self.is_active():
+            self._was_active = True
+            self._maybe_paste()
+        elif self.overlay and self.files and self._was_active:
+            # The layer covers the screen: never leave it behind another window.
+            # (A Shift-drag wheel has no files yet and closes when the drag ends.)
+            GLib.timeout_add(150, self._dismiss_if_inactive)
+
+    def _dismiss_if_inactive(self) -> bool:
+        if not self.is_active() and not self._closing:
+            self.dismiss()
+        return GLib.SOURCE_REMOVE
+
     def _on_motion(self, _controller: Gtk.EventControllerMotion, x: float, y: float) -> None:
-        if self.view.center is None and self.overlay:
+        if self.overlay and (self.view.center is None or self._guessed_center):
+            self._guessed_center = False
             self.view.set_center(x, y)
             return
         self.view.set_hover(self.view.slice_at_point(x, y))
@@ -522,6 +561,7 @@ class WheelWindow(Gtk.Window):
             self.dismiss()
 
     def _on_key(self, _c: Gtk.EventControllerKey, keyval: int, _code: int, state: int) -> bool:
+        self._guessed_center = False  # keyboard user: keep the wheel where it is
         count = len(self.view.slices)
         current = self.view.hover
         if keyval == Gdk.KEY_Escape:

@@ -21,7 +21,13 @@ from typing import Any
 
 import gi
 
-gi.require_version("Nautilus", "4.0")
+# Nautilus 43-48 ship the 4.0 extension API, Nautilus 49+ (Ubuntu 25.10+) ship 4.1.
+for _version in ("4.1", "4.0"):
+    try:
+        gi.require_version("Nautilus", _version)
+        break
+    except ValueError:  # not installed, or the host already loaded the other one
+        continue
 from gi.repository import Gio, GLib, GObject, Nautilus  # noqa: E402
 
 APP_ID = "io.github.guilyx.Roue"
@@ -135,7 +141,14 @@ def _platform_data() -> dict[str, GLib.Variant]:
         gi.require_version("Gdk", "4.0")
         from gi.repository import Gdk
 
-        info = Gio.DesktopAppInfo.new(f"{APP_ID}.desktop")
+        try:  # GLib >= 2.80 moved it to GioUnix; Gio.DesktopAppInfo is deprecated
+            gi.require_version("GioUnix", "2.0")
+            from gi.repository import GioUnix
+
+            desktop_app_info: Any = GioUnix.DesktopAppInfo
+        except (ValueError, ImportError):
+            desktop_app_info = Gio.DesktopAppInfo
+        info = desktop_app_info.new(f"{APP_ID}.desktop")
         display = Gdk.Display.get_default()
         if info is None or display is None:
             return {}

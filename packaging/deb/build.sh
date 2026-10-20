@@ -5,8 +5,9 @@
 #
 # Needs only dpkg-deb, python3 (>= 3.12) and gzip. The package installs the
 # pure-Python roue package into /usr/lib/python3/dist-packages and the
-# desktop integration (launcher, D-Bus service, icons, Files menu) under
-# /usr/share. Icon and desktop caches are refreshed by dpkg triggers.
+# desktop integration (launcher, D-Bus service, icons, Files menu, GNOME
+# helper extension) under /usr/share. Icon and desktop caches are refreshed
+# by dpkg triggers.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -52,11 +53,13 @@ PYTHONPATH="$ROOT/src" "$PYTHON" - "$SHARE" <<'EOF'
 import sys
 from pathlib import Path
 
+from roue.integrations import gnome_shell
 from roue.integrations.desktop import install_desktop_files, install_nautilus_extension
 
 base = Path(sys.argv[1])
 install_desktop_files("/usr/bin/roue", base=base, refresh=False)
 install_nautilus_extension("/usr/bin/roue", base=base)
+gnome_shell.install(base=base)
 EOF
 # Belt and braces: caches belong to dpkg triggers, never ship them.
 rm -f "$SHARE/applications/mimeinfo.cache" "$SHARE/icons/hicolor/icon-theme.cache"

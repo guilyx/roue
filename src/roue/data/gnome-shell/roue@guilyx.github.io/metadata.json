@@ -1,0 +1,7 @@
+{
+  "uuid": "roue@guilyx.github.io",
+  "name": "Roue",
+  "description": "Keeps Roue's conversion wheel above other windows and opens it at the pointer. Needs the Roue app.",
+  "url": "https://github.com/guilyx/roue",
+  "shell-version": ["45", "46", "47", "48", "49", "50"]
+}
