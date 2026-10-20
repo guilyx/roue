@@ -36,6 +36,8 @@ class Settings:
     shift_drag: bool = True
     #: Convert everything inside dropped folders, not just the top level.
     recursive_folders: bool = False
+    #: The setup dialog was shown once (it stays in the main menu).
+    welcome_done: bool = False
 
     @classmethod
     def load(cls, path: Path | None = None) -> Settings:

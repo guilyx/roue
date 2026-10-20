@@ -83,6 +83,7 @@ class DropPanel(Adw.ApplicationWindow):
         section.append("Undo Last Conversion", "app.undo")
         menu.append_section(None, section)
         section = Gio.Menu()
+        section.append("Set Up Roue…", "app.welcome")
         section.append("Preferences", "app.preferences")
         section.append("About Roue", "app.about")
         menu.append_section(None, section)

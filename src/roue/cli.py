@@ -370,6 +370,12 @@ def cmd_doctor(args: argparse.Namespace) -> int:
         if state in (gnome_shell.State.OFF, gnome_shell.State.MISSING):
             detail += " · run: roue setup"
         print(f"  {mark} {'GNOME helper':<12} {s.dim(detail)}")
+    if desktop.system_installed("desktop"):
+        if desktop.UPDATE_CHANNEL.exists():
+            print(f"  {s.green('✓')} {'Updates':<12} {s.dim('Software Updater (Roue channel)')}")
+        else:
+            hint = "not set up · see " + WEBSITE + "docs/install.html"
+            print(f"  {s.yellow('-')} {'Updates':<12} {s.dim(hint)}")
     return EXIT_OK
 
 

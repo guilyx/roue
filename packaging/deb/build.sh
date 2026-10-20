@@ -3,7 +3,7 @@
 #
 # Usage: packaging/deb/build.sh [output-dir]
 #
-# Needs only dpkg-deb, python3 (>= 3.12) and gzip. The package installs the
+# Needs dpkg-deb, python3 (>= 3.12), gzip and gpg. The package installs the
 # pure-Python roue package into /usr/lib/python3/dist-packages and the
 # desktop integration (launcher, D-Bus service, icons, Files menu, GNOME
 # helper extension) under /usr/share. Icon and desktop caches are refreshed
@@ -67,7 +67,18 @@ rm -f "$SHARE/applications/mimeinfo.cache" "$SHARE/icons/hicolor/icon-theme.cach
 install -Dm0644 "$ROOT/data/io.github.guilyx.Roue.metainfo.xml" \
     "$SHARE/metainfo/io.github.guilyx.Roue.metainfo.xml"
 
-# 4. Docs and man page.
+# 4. The update channel: Software Updater then offers new Roue versions.
+# Only once the signing key exists (scripts/apt-key.sh), or apt would fail.
+KEYRING="$ROOT/packaging/apt/roue-archive-keyring.asc"
+if [[ -f "$KEYRING" ]]; then
+    install -Dm0644 "$ROOT/packaging/apt/roue.sources" "$PKG/etc/apt/sources.list.d/roue.sources"
+    install -d "$SHARE/keyrings"
+    gpg --batch --dearmor < "$KEYRING" > "$SHARE/keyrings/roue-archive-keyring.gpg"
+else
+    echo "note: no packaging/apt/roue-archive-keyring.asc: building without the update channel"
+fi
+
+# 5. Docs and man page.
 install -Dm0644 "$HERE/copyright" "$DOC/copyright"
 STAMP="${SOURCE_DATE_EPOCH:-$(git -C "$ROOT" log -1 --format=%ct 2>/dev/null || date +%s)}"
 cat > "$STAGE/changelog" <<CHANGELOG
@@ -82,12 +93,16 @@ gzip -9nc "$STAGE/changelog" > "$DOC/changelog.gz"
 install -d "$SHARE/man/man1"
 gzip -9nc "$ROOT/packaging/man/roue.1" > "$SHARE/man/man1/roue.1.gz"
 
-# 5. Control files.
+# 6. Control files.
 find "$PKG" -type d -exec chmod 0755 {} +
 find "$PKG" -type f ! -path "$PKG/usr/bin/*" -exec chmod 0644 {} +
 install -d "$PKG/DEBIAN"
 SIZE="$(du -sk --exclude=DEBIAN "$PKG" | cut -f1)"
 sed -e "s/@VERSION@/$VERSION/" -e "s/@INSTALLED_SIZE@/$SIZE/" "$HERE/control.in" > "$PKG/DEBIAN/control"
+if [[ -f "$PKG/etc/apt/sources.list.d/roue.sources" ]]; then
+    echo "/etc/apt/sources.list.d/roue.sources" > "$PKG/DEBIAN/conffiles"
+    chmod 0644 "$PKG/DEBIAN/conffiles"
+fi
 install -m0755 "$HERE/postinst" "$PKG/DEBIAN/postinst"
 install -m0755 "$HERE/prerm" "$PKG/DEBIAN/prerm"
 (cd "$PKG" && find usr -type f -exec md5sum {} + | sort -k2) > "$PKG/DEBIAN/md5sums"

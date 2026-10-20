@@ -103,6 +103,8 @@ def install_nautilus_extension(command: str | None = None, base: Path | None = N
 
 #: Where the .deb puts the same files. ``roue setup`` skips what's already there.
 SYSTEM_DATA = Path("/usr/share")
+#: The APT source the .deb (or the install script) adds for updates.
+UPDATE_CHANNEL = Path("/etc/apt/sources.list.d/roue.sources")
 
 
 def system_installed(key: str) -> bool:

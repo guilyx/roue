@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: write
+  actions: write  # to start the Website workflow, which publishes the update channel
 
 jobs:
   release:
@@ -41,7 +42,12 @@ jobs:
             found {print}
           ' CHANGELOG.md > release-notes.md
           echo "" >> release-notes.md
-          echo "Install on Ubuntu/Debian: download \`roue_${version}_all.deb\`, then \`sudo apt install ./roue_${version}_all.deb && roue setup\`." >> release-notes.md
+          {
+            echo "**Install on Ubuntu 24.04+ or Debian 13+:** \`wget -qO- https://guilyx.github.io/roue/install.sh | sh\`"
+            echo ""
+            echo "Or download \`roue_${version}_all.deb\` and run \`sudo apt install ./roue_${version}_all.deb\`."
+            echo "Already installed? Software Updater offers this version."
+          } >> release-notes.md
 
       - name: Checksums
         run: cd dist && sha256sum * > SHA256SUMS
@@ -54,3 +60,10 @@ jobs:
             dist/*.whl
             dist/*.tar.gz
             dist/SHA256SUMS
+
+      - name: Publish to the update channel
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # Releases made with the workflow token don't trigger other workflows,
+        # but starting one by hand does.
+        run: gh workflow run pages.yml --ref main

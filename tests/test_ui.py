@@ -26,6 +26,7 @@ def run_app(check: object, monkeypatch: pytest.MonkeyPatch) -> dict[str, object]
     monkeypatch.setenv("XDG_SESSION_TYPE", "wayland")
     monkeypatch.setenv("GSK_RENDERER", "cairo")
     app = RoueApplication()
+    app.settings.welcome_done = True  # tests open the setup dialog themselves
     app.set_flags(app.get_flags() | Gio.ApplicationFlags.NON_UNIQUE)
     results: dict[str, object] = {}
 
@@ -179,3 +180,37 @@ def test_notifications_are_built_without_errors(
 
     run_app(check, monkeypatch)
     assert len(sent) == 3
+
+
+def test_setup_dialog_lists_missing_tools(monkeypatch: pytest.MonkeyPatch) -> None:
+    from roue.engine import tools
+
+    monkeypatch.setenv("ROUE_DISABLE_TOOLS", "libreoffice,ghostscript")
+    tools.which.cache_clear()
+
+    def check(app: RoueApplication, results: dict[str, object]) -> None:
+        from gi.repository import Adw
+
+        app.show_welcome()
+        dialog = app.panel.get_visible_dialog() if app.panel else None
+        assert isinstance(dialog, Adw.Dialog)
+        titles = []
+        for group in dialog._groups:  # type: ignore[attr-defined]
+            row = group.get_first_child()
+            stack = [row]
+            while stack:
+                widget = stack.pop()
+                if widget is None:
+                    continue
+                if isinstance(widget, Adw.PreferencesRow):
+                    titles.append(widget.get_title())
+                stack.extend([widget.get_first_child(), widget.get_next_sibling()])
+        results["titles"] = titles
+        dialog.close()
+        results["done"] = app.settings.welcome_done
+
+    results = run_app(check, monkeypatch)
+    assert "Office documents to PDF" in results["titles"]  # type: ignore[operator]
+    assert "PDF tools" in results["titles"]  # type: ignore[operator]
+    assert "Keyboard shortcut" in results["titles"]  # type: ignore[operator]
+    assert results["done"] is True

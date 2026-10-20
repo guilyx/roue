@@ -23,6 +23,7 @@ from typing import Any
 from gi.repository import Adw, Gdk, Gio, GLib, Gtk
 
 from .. import APP_ID, APP_NAME, ISSUES_URL, WEBSITE, __version__
+from ..engine import tools
 from ..engine.history import History
 from ..engine.presets import Preset, PresetRegistry, load_presets
 from ..engine.runner import Batch, JobState, Runner, human_size
@@ -97,6 +98,7 @@ class RoueApplication(Adw.Application):
 
     def do_activate(self) -> None:
         self.show_panel()
+        self._welcome_once()
 
     def do_open(self, files: list[Gio.File], _n_files: int, _hint: str) -> None:
         self.show_panel()
@@ -117,6 +119,8 @@ class RoueApplication(Adw.Application):
             self.panel.stage(files)
         if options.get("preferences"):
             self.show_preferences()
+        elif not files:
+            self._welcome_once()
         return 0
 
     def do_shutdown(self) -> None:
@@ -151,6 +155,12 @@ class RoueApplication(Adw.Application):
         if self.panel:
             self.panel.rebuild()
 
+    def tools_changed(self) -> None:
+        """Called after installing tools: presets may have become ready."""
+        tools.which.cache_clear()
+        if self.panel:
+            self.panel.rebuild()
+
     def reload_presets(self) -> None:
         self.registry = load_presets()
         if self.panel:
@@ -171,6 +181,7 @@ class RoueApplication(Adw.Application):
             "show-wheel": lambda *_: self.show_wheel(),
             "show-panel": lambda *_: self.show_panel(),
             "preferences": lambda *_: self.show_preferences(),
+            "welcome": lambda *_: self.show_welcome(),
             "history": lambda *_: self.show_history(),
             "undo": lambda *_: self.undo(),
             "about": lambda *_: self.show_about(),
@@ -255,6 +266,15 @@ class RoueApplication(Adw.Application):
         except Exception as exc:  # placement is a nicety; never break the wheel
             log.debug("Couldn't place the wheel: %s", exc)
         return GLib.SOURCE_REMOVE
+
+    def show_welcome(self) -> None:
+        from .welcome import WelcomeDialog
+
+        WelcomeDialog(self).present(self.show_panel())
+
+    def _welcome_once(self) -> None:
+        if not self.settings.welcome_done:
+            self.show_welcome()
 
     def show_preferences(self) -> None:
         from .preferences import PreferencesDialog

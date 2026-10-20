@@ -9,6 +9,7 @@ on:
       - "scripts/build_site.py"
       - "src/roue/presets/**"
       - "src/roue/data/icons/**"
+      - "scripts/apt-repo.sh"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -35,6 +36,26 @@ jobs:
         run: PYTHONPATH=src python scripts/build_site.py --check
       - name: Build the site
         run: PYTHONPATH=src python scripts/build_site.py --out _site
+      - name: Publish the update channel (signed APT repository)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          APT_SIGNING_KEY: ${{ secrets.APT_SIGNING_KEY }}
+        run: |
+          if [ -z "$APT_SIGNING_KEY" ]; then
+            echo "::notice::No APT_SIGNING_KEY secret: skipping the update channel (docs/releasing.md)"
+            exit 0
+          fi
+          mkdir -p debs
+          for tag in $(gh release list --limit 5 --exclude-drafts --exclude-pre-releases \
+                         --json tagName --jq '.[].tagName'); do
+            gh release download "$tag" --pattern 'roue_*_all.deb' --dir debs --clobber
+          done
+          if ! ls debs/roue_*_all.deb >/dev/null 2>&1; then
+            echo "::notice::No released .deb yet: skipping the update channel"
+            exit 0
+          fi
+          command -v apt-ftparchive || sudo apt-get install -y apt-utils
+          scripts/apt-repo.sh debs _site/apt
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
