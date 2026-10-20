@@ -14,7 +14,8 @@ It comes in two forms:
 
 - **At the pointer**, over a lightly dimmed screen, when Roue already knows
   the files: **Convert with Roue…** in Files, or Shift-drag on X11. Click a
-  slice to convert. Click outside the wheel, or press **Esc**, to cancel.
+  slice to convert. Click outside the wheel, press **Esc**, or switch to
+  another window to cancel.
 - **As a small round window** you drop files onto, when you press the hotkey.
   It starts with a handful of popular presets and re-arranges itself to fit
   the file you drag over it. Files you copied with **Ctrl+C** are picked up
@@ -32,10 +33,35 @@ background. A notification says when it's done.
 | Ctrl+V | Use copied files |
 | Esc | Close the wheel |
 
-On Wayland, the wheel at the pointer is a transparent full-screen layer: the
-desktop doesn't let apps place windows, but it does tell a full-screen
-window where the pointer is. On X11 the hotkey's wheel opens centred on the
-pointer and stays on top; on Wayland the desktop decides where it goes.
+On Wayland, the wheel at the pointer sits on a see-through layer that covers
+the screen: the desktop doesn't let apps place windows, but it does tell a
+window under the pointer where the pointer is. GNOME paints black behind
+full-screen windows, so on Wayland that layer is a maximised window (the top
+bar and the dock stay visible). It closes as soon as another window takes
+focus, so it never lingers invisibly over your desktop.
+
+On X11 the hotkey's wheel opens centred on the pointer and stays on top. On
+GNOME's Wayland session the [GNOME helper](#the-gnome-helper) does the same;
+on other Wayland desktops the desktop decides where it goes.
+
+## The GNOME helper
+
+Wayland apps can't keep a window above the others, or open it at the
+pointer. On GNOME, a small Shell extension does both for Roue's wheel:
+
+- the hotkey's wheel opens centred on the pointer;
+- the wheel stays above the window you drag from (otherwise clicking a file
+  in a maximised Files window would hide it).
+
+It touches only Roue's wheel window, nothing else. Its id is
+`roue@guilyx.github.io`. The `.deb` installs it; `roue setup`, **Set Up
+Roue** or **Preferences > General** turn it on. GNOME only discovers new
+extensions when your session starts, so after a fresh install it starts the
+next time you log in.
+
+Without it Roue still works: the wheel opens where GNOME puts new windows, and
+**Ctrl+C**, then the hotkey, avoids dragging altogether. Turn it off in
+**Preferences > General** or in GNOME's Extensions app.
 
 ## The hotkey
 
@@ -104,10 +130,11 @@ close it.
 
 ### Dragging onto a covered window (GNOME)
 
-If a maximised window covers the wheel or the panel, start dragging your file,
-press **Super** to open the Activities overview, hover the Roue window until it
-comes forward, then drop. Or skip the drag: **Ctrl+C**, **Super+Shift+D**,
-click a slice.
+With the [GNOME helper](#the-gnome-helper) on, the wheel stays on top, so this
+doesn't happen to it. If a maximised window covers the panel, start dragging
+your file, press **Super** to open the Activities overview, hover the Roue
+window until it comes forward, then drop. Or skip the drag: **Ctrl+C**,
+**Super+Shift+D**, click a slice.
 
 ### Staying in the background
 
@@ -132,7 +159,9 @@ It works by noticing when a drag starts on the X server, so it needs
 **Preferences > General > Shift-drag**.
 
 Wayland keeps each app's drags private by design, so no app can see a drag
-start elsewhere. There, use the Files menu or the hotkey.
+start elsewhere. There, use the Files menu or the hotkey. GNOME 49 and newer
+(Ubuntu 25.10, 26.04) have no X11 session at all, so Shift-drag is for X11
+sessions of Xfce, MATE, Cinnamon and the like.
 
 ## Files (Nautilus) right-click menu
 
@@ -144,7 +173,10 @@ The item only appears when at least one preset fits.
   Debian/Ubuntu, `nautilus-python` on Fedora, `python-nautilus` on Arch.
 - The `.deb` installs the extension system-wide. Otherwise `roue setup` adds it
   to `~/.local/share/nautilus-python/extensions/`.
-- Restart Files once to load it: `nautilus -q`.
+- Works with both Files extension APIs: 4.0 (Nautilus 43–48, Ubuntu 24.04) and
+  4.1 (Nautilus 49+, Ubuntu 25.10 and 26.04).
+- Restart Files once to load it: `nautilus -q`, or the **Restart Files**
+  button in **Set Up Roue**. Files' open windows close.
 - Folders and remote locations without a local path don't get the menu.
 
 The menu asks the Roue app (over D-Bus, starting it if needed) to show the
@@ -158,7 +190,9 @@ Nemo, Dolphin and Thunar menus are on the [roadmap](https://github.com/guilyx/ro
 
 When a conversion finishes and the panel isn't in front (always the case
 after the wheel), you get a desktop notification with **Open** and
-**Show in Folder**. Turn them off in **Preferences > Results**.
+**Show in Folder**. Clicking it shows the result in Files. Roue passes on the
+activation token GNOME sends with the click, so the app it opens is allowed to
+come to the front. Turn notifications off in **Preferences > Results**.
 
 ## D-Bus
 
@@ -192,6 +226,13 @@ gdbus call --session --dest io.github.guilyx.Roue \
 | `dbus-1/services/io.github.guilyx.Roue.service` | Start on demand over D-Bus |
 | `icons/hicolor/scalable/apps/io.github.guilyx.Roue.svg` | Icon |
 | `nautilus-python/extensions/roue_nautilus.py` | Files menu |
+| `gnome-shell/extensions/roue@guilyx.github.io/` | GNOME helper |
 
 They live under `/usr/share` with the `.deb`, or under `~/.local/share` with
-`roue setup`. `roue setup --remove` deletes the ones it added.
+`roue setup`. `roue setup --remove` deletes the ones it added, turns the GNOME
+helper off and removes the hotkey.
+
+The `.deb` also adds Roue's update channel,
+`/etc/apt/sources.list.d/roue.sources`, with its key in
+`/usr/share/keyrings/roue-archive-keyring.gpg`. See
+[Updates](install.md#updates).

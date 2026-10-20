@@ -55,6 +55,7 @@ NAV: list[tuple[str, str]] = [
     ("faq", "FAQ"),
     ("architecture", "Architecture"),
     ("contributing", "Contributing"),
+    ("releasing", "Releasing"),
 ]
 
 # -- describing presets --------------------------------------------------------

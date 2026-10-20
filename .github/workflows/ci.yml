@@ -31,6 +31,8 @@ jobs:
           ruff format --check src tests scripts
       - name: Mypy
         run: mypy
+      - name: Shell scripts
+        run: shellcheck website/install.sh scripts/*.sh packaging/deb/build.sh packaging/deb/postinst packaging/deb/prerm
 
   test:
     name: Tests (Ubuntu 24.04, all tools)
@@ -90,7 +92,9 @@ jobs:
       - name: Install
         run: |
           sudo apt-get update
-          sudo apt-get install -y ./dist/roue_*.deb
+          sudo apt-get install -y ./dist/roue_*.deb lintian
+      - name: Lintian
+        run: lintian --fail-on error --tag-display-limit 0 dist/roue_*.deb
       - name: Smoke test
         run: |
           roue --version
@@ -104,6 +108,10 @@ jobs:
         run: |
           sudo apt-get remove -y roue
           test ! -e /usr/lib/python3/dist-packages/roue
+      - name: Update channel (install, signed apt upgrade, purge)
+        run: |
+          command -v apt-ftparchive || sudo apt-get install -y apt-utils
+          scripts/test-update-channel.sh
       - uses: actions/upload-artifact@v7
         with:
           name: deb

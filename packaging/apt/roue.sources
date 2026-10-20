@@ -1,0 +1,6 @@
+# Roue's update channel: Software Updater installs new Roue versions from here.
+# Installed by the roue package. To stop updates from Roue, delete this file.
+Types: deb
+URIs: https://guilyx.github.io/roue/apt/
+Suites: ./
+Signed-By: /usr/share/keyrings/roue-archive-keyring.gpg

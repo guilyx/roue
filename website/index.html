@@ -55,10 +55,10 @@
             <a class="btn btn-ghost" href="docs/getting-started.html">Read the tutorial</a>
           </div>
           <div class="install" aria-label="Install command">
-            <code id="install-cmd">sudo apt install ./roue_0.1.0_all.deb &amp;&amp; roue setup</code>
+            <code id="install-cmd">wget -qO- https://guilyx.github.io/roue/install.sh | sh</code>
             <button class="copy" type="button" data-copy="#install-cmd" hidden>Copy</button>
           </div>
-          <p class="small muted">Other distributions: <a href="docs/install.html">install from source with pipx</a>. Version 0.1.0 · GPL-3.0-or-later.</p>
+          <p class="small muted">Ubuntu 24.04+ and Debian 13+. Updates arrive through Software Updater. Other distributions: <a href="docs/install.html">install from source with pipx</a>. Version 0.1.0 · GPL-3.0-or-later.</p>
         </div>
 
         <div class="hero-visual">
@@ -287,9 +287,9 @@
         <ol class="steps" role="list">
           <li>
             <h3>Install</h3>
-            <p>Get the <code>.deb</code> from <a href="https://github.com/guilyx/roue/releases/latest">Releases</a>, then:</p>
-            <pre><code>sudo apt install ./roue_0.1.0_all.deb
-roue setup</code></pre>
+            <p>On Ubuntu or Debian, run this in a terminal. It asks for your password, installs Roue and sets up the hotkey and the Files menu:</p>
+            <pre><code>wget -qO- https://guilyx.github.io/roue/install.sh | sh</code></pre>
+            <p class="small muted">Prefer the <code>.deb</code>? Get it from <a href="https://github.com/guilyx/roue/releases/latest">Releases</a>; the first launch walks you through setup.</p>
           </li>
           <li>
             <h3>Open the wheel</h3>

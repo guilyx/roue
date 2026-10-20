@@ -10,10 +10,14 @@ from typing import Any
 import pytest
 
 gi = pytest.importorskip("gi")
-try:
-    gi.require_version("Nautilus", "4.0")
-except ValueError:
-    pytest.skip("nautilus-python (Nautilus 4.0 typelib) isn't installed", allow_module_level=True)
+for _version in ("4.1", "4.0"):
+    try:
+        gi.require_version("Nautilus", _version)
+        break
+    except ValueError:
+        continue
+else:
+    pytest.skip("nautilus-python (Nautilus 4.x typelib) isn't installed", allow_module_level=True)
 
 from gi.repository import Gio  # noqa: E402
 
@@ -64,6 +68,9 @@ def test_no_menu_for_mixed_or_folders(extension: ModuleType) -> None:
     assert menu(extension, [FakeInfo("/tmp/a.zip", "application/zip")]) == []
 
 
-def test_platform_data_is_safe_without_an_installed_app(extension: ModuleType) -> None:
-    # No io.github.guilyx.Roue.desktop in the test environment: no token, no crash.
+def test_platform_data_is_safe_without_an_installed_app(
+    extension: ModuleType, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # The .deb may have installed the real desktop file: look up one that can't exist.
+    monkeypatch.setattr(extension, "APP_ID", "io.github.guilyx.Roue.NotInstalled")
     assert extension._platform_data() == {}

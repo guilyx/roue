@@ -23,6 +23,7 @@ from typing import Any
 from gi.repository import Adw, Gdk, Gio, GLib, Gtk
 
 from .. import APP_ID, APP_NAME, ISSUES_URL, WEBSITE, __version__
+from ..engine import tools
 from ..engine.history import History
 from ..engine.presets import Preset, PresetRegistry, load_presets
 from ..engine.runner import Batch, JobState, Runner, human_size
@@ -33,6 +34,18 @@ from .panel import DropPanel
 from .wheel import WheelWindow
 
 log = logging.getLogger(__name__)
+
+
+class _TokenLaunchContext(Gio.AppLaunchContext):
+    """Hands a Wayland activation token on to the app we launch, so it may
+    come to the front (GNOME otherwise just says "… is ready")."""
+
+    def __init__(self, token: str):
+        super().__init__()
+        self._token = token
+
+    def do_get_startup_notify_id(self, _info: Any, _files: Any) -> str:
+        return self._token
 
 
 class RoueApplication(Adw.Application):
@@ -54,6 +67,8 @@ class RoueApplication(Adw.Application):
         self._drag_started_at = 0.0
         self._last_drop = 0.0
         self._opened_by_drag = False
+        #: Token GNOME sent with the last activation (e.g. a notification click).
+        self._activation_token: str | None = None
 
     # -- lifecycle ------------------------------------------------------------
 
@@ -83,6 +98,7 @@ class RoueApplication(Adw.Application):
 
     def do_activate(self) -> None:
         self.show_panel()
+        self._welcome_once()
 
     def do_open(self, files: list[Gio.File], _n_files: int, _hint: str) -> None:
         self.show_panel()
@@ -103,6 +119,8 @@ class RoueApplication(Adw.Application):
             self.panel.stage(files)
         if options.get("preferences"):
             self.show_preferences()
+        elif not files:
+            self._welcome_once()
         return 0
 
     def do_shutdown(self) -> None:
@@ -137,6 +155,12 @@ class RoueApplication(Adw.Application):
         if self.panel:
             self.panel.rebuild()
 
+    def tools_changed(self) -> None:
+        """Called after installing tools: presets may have become ready."""
+        tools.which.cache_clear()
+        if self.panel:
+            self.panel.rebuild()
+
     def reload_presets(self) -> None:
         self.registry = load_presets()
         if self.panel:
@@ -157,6 +181,7 @@ class RoueApplication(Adw.Application):
             "show-wheel": lambda *_: self.show_wheel(),
             "show-panel": lambda *_: self.show_panel(),
             "preferences": lambda *_: self.show_preferences(),
+            "welcome": lambda *_: self.show_welcome(),
             "history": lambda *_: self.show_history(),
             "undo": lambda *_: self.undo(),
             "about": lambda *_: self.show_about(),
@@ -242,6 +267,15 @@ class RoueApplication(Adw.Application):
             log.debug("Couldn't place the wheel: %s", exc)
         return GLib.SOURCE_REMOVE
 
+    def show_welcome(self) -> None:
+        from .welcome import WelcomeDialog
+
+        WelcomeDialog(self).present(self.show_panel())
+
+    def _welcome_once(self) -> None:
+        if not self.settings.welcome_done:
+            self.show_welcome()
+
     def show_preferences(self) -> None:
         from .preferences import PreferencesDialog
 
@@ -301,14 +335,63 @@ class RoueApplication(Adw.Application):
             return
         self.convert(preset, [Path(p) for p in paths])
 
+    def do_before_emit(self, platform_data: GLib.Variant) -> None:
+        Adw.Application.do_before_emit(self, platform_data)
+        token = platform_data.lookup_value("activation-token", GLib.VariantType("s"))
+        self._activation_token = token.unpack() if token else None
+
+    def _take_activation_token(self) -> str | None:
+        token, self._activation_token = self._activation_token, None
+        return token
+
+    def _visible_panel(self) -> DropPanel | None:
+        return self.panel if self.panel and self.panel.get_visible() else None
+
     def _on_open_file(self, _action: Gio.SimpleAction, param: GLib.Variant) -> None:
-        launcher = Gtk.FileLauncher(file=Gio.File.new_for_uri(param.unpack()))
-        launcher.launch(self.panel if self.panel and self.panel.get_visible() else None, None, None)
+        uri = param.unpack()
+        token = self._take_activation_token()
+        if token and not self._visible_panel():
+            try:
+                Gio.AppInfo.launch_default_for_uri(uri, _TokenLaunchContext(token))
+                return
+            except GLib.Error as exc:
+                log.debug("Couldn't open %s with a token: %s", uri, exc.message)
+        launcher = Gtk.FileLauncher(file=Gio.File.new_for_uri(uri))
+        launcher.launch(self._visible_panel(), None, None)
 
     def _on_show_in_folder(self, _action: Gio.SimpleAction, param: GLib.Variant) -> None:
-        launcher = Gtk.FileLauncher(file=Gio.File.new_for_uri(param.unpack()))
-        parent = self.panel if self.panel and self.panel.get_visible() else None
-        launcher.open_containing_folder(parent, None, None)
+        uri = param.unpack()
+        token = self._take_activation_token()
+
+        def fallback() -> None:
+            launcher = Gtk.FileLauncher(file=Gio.File.new_for_uri(uri))
+            launcher.open_containing_folder(self._visible_panel(), None, None)
+
+        bus = self.get_dbus_connection()
+        if not token or bus is None or self._visible_panel():
+            fallback()
+            return
+
+        def done(conn: Gio.DBusConnection, result: Gio.AsyncResult) -> None:
+            try:
+                conn.call_finish(result)
+            except GLib.Error as exc:
+                log.debug("ShowItems failed (%s), using the file launcher", exc.message)
+                fallback()
+
+        # The call GTK makes too, plus the token so the file manager comes forward.
+        bus.call(
+            "org.freedesktop.FileManager1",
+            "/org/freedesktop/FileManager1",
+            "org.freedesktop.FileManager1",
+            "ShowItems",
+            GLib.Variant("(ass)", ([uri], token)),
+            None,
+            Gio.DBusCallFlags.NONE,
+            5000,
+            None,
+            done,
+        )
 
     # -- conversions ------------------------------------------------------------
 

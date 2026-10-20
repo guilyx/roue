@@ -10,7 +10,7 @@ from .. import WEBSITE
 from ..engine import tools
 from ..engine.backends import missing_tools
 from ..engine.presets import GROUPS, user_preset_dir
-from ..integrations import hotkey, session, x11_drag
+from ..integrations import gnome_shell, hotkey, session, x11_drag
 from ..integrations.desktop import roue_command
 
 if TYPE_CHECKING:
@@ -86,6 +86,13 @@ class PreferencesDialog(Adw.PreferencesDialog):
             shift.set_sensitive(False)
             shift.set_subtitle("Needs python3-xlib")
         opening.add(shift)
+        if gnome_shell.wanted():
+            self.helper_row = Adw.ActionRow(title="Wheel on top, at the pointer")
+            self.helper_button = Gtk.Button(valign=Gtk.Align.CENTER)
+            self.helper_button.connect("clicked", self._on_helper_clicked)
+            self.helper_row.add_suffix(self.helper_button)
+            self._refresh_helper()
+            opening.add(self.helper_row)
         opening.add(
             self._switch(
                 "Stay in the background",
@@ -164,6 +171,22 @@ class PreferencesDialog(Adw.PreferencesDialog):
         except hotkey.HotkeyError as exc:
             self.add_toast(Adw.Toast(title=GLib.markup_escape_text(str(exc))))
         self._refresh_hotkey()
+
+    def _refresh_helper(self) -> None:
+        state = gnome_shell.state()
+        self.helper_row.set_subtitle(f"Roue's GNOME extension: {gnome_shell.describe(state)}")
+        on = state in (gnome_shell.State.ACTIVE, gnome_shell.State.PENDING)
+        self.helper_button.set_label("Turn Off" if on else "Turn On")
+        self.helper_button.set_sensitive(state is not gnome_shell.State.ERROR)
+
+    def _on_helper_clicked(self, _button: Gtk.Button) -> None:
+        if gnome_shell.state() in (gnome_shell.State.ACTIVE, gnome_shell.State.PENDING):
+            gnome_shell.disable()
+        else:
+            if not gnome_shell.installed():
+                gnome_shell.install()
+            gnome_shell.enable()
+        self._refresh_helper()
 
     def _refresh_folder(self) -> None:
         path = self.settings.output_path

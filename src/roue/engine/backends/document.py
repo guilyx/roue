@@ -50,6 +50,9 @@ def route_for(mime: str) -> str | None:
 class DocumentBackend:
     def requirements(self, preset: Preset, mime: str | None = None) -> Requirements:
         if mime is None:
+            if preset.output_ext == "pdf":
+                # LibreOffice alone, or Pandoc with a PDF engine.
+                return [("libreoffice", "pandoc"), ("libreoffice", *tools.PDF_ENGINES)]
             return [("libreoffice", "pandoc")]
         route = route_for(mime)
         if route == "libreoffice":
