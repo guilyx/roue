@@ -18,8 +18,8 @@ jobs:
     name: Lint & types
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
@@ -38,7 +38,7 @@ jobs:
     name: Tests (Ubuntu 24.04, all tools)
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Install conversion tools and GTK
         run: |
           sudo apt-get update
@@ -58,7 +58,7 @@ jobs:
         env:
           GSK_RENDERER: cairo
         run: xvfb-run -a .venv/bin/pytest --cov --cov-report=term-missing --cov-report=xml
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: coverage
@@ -69,8 +69,8 @@ jobs:
     name: Website
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
@@ -84,7 +84,7 @@ jobs:
     name: Debian package
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
       - name: Build
@@ -112,7 +112,7 @@ jobs:
         run: |
           command -v apt-ftparchive || sudo apt-get install -y apt-utils
           scripts/test-update-channel.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: deb
           path: dist/*.deb
