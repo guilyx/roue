@@ -92,7 +92,9 @@ jobs:
       - name: Install
         run: |
           sudo apt-get update
-          sudo apt-get install -y ./dist/roue_*.deb
+          sudo apt-get install -y ./dist/roue_*.deb lintian
+      - name: Lintian
+        run: lintian --fail-on error --tag-display-limit 0 dist/roue_*.deb
       - name: Smoke test
         run: |
           roue --version

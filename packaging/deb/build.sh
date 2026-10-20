@@ -74,6 +74,11 @@ if [[ -f "$KEYRING" ]]; then
     install -Dm0644 "$ROOT/packaging/apt/roue.sources" "$PKG/etc/apt/sources.list.d/roue.sources"
     install -d "$SHARE/keyrings"
     gpg --batch --dearmor < "$KEYRING" > "$SHARE/keyrings/roue-archive-keyring.gpg"
+    # Debian's own packages mustn't add APT sources; a third-party app that
+    # updates itself through APT has to (as Chrome and VS Code do).
+    install -d "$SHARE/lintian/overrides"
+    echo "roue: package-installs-apt-sources [etc/apt/sources.list.d/roue.sources]" \
+        > "$SHARE/lintian/overrides/roue"
 else
     echo "note: no packaging/apt/roue-archive-keyring.asc: building without the update channel"
 fi
