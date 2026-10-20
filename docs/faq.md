@@ -9,11 +9,12 @@
 | Copy files, then press the hotkey | ✓ | ✓ |
 | Drag onto the wheel or the panel | ✓ | ✓ |
 | Shift-drag opens the wheel around the pointer | ✗ | ✓ |
-| The hotkey's wheel opens at the pointer | ✗ (the desktop places it) | ✓ |
+| The hotkey's wheel opens at the pointer, on top | GNOME, with the [GNOME helper](desktop-integration.md#the-gnome-helper) | ✓ |
 
 Wayland keeps each app's drags and window positions private, by design. Roue
-respects that instead of working around it. `roue doctor` tells you which
-session you're in.
+respects that instead of working around it; on GNOME, the optional GNOME
+helper asks the desktop itself to place the wheel. `roue doctor` tells you
+which session you're in. Ubuntu 25.10 and newer only have Wayland.
 
 ## Why isn't my preset on the wheel?
 
@@ -97,7 +98,14 @@ even wrap any command-line tool.
 
 ## Does it work offline?
 
-Yes. Roue never uses the network.
+Yes. Roue never uses the network. Updates come through apt, like your other
+apps ([Updates](install.md#updates)).
+
+## How do I update Roue?
+
+If you installed the `.deb` or used the install command, Software Updater
+offers new versions. `sudo apt update && sudo apt upgrade` works too. With
+pipx: `pipx upgrade roue`.
 
 ## How do I stop it running in the background?
 

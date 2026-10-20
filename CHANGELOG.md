@@ -54,6 +54,40 @@ First public release.
   extract.", with the tool output available via `--verbose`.
 - Packaging: `.deb`, AppStream metadata, man page, `roue setup` for pipx and
   source installs.
+- **One-command install** on Ubuntu and Debian:
+  `wget -qO- https://guilyx.github.io/roue/install.sh | sh` adds the update
+  channel, installs the package and runs `roue setup`. It uses `wget`: stock
+  Ubuntu doesn't include `curl`.
+- **Updates through Software Updater**: a signed APT channel published on the
+  website from the last five releases. The `.deb` ships its sources file (a
+  conffile: delete it to opt out) and key. `roue doctor` says whether it's
+  set up. Roue itself still never uses the network.
+- **Set Up Roue**: a first-launch dialog, also in the main menu, with one
+  button per thing that isn't ready: the Files menu (installs
+  `python3-nautilus`, restarts Files), the hotkey, the GNOME helper, and
+  missing conversion tools (installed with apt after a password prompt).
+- **GNOME helper**: an optional GNOME Shell extension (shipped in the `.deb`,
+  turned on by `roue setup`, Set Up Roue or Preferences) that keeps the wheel
+  above other windows and opens the hotkey's wheel at the pointer on Wayland.
+- **GNOME on Wayland**, checked in a real GNOME Shell session: the wheel at the
+  pointer sits on a maximised see-through layer (GNOME paints black behind
+  full-screen windows), opens at the pointer even when the first pointer
+  event comes late, and closes when another window takes focus. The hotkey's
+  wheel picks up files copied with Ctrl+C once it has focus, as Wayland
+  requires.
+- **Ubuntu 25.10 and 26.04**: the Files menu supports Nautilus 49+ and its
+  4.1 extension API. Tested on Ubuntu 26.04 with GNOME 50 and Python 3.14.
+- Notification clicks pass GNOME's activation token on to the app they open,
+  so it may come to the front.
+
+### Fixed
+
+- The symbolic icon showed as a dot in GNOME Shell: it is now drawn with
+  fills only.
+- The PDF preset no longer looks ready when only Pandoc is installed: it
+  needs LibreOffice, or Pandoc with a PDF engine.
+- `roue setup` checks for `python3-nautilus` with the `.deb` too, and only
+  asks you to restart Files when Files started before the menu was installed.
 
 [Unreleased]: https://github.com/guilyx/roue/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/guilyx/roue/releases/tag/v0.1.0

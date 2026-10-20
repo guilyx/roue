@@ -55,16 +55,19 @@ conversion is done.
 
 ## Install
 
-### Ubuntu / Debian (24.04+)
-
-Download `roue_0.1.0_all.deb` from the [latest release](https://github.com/guilyx/roue/releases/latest), then:
+### Ubuntu 24.04+ / Debian 13+
 
 ```bash
-sudo apt install ./roue_0.1.0_all.deb
-roue setup          # sets the Super+Shift+D hotkey (opens the wheel)
+wget -qO- https://guilyx.github.io/roue/install.sh | sh
 ```
 
-The package adds the app launcher and the Files menu (restart Files once: `nautilus -q`).
+It adds Roue's signed update channel, installs the `roue` package with apt and
+runs `roue setup` (Files menu, **Super+Shift+D** hotkey, GNOME helper).
+[Read it first](https://guilyx.github.io/roue/install.sh) if you like.
+
+Or download `roue_<version>_all.deb` from the [latest release](https://github.com/guilyx/roue/releases/latest) and run `sudo apt install ./roue_<version>_all.deb`. The first time you open Roue, **Set Up Roue** offers a button for everything that isn't ready yet, missing tools included.
+
+**Updates** arrive through Software Updater, like any Ubuntu app. Roue itself never touches the network. Tested on Ubuntu 24.04 (GNOME 46) and 26.04 (GNOME 50), on Wayland.
 
 ### Any distribution, from source
 

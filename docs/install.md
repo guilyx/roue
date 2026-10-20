@@ -1,23 +1,61 @@
 # Install
 
-Roue needs Linux, Python 3.12+, and GTK 4 with libadwaita 1.5+ for the wheel
-and the panel.
+Roue needs Linux, Python 3.12+, and GTK 4.12+ with libadwaita 1.5+ for the
+wheel and the panel.
 Ubuntu 24.04, Debian 13, Fedora 40 and newer all qualify. The command line and
 the conversion engine work without GTK.
 
-## Ubuntu and Debian (.deb)
+Tested on Ubuntu 24.04 (GNOME 46, Wayland) and Ubuntu 26.04 (GNOME 50,
+Python 3.14).
 
-Download `roue_0.1.0_all.deb` from the
+## Ubuntu and Debian: one command
+
+```sh
+wget -qO- https://guilyx.github.io/roue/install.sh | sh
+```
+
+It asks for your password, then:
+
+1. Adds Roue's signed update channel:
+   `/etc/apt/sources.list.d/roue.sources` and
+   `/usr/share/keyrings/roue-archive-keyring.gpg`.
+2. Installs the `roue` package with apt, which pulls in FFmpeg and libvips.
+3. Runs `roue setup` for you: the Files menu, the **Super+Shift+D** hotkey and,
+   on GNOME, the GNOME helper.
+
+Want to read it first? Open
+[install.sh](https://guilyx.github.io/roue/install.sh) in your browser, or
+download it and run it with `sh install.sh`. (Ubuntu ships `wget`, not `curl`.)
+
+## Ubuntu and Debian: the .deb by hand
+
+Download `roue_<version>_all.deb` from the
 [releases page](https://github.com/guilyx/roue/releases/latest), then:
 
 ```sh
-sudo apt install ./roue_0.1.0_all.deb
-roue setup
+sudo apt install ./roue_<version>_all.deb
 ```
 
-The package installs the app, the launcher, the D-Bus service and the Files
-right-click menu, and pulls in FFmpeg and libvips. `roue setup` only adds your
-personal hotkey (**Super+Shift+D**, which opens the wheel).
+Double-clicking the file may also work, depending on your Ubuntu version's
+App Center. The package installs the app, the launcher, the D-Bus service, the
+Files right-click menu, the GNOME helper and Roue's update channel.
+
+## First launch: Set Up Roue
+
+Open Roue from your apps. The first time, **Set Up Roue** shows what's ready
+and offers one button for each thing that isn't:
+
+- **Right-click in Files**: installs `python3-nautilus` if it's missing, or
+  restarts Files so **Convert with Roue…** shows up (Files' windows close).
+- **Keyboard shortcut**: sets **Super+Shift+D** to open the wheel.
+- **Wheel on top, at the pointer** (GNOME on Wayland): turns on the
+  [GNOME helper](desktop-integration.md#the-gnome-helper).
+- **Conversion tools**: one **Install** button per missing tool. It asks for
+  your password, then installs the package with apt. LibreOffice (Office
+  documents to PDF) is a large download: skip it if you don't need it.
+
+Open it again any time from the panel's main menu: **Set Up Roue…**. In a
+terminal, `roue setup` does the same, minus the tools.
 
 ## Any distribution, from source
 
@@ -84,16 +122,38 @@ roue doctor
 It shows every tool, which presets are ready, and one command to install
 everything that's missing.
 
-## Update
+## Updates
 
-- `.deb`: install the new release the same way.
-- pipx: `pipx upgrade roue`.
+The `.deb` adds Roue's update channel, so **Software Updater** offers new
+versions of Roue next to your other updates. In a terminal:
+
+```sh
+sudo apt update && sudo apt upgrade
+```
+
+`roue doctor` shows whether the channel is set up.
+
+Roue itself never checks for updates and never contacts the network: apt
+does the checking, as for any other Ubuntu app.
+
+**Opt out**: delete `/etc/apt/sources.list.d/roue.sources`. Upgrades don't
+bring it back.
+
+**Install updates automatically**: Ubuntu's unattended upgrades only take
+security updates by default. To let them install Roue too, create
+`/etc/apt/apt.conf.d/52roue-unattended` with:
+
+```text
+Unattended-Upgrade::Origins-Pattern { "origin=Roue"; };
+```
+
+**pipx installs**: `pipx upgrade roue`.
 
 ## Uninstall
 
 ```sh
-roue setup --remove      # removes the hotkey and the files roue setup added
-sudo apt remove roue     # if you used the .deb
+roue setup --remove      # your hotkey, GNOME helper and the files roue setup added
+sudo apt purge roue      # if you used the .deb: also removes the update channel
 pipx uninstall roue      # if you used pipx
 ```
 
