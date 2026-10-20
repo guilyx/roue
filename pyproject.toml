@@ -1,0 +1,98 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "roue"
+version = "0.1.0"
+description = "Drop a file, get the file you wanted. A drag-and-drop file converter for Linux."
+readme = "README.md"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
+requires-python = ">=3.12"
+authors = [{ name = "Erwin Lejeune" }]
+keywords = ["converter", "gtk", "gnome", "ffmpeg", "libvips", "drag-and-drop", "linux"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: X11 Applications :: GTK",
+  "Intended Audience :: End Users/Desktop",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Multimedia :: Graphics :: Graphics Conversion",
+  "Topic :: Multimedia :: Sound/Audio :: Conversion",
+  "Topic :: Multimedia :: Video :: Conversion",
+  "Typing :: Typed",
+]
+# PyGObject is deliberately not listed: it comes from the distribution
+# (python3-gi) together with the GTK 4 and libadwaita typelibs. The CLI and
+# the engine work without it.
+dependencies = ["PyYAML>=6.0"]
+
+[project.optional-dependencies]
+x11 = ["python-xlib>=0.33"]
+
+[dependency-groups]
+dev = [
+  "pytest>=8",
+  "pytest-cov>=5",
+  "ruff>=0.6",
+  "mypy>=1.11",
+  "types-PyYAML",
+  "markdown>=3.6",
+]
+
+[project.urls]
+Homepage = "https://guilyx.github.io/roue/"
+Documentation = "https://guilyx.github.io/roue/docs/"
+Repository = "https://github.com/guilyx/roue"
+Issues = "https://github.com/guilyx/roue/issues"
+Changelog = "https://github.com/guilyx/roue/blob/main/CHANGELOG.md"
+
+[project.scripts]
+roue = "roue.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/roue"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "tests", "data", "nautilus", "docs", "README.md", "LICENSE", "CHANGELOG.md"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF", "PTH", "C4", "PIE", "RET"]
+ignore = ["RET504"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["PTH"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unreachable = true
+files = ["src/roue/engine", "src/roue/cli.py", "src/roue/integrations", "src/roue/radial.py"]
+
+[[tool.mypy.overrides]]
+module = ["gi", "gi.*", "Xlib", "Xlib.*"]
+ignore_missing_imports = true
+
+# The GTK front end is checked with ruff only: PyGObject has no usable stubs.
+[[tool.mypy.overrides]]
+module = ["roue.ui.*"]
+follow_imports = "skip"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+markers = [
+  "slow: conversions that take more than a couple of seconds (LibreOffice, two-pass video)",
+]
+
+[tool.coverage.run]
+source = ["roue"]
+omit = ["src/roue/ui/*"]

@@ -1,0 +1,44 @@
+name: Preset request
+description: Suggest a new built-in conversion.
+labels: ["preset"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Tip: you can already add your own presets as YAML files in `~/.config/roue/presets`.
+        See the [preset guide](https://guilyx.github.io/roue/docs/custom-presets.html). If yours works well,
+        share it below: it may become a built-in.
+  - type: input
+    id: name
+    attributes:
+      label: Tile name
+      placeholder: Instagram square
+    validations:
+      required: true
+  - type: input
+    id: from-to
+    attributes:
+      label: From → to
+      placeholder: Any image → 1080×1080 JPG
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: When would you use it?
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command or preset YAML (if you have one)
+      render: yaml
+      placeholder: |
+        id: instagram-square
+        name: Instagram square
+        group: image
+        accepts: ["image/*"]
+        output_ext: jpg
+        backend: command
+        params:
+          command: ["vips", "thumbnail", "{in}", "{out}[Q=90]", "1080", "--height", "1080", "--crop", "attention"]

@@ -1,0 +1,110 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint & types
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install tools
+        run: python -m pip install -e . ruff mypy types-PyYAML
+      - name: Ruff
+        run: |
+          ruff check --output-format=github src tests scripts
+          ruff format --check src tests scripts
+      - name: Mypy
+        run: mypy
+
+  test:
+    name: Tests (Ubuntu 24.04, all tools)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install conversion tools and GTK
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ffmpeg libvips-tools libheif-plugin-libde265 libheif-plugin-aomenc libheif-plugin-x265 \
+            ghostscript pandoc imagemagick libreoffice-writer-nogui \
+            python3-gi python3-gi-cairo gir1.2-gtk-4.0 gir1.2-adw-1 python3-nautilus \
+            python3-xlib python3-yaml python3-venv file xvfb xauth
+      - name: Create venv (system site packages, for PyGObject)
+        run: |
+          /usr/bin/python3 -m venv --system-site-packages .venv
+          .venv/bin/python -m pip install --upgrade pip
+          .venv/bin/python -m pip install -e . pytest pytest-cov ruff mypy types-PyYAML markdown
+      - name: Check tools
+        run: .venv/bin/roue doctor
+      - name: Pytest (GTK tests run on a virtual display)
+        env:
+          GSK_RENDERER: cairo
+        run: xvfb-run -a .venv/bin/pytest --cov --cov-report=term-missing --cov-report=xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: coverage.xml
+          if-no-files-found: ignore
+
+  site:
+    name: Website
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: python -m pip install markdown PyYAML
+      - name: Generated preset tables are up to date
+        run: PYTHONPATH=src python scripts/build_site.py --check
+      - name: Build
+        run: PYTHONPATH=src python scripts/build_site.py --out _site
+
+  deb:
+    name: Debian package
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Build
+        run: packaging/deb/build.sh
+      - name: Install
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ./dist/roue_*.deb
+      - name: Smoke test
+        run: |
+          roue --version
+          roue list
+          roue doctor
+          dpkg -L roue
+          ffmpeg -v error -f lavfi -i testsrc=size=160x120 -frames:v 1 /tmp/sample.png
+          roue jpg /tmp/sample.png
+          test -s /tmp/sample.jpg
+      - name: Remove cleanly
+        run: |
+          sudo apt-get remove -y roue
+          test ! -e /usr/lib/python3/dist-packages/roue
+      - uses: actions/upload-artifact@v4
+        with:
+          name: deb
+          path: dist/*.deb

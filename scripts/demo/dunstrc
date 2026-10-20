@@ -1,0 +1,36 @@
+# Notifications for the demo session, styled like GNOME's.
+[global]
+    follow = none
+    width = 390
+    height = 120
+    origin = top-center
+    offset = 0x10
+    padding = 14
+    horizontal_padding = 16
+    frame_width = 0
+    corner_radius = 14
+    font = Cantarell 11
+    markup = full
+    format = "<b>%s</b>\n%b"
+    icon_position = left
+    min_icon_size = 34
+    max_icon_size = 40
+    icon_path = @ICONS@
+    show_indicators = no
+    gap_size = 8
+    separator_height = 0
+
+[urgency_low]
+    background = "#2b2b30"
+    foreground = "#ffffff"
+    timeout = 4
+
+[urgency_normal]
+    background = "#2b2b30"
+    foreground = "#ffffff"
+    timeout = 4
+
+[urgency_critical]
+    background = "#2b2b30"
+    foreground = "#ffffff"
+    timeout = 8

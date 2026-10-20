@@ -1,0 +1,27 @@
+name: Feature request
+description: An idea to make Roue more useful.
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: Describe the situation, not the solution. "I keep sending screen recordings to my team and..."
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would help?
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What do you do today instead?
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: This works fully offline (Roue never uploads files).
+          required: true
+        - label: This isn't a full editor (no timelines or canvases). Small one-off dialogs are fine.

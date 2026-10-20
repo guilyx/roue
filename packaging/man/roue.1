@@ -1,0 +1,117 @@
+.TH ROUE 1 "2026" "roue 0.1.0" "User Commands"
+.SH NAME
+roue \- drag-and-drop file converter for the Linux desktop
+.SH SYNOPSIS
+.B roue
+.RI [ PRESET ] " FILE" ...
+.br
+.B roue
+.I COMMAND
+.RI [ OPTIONS ]
+.SH DESCRIPTION
+.B roue
+converts files with presets: HEIC to JPG, MOV to MP4, video to GIF, Word to
+PDF, "under 10 MB" for chat apps, and more. Results are written next to the
+originals and never overwrite an existing file. Everything runs locally with
+FFmpeg, libvips (or ImageMagick), Ghostscript, Pandoc and LibreOffice.
+.PP
+Without arguments in a desktop session,
+.B roue
+opens the full panel. The everyday way in is the wheel: a radial menu of the
+presets that fit your files, opened by the hotkey (Super+Shift+D, which runs
+.BR "roue wheel" ),
+by "Convert with Roue..." in the Files right-click menu, or by holding Shift
+while dragging a file on X11.
+.PP
+.B roue PRESET FILE...
+is a shorthand for
+.BR "roue convert PRESET FILE..." .
+.SH COMMANDS
+.TP
+.BI "convert " "PRESET FILE..."
+Convert files or folders with a preset.
+.RS
+.TP
+.BI "\-o, \-\-output\-dir " DIR
+Write results to DIR instead of next to the originals.
+.TP
+.BI "\-j, \-\-jobs " N
+Number of parallel conversions (default: one per CPU core).
+.TP
+.B \-r, \-\-recursive
+Include files in sub-folders of dropped folders.
+.TP
+.B \-\-notify
+Show a desktop notification when done.
+.TP
+.B \-\-json
+Print results as JSON.
+.TP
+.B \-q, \-\-quiet
+Only print errors.
+.TP
+.B \-v, \-\-verbose
+Show the tool's output when a conversion fails.
+.RE
+.TP
+.BR "list " [ \-\-for " FILE...] [" \-\-group " GROUP] [" \-\-all "] [" \-\-json ]
+List presets, optionally only those that fit the given files.
+.TP
+.BI "info " FILE...
+Show the detected type, media details and matching presets.
+.TP
+.B doctor
+Check which conversion tools and desktop integrations are installed.
+.TP
+.BR "history " [ \-n " N]"
+Show recent conversions.
+.TP
+.B undo
+Move the results of the last conversion to the trash.
+.TP
+.BR "setup " [ \-\-binding " KEYS] [" \-\-no\-hotkey "] [" \-\-no\-nautilus "] [" \-\-restart\-files "] [" \-\-remove ]
+Add the app launcher, the D-Bus service, the Files right-click menu and the
+hotkey (GNOME) for the current user. The hotkey runs
+.BR "roue wheel" .
+Parts already installed by a system package are skipped.
+.TP
+.BR "wheel " [FILE...]
+Open the wheel. Without files, a small round window to drop files on (it also
+uses files copied with Ctrl+C); with files, the wheel at the pointer, showing
+the presets that fit them. Its last slice, More..., opens the full panel.
+.TP
+.BR "panel " [ \-\-preferences "] [FILE...]"
+Open the full panel, optionally with files ready to convert.
+.TP
+.B quit
+Stop Roue running in the background.
+.SH EXIT STATUS
+0 on success, 1 if a conversion failed, 2 on usage errors (such as an unknown
+preset), 130 when interrupted.
+.SH FILES
+.TP
+.I ~/.config/roue/settings.yaml
+Settings shared by the wheel, the panel, the CLI and the Files menu.
+.TP
+.I ~/.config/roue/presets/*.yaml
+Your own presets. A preset with the same id as a built-in one replaces it.
+.TP
+.I ~/.local/state/roue/history.jsonl
+The last 50 conversions, used by
+.B history
+and
+.BR undo .
+.SH ENVIRONMENT
+.TP
+.B NO_COLOR
+Disable colours in terminal output.
+.TP
+.B ROUE_DISABLE_TOOLS
+Comma-separated tool ids to treat as missing (for testing fallbacks).
+.SH SEE ALSO
+.BR ffmpeg (1),
+.BR vips (1),
+.BR gs (1),
+.BR pandoc (1)
+.PP
+Documentation: https://guilyx.github.io/roue/docs/

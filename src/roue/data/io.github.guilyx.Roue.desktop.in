@@ -1,0 +1,19 @@
+[Desktop Entry]
+Name=Roue
+GenericName=File Converter
+Comment=Drop a file, get the file you wanted
+Exec=@EXEC@ panel %F
+Icon=@APP_ID@
+Terminal=false
+Type=Application
+Categories=Utility;GTK;GNOME;
+Keywords=convert;converter;video;image;photo;pdf;heic;gif;mp4;mp3;webp;compress;resize;
+StartupNotify=true
+DBusActivatable=true
+SingleMainWindow=true
+X-GNOME-UsesNotifications=true
+Actions=preferences;
+
+[Desktop Action preferences]
+Name=Preferences
+Exec=@EXEC@ panel --preferences

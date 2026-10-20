@@ -1,0 +1,129 @@
+/* Group colours, shared with the icon and the website. */
+@define-color roue_image #26a269;
+@define-color roue_video #e01b24;
+@define-color roue_audio #9141ac;
+@define-color roue_document #1c71d8;
+@define-color roue_custom #e66100;
+
+.roue-panel .group-heading {
+  font-weight: 700;
+  font-size: 0.8em;
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+}
+
+.roue-panel .group-dot {
+  min-width: 8px;
+  min-height: 8px;
+  border-radius: 99px;
+}
+
+.group-dot.image { background-color: @roue_image; }
+.group-dot.video { background-color: @roue_video; }
+.group-dot.audio { background-color: @roue_audio; }
+.group-dot.document { background-color: @roue_document; }
+.group-dot.custom { background-color: @roue_custom; }
+
+.tile {
+  min-width: 96px;
+  min-height: 100px;
+  padding: 10px 2px 6px 2px;
+  border-radius: 16px;
+  transition: background-color 120ms ease, opacity 160ms ease, outline-color 120ms ease;
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+}
+
+.tile .badge {
+  min-width: 52px;
+  min-height: 52px;
+  border-radius: 16px;
+}
+
+.tile.group-image .badge { background-color: alpha(@roue_image, 0.16); color: @roue_image; }
+.tile.group-video .badge { background-color: alpha(@roue_video, 0.14); color: @roue_video; }
+.tile.group-audio .badge { background-color: alpha(@roue_audio, 0.16); color: @roue_audio; }
+.tile.group-document .badge { background-color: alpha(@roue_document, 0.15); color: @roue_document; }
+.tile.group-custom .badge { background-color: alpha(@roue_custom, 0.16); color: @roue_custom; }
+
+.tile.group-image .ring { color: @roue_image; }
+.tile.group-video .ring { color: @roue_video; }
+.tile.group-audio .ring { color: @roue_audio; }
+.tile.group-document .ring { color: @roue_document; }
+.tile.group-custom .ring { color: @roue_custom; }
+
+.tile .tile-name { font-weight: 600; }
+.tile .tile-sub { font-size: 0.82em; }
+
+.tile.incompatible { opacity: 0.28; }
+.tile.unavailable .badge { filter: grayscale(1); opacity: 0.6; }
+
+.tile.drop-hover {
+  background-color: alpha(@accent_bg_color, 0.16);
+  outline-color: @accent_bg_color;
+}
+
+.tile.busy .badge image { opacity: 0.35; }
+
+.tile .state-icon {
+  min-width: 18px;
+  min-height: 18px;
+  border-radius: 99px;
+  padding: 2px;
+  margin: -4px -6px 0 0;
+}
+.tile .state-icon.success { background-color: @success_bg_color; color: @success_fg_color; }
+.tile .state-icon.warning { background-color: @warning_bg_color; color: @warning_fg_color; }
+
+.roue-panel .staged-bar {
+  padding: 8px 12px;
+  background-color: alpha(@accent_bg_color, 0.12);
+  border-radius: 12px;
+  margin: 8px 12px 0 12px;
+}
+
+.roue-panel .status-bar {
+  padding: 6px 14px 10px 14px;
+  font-size: 0.9em;
+}
+
+.roue-panel .drop-zone-active {
+  background-color: alpha(@accent_bg_color, 0.04);
+}
+
+.roue-panel .empty-hint {
+  font-size: 0.95em;
+  opacity: 0.7;
+}
+
+/* The wheel ------------------------------------------------------------- */
+window.roue-wheel,
+window.roue-wheel.background {
+  background: none;
+  box-shadow: none;
+}
+window.roue-wheel.opaque { background-color: @window_bg_color; }
+
+.roue-wheel .wheel-slice {
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  min-height: 0;
+  min-width: 0;
+  outline: none;
+}
+.roue-wheel .wheel-slice .slice-title { font-weight: 700; font-size: 0.92em; }
+.roue-wheel .wheel-slice .slice-sub { font-size: 0.74em; opacity: 0.6; }
+.roue-wheel .wheel-slice.group-image image { color: @roue_image; }
+.roue-wheel .wheel-slice.group-video image { color: @roue_video; }
+.roue-wheel .wheel-slice.group-audio image { color: @roue_audio; }
+.roue-wheel .wheel-slice.group-document image { color: @roue_document; }
+.roue-wheel .wheel-slice.group-custom image { color: @roue_custom; }
+.roue-wheel .wheel-slice.hot,
+.roue-wheel .wheel-slice.hot image { color: white; }
+.roue-wheel .wheel-slice.hot .slice-sub { opacity: 0.85; }
+
+.roue-wheel .wheel-hub { color: white; }
+.roue-wheel .wheel-hub .hub-title { font-weight: 700; font-size: 0.95em; }
+.roue-wheel .wheel-hub .hub-text { font-size: 0.78em; opacity: 0.75; }

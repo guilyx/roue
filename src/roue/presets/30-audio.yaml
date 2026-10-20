@@ -1,0 +1,60 @@
+# Built-in audio presets. They also accept videos: the sound is extracted.
+presets:
+  - id: mp3
+    name: MP3
+    description: Plays anywhere. Also pulls the soundtrack out of a video.
+    group: audio
+    icon: audio-x-generic-symbolic
+    accepts: ["audio/*", "video/*"]
+    rejects: ["audio/mpeg"]
+    output_ext: mp3
+    backend: ffmpeg
+    keywords: [extract, soundtrack, music, podcast]
+    params: { video: false, audio_codec: libmp3lame, audio_quality: 2 }
+
+  - id: opus
+    name: Opus
+    description: Tiny files that keep voices clear. Ideal for voice notes and podcasts.
+    group: audio
+    icon: audio-input-microphone-symbolic
+    accepts: ["audio/*", "video/*"]
+    output_ext: opus
+    backend: ffmpeg
+    keywords: [voice, speech, podcast, small]
+    params: { video: false, audio_codec: libopus, audio_bitrate: 64k }
+
+  - id: wav
+    name: WAV
+    description: Uncompressed audio for editors and samplers.
+    group: audio
+    icon: audio-speakers-symbolic
+    accepts: ["audio/*", "video/*"]
+    rejects: ["audio/x-wav", "audio/wav"]
+    output_ext: wav
+    backend: ffmpeg
+    keywords: [uncompressed, pcm, editing]
+    params: { video: false, audio_codec: pcm_s16le }
+
+  - id: flac
+    name: FLAC
+    description: Lossless and smaller than WAV.
+    group: audio
+    icon: emblem-music-symbolic
+    accepts: ["audio/*", "video/*"]
+    rejects: ["audio/flac"]
+    output_ext: flac
+    backend: ffmpeg
+    keywords: [lossless, archive]
+    params: { video: false, audio_codec: flac }
+
+  - id: normalize
+    name: Even out volume
+    description: Normalise loudness (EBU R128) so quiet and loud recordings match.
+    group: audio
+    icon: audio-volume-high-symbolic
+    accepts: ["audio/*"]
+    output_ext: same
+    suffix: " (normalized)"
+    backend: ffmpeg
+    keywords: [loudness, louder, quiet, r128, podcast]
+    params: { video: false, normalize: true }

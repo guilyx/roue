@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Roue · Drop a file, get the file you wanted</title>
+  <meta name="description" content="Roue is a free drag-and-drop file converter for Linux. Press a key, drop a file on a slice of the wheel, get a JPG, MP4, GIF, MP3 or PDF next to the original. 100% local, no uploads.">
+  <link rel="canonical" href="https://guilyx.github.io/roue/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Roue">
+  <meta property="og:title" content="Roue · Drop a file, get the file you wanted">
+  <meta property="og:description" content="A tiny drag-and-drop file converter for the Linux desktop. HEIC to JPG, video under 10 MB, GIFs, PDFs. Local only, no uploads, free software.">
+  <meta property="og:url" content="https://guilyx.github.io/roue/">
+  <meta property="og:image" content="https://guilyx.github.io/roue/assets/icon-512.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#fbfaf8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#141218" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/icon-512.png">
+  <link rel="stylesheet" href="assets/style.css">
+  <script src="assets/site.js" defer></script>
+</head>
+<body class="home">
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="wrap header-row">
+      <a class="brand" href="./"><img src="assets/icon.svg" alt="" width="28" height="28"><span>Roue</span></a>
+      <nav class="top-nav" aria-label="Site">
+        <a href="#demo" class="hide-sm">Demo</a>
+        <a href="#ways" class="hide-sm">How it works</a>
+        <a href="#presets" class="hide-sm">Presets</a>
+        <a href="docs/index.html">Docs</a>
+        <a href="https://github.com/guilyx/roue" class="gh">
+          <svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          <span>GitHub</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- Hero -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="pill">New</span> Free file converter for the Linux desktop</p>
+          <h1 id="hero-title">Drop a file.<br><span class="wheel-text">Get the file you wanted.</span></h1>
+          <p class="lede">Press <kbd>Super</kbd>&nbsp;<kbd>Shift</kbd>&nbsp;<kbd>D</kbd>, drop a file on a slice of the wheel, done. Roue turns HEIC into JPG, screen recordings into tiny MP4s, videos into GIFs and documents into PDFs, right next to the original. No dialogs, no uploads.</p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="https://github.com/guilyx/roue/releases/latest">
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m0 0-5-5m5 5 5-5M5 21h14"/></svg>
+              Download for Ubuntu &amp; Debian
+            </a>
+            <a class="btn btn-ghost" href="docs/getting-started.html">Read the tutorial</a>
+          </div>
+          <div class="install" aria-label="Install command">
+            <code id="install-cmd">sudo apt install ./roue_0.1.0_all.deb &amp;&amp; roue setup</code>
+            <button class="copy" type="button" data-copy="#install-cmd" hidden>Copy</button>
+          </div>
+          <p class="small muted">Other distributions: <a href="docs/install.html">install from source with pipx</a>. Version 0.1.0 · GPL-3.0-or-later.</p>
+        </div>
+
+        <div class="hero-visual">
+          <div class="glow" aria-hidden="true"></div>
+          <div class="wheel-demo" role="img" aria-label="Animation: a HEIC photo is dragged onto the JPG slice of the Roue wheel. The slice lights up, the wheel says Converting, then a notification says IMG_2041.jpg is ready.">
+            <div class="wd-stage">
+            <svg class="wd-wheel" viewBox="-215 -215 430 430" aria-hidden="true">
+            <g class="wd-slice wd-target"><path d="M-22.9 -57.6L-63.6 -159.8A172 172 0 0 1 63.6 -159.8L22.9 -57.6A62 62 0 0 0 -22.9 -57.6Z"/><g transform="translate(0.0 -121.0)"><g class="wd-ico" transform="translate(-9 -24) scale(1.125)"><rect x="2" y="3" width="12" height="10" rx="2" class="o"/><circle cx="6" cy="6.5" r="1.3" class="f"/><path d="m3 12 3.5-3.5L9 11l2-2 2 2" class="o"/></g><text class="wd-t" y="10">JPG</text><text class="wd-s" y="24">.jpg</text></g></g>
+            <g class="wd-slice"><path d="M24.5 -56.9L68.0 -158.0A172 172 0 0 1 158.0 -68.0L56.9 -24.5A62 62 0 0 0 24.5 -56.9Z"/><g transform="translate(85.6 -85.6)"><g class="wd-ico" transform="translate(-9 -24) scale(1.125)"><rect x="2" y="3" width="12" height="10" rx="2" class="o"/><circle cx="6" cy="6.5" r="1.3" class="f"/><path d="m3 12 3.5-3.5L9 11l2-2 2 2" class="o"/></g><text class="wd-t" y="10">PNG</text><text class="wd-s" y="24">.png</text></g></g>
+            <g class="wd-slice"><path d="M57.6 -22.9L159.8 -63.6A172 172 0 0 1 159.8 63.6L57.6 22.9A62 62 0 0 0 57.6 -22.9Z"/><g transform="translate(121.0 0.0)"><g class="wd-ico" transform="translate(-9 -24) scale(1.125)"><circle cx="8" cy="8" r="6" class="o"/><path d="M2 8h12M8 2c-2.2 2.4-2.2 9.6 0 12M8 2c2.2 2.4 2.2 9.6 0 12" class="o"/></g><text class="wd-t" y="10">WebP</text><text class="wd-s" y="24">.webp</text></g></g>
+            <g class="wd-slice"><path d="M56.9 24.5L158.0 68.0A172 172 0 0 1 68.0 158.0L24.5 56.9A62 62 0 0 0 56.9 24.5Z"/><g transform="translate(85.6 85.6)"><g class="wd-ico" transform="translate(-9 -24) scale(1.125)"><circle cx="8" cy="8" r="6" class="o"/><path d="M2 8h12M8 2c-2.2 2.4-2.2 9.6 0 12M8 2c2.2 2.4 2.2 9.6 0 12" class="o"/></g><text class="wd-t" y="10">AVIF</text><text class="wd-s" y="24">.avif</text></g></g>
+            <g class="wd-slice"><path d="M22.9 57.6L63.6 159.8A172 172 0 0 1 -63.6 159.8L-22.9 57.6A62 62 0 0 0 22.9 57.6Z"/><g transform="translate(0.0 121.0)"><g class="wd-ico" transform="translate(-9 -24) scale(1.125)"><rect x="2" y="2" width="12" height="12" rx="3" class="f"/><path d="M5 8h6" class="k"/></g><text class="wd-t" y="10">Half size</text><text class="wd-s" y="24">same format</text></g></g>
+            <g class="wd-slice"><path d="M-24.5 56.9L-68.0 158.0A172 172 0 0 1 -158.0 68.0L-56.9 24.5A62 62 0 0 0 -24.5 56.9Z"/><g transform="translate(-85.6 85.6)"><g class="wd-ico" transform="translate(-9 -31) scale(1.125)"><path d="M9.5 2.5H13.5V6.5M13.5 2.5 9 7M6.5 13.5H2.5V9.5M2.5 13.5 7 9" class="o"/></g><text class="wd-t" y="3">1080 px</text><text class="wd-t" y="18">wide</text><text class="wd-s" y="32">same format</text></g></g>
+            <g class="wd-slice"><path d="M-57.6 22.9L-159.8 63.6A172 172 0 0 1 -159.8 -63.6L-57.6 -22.9A62 62 0 0 0 -57.6 22.9Z"/><g transform="translate(-121.0 0.0)"><g class="wd-ico" transform="translate(-9 -24) scale(1.125)"><rect x="2" y="2" width="12" height="12" rx="3" class="f"/><path d="M5 8h6M8 5v6" class="k"/></g><text class="wd-t" y="10">Double size</text><text class="wd-s" y="24">.png</text></g></g>
+            <g class="wd-slice wd-more"><path d="M-56.9 -24.5L-158.0 -68.0A172 172 0 0 1 -68.0 -158.0L-24.5 -56.9A62 62 0 0 0 -56.9 -24.5Z"/><g transform="translate(-85.6 -85.6)"><g class="wd-ico" transform="translate(-9 -24) scale(1.125)"><circle cx="3" cy="8" r="1.5" class="f"/><circle cx="8" cy="8" r="1.5" class="f"/><circle cx="13" cy="8" r="1.5" class="f"/></g><text class="wd-t" y="10">More…</text><text class="wd-s" y="24">all presets</text></g></g>
+            <circle class="wd-hub" r="56"/>
+            <g class="wd-hub-text wd-idle"><text class="wd-ht" y="-2">Drop a file</text><text class="wd-hs" y="15">on a slice</text></g>
+            <g class="wd-hub-text wd-hover"><text class="wd-ht" y="-8">JPG</text><text class="wd-hs" y="9">Photos that open</text><text class="wd-hs" y="22">everywhere</text></g>
+            <g class="wd-hub-text wd-done"><circle cx="0" cy="-10" r="15" class="wd-ok"/><path d="m-7 -10 5 5 9-10" class="wd-tick"/><text class="wd-hs" y="21">Converting…</text></g>
+            </svg>
+            </div>
+            <div class="wd-file">
+              <span class="fic heic">HEIC</span><span class="fname">IMG_2041.HEIC</span>
+              <svg class="cursor" viewBox="0 0 16 20" aria-hidden="true"><path d="M1 1v15l4-3.5 2.7 6 2.3-1-2.6-5.8H13z" fill="#fff" stroke="#1d1b22" stroke-width="1.3" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="wd-note">
+              <img src="assets/icon.svg" alt="" width="40" height="40">
+              <span class="wd-note-text"><b>IMG_2041.jpg is ready</b><span class="wd-note-buttons"><span>Open</span><span>Show in Folder</span></span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trust strip -->
+    <section class="strip" aria-label="Promises">
+      <ul class="wrap strip-list" role="list">
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11h16v9H4zM8 11V7a4 4 0 0 1 8 0v4"/></svg>100% local</li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0M3 3l18 18"/></svg>Works offline</li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0M3 3l18 18"/></svg>No accounts</li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12s3.5-7 9-7 9 7 9 7-3.5 7-9 7-9-7-9-7zM3 3l18 18"/></svg>No telemetry</li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 7v5c0 5 3.5 8 8 9 4.5-1 8-4 8-9V7z"/><path d="m9 12 2 2 4-4"/></svg>Never overwrites</li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg>GPL-3.0 free software</li>
+      </ul>
+    </section>
+
+    <!-- Demo video -->
+    <section id="demo" class="section alt" aria-labelledby="demo-title">
+      <div class="wrap">
+        <header class="section-head">
+          <p class="kicker">See it in action</p>
+          <h2 id="demo-title">About 50 seconds, four conversions</h2>
+          <p>A phone photo to JPG with the hotkey's wheel, a screen recording under 10&nbsp;MB from the Files menu, a WebP with Shift-drag, and a GIF from the terminal. Recorded live, nothing staged.</p>
+        </header>
+        <figure class="demo-video">
+          <video controls muted playsinline preload="none" width="1280" height="800"
+                 poster="assets/demo-poster.jpg"
+                 aria-describedby="demo-caption">
+            <source src="assets/demo.webm" type="video/webm">
+            <source src="assets/demo.mp4" type="video/mp4">
+            <a href="assets/demo.mp4">Download the demo video (MP4)</a>
+          </video>
+          <figcaption id="demo-caption">Roue 0.1 on GNOME Files (X11). Every result in the video is a real conversion.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- Three ways in -->
+    <section id="ways" class="section" aria-labelledby="ways-title">
+      <div class="wrap">
+        <header class="section-head">
+          <p class="kicker">How it works</p>
+          <h2 id="ways-title">One engine, three ways in</h2>
+          <p>Use whichever is closest. They share the same presets, the same history and the same rule: results land next to the original.</p>
+        </header>
+        <div class="cards three">
+          <article class="card way">
+            <div class="way-art keys" aria-hidden="true"><kbd>Super</kbd><span>+</span><kbd>Shift</kbd><span>+</span><kbd>D</kbd></div>
+            <h3>The wheel</h3>
+            <p>A hotkey opens the wheel. Drop a file on a slice, or copy files in Files and click one. It only shows presets that fit, and <strong>More…</strong> opens every preset. On X11, hold <kbd>Shift</kbd> while dragging and it opens around the pointer.</p>
+          </article>
+          <article class="card way">
+            <div class="way-art menu" aria-hidden="true">
+              <div class="ctx">
+                <span>Open With…</span>
+                <span>Rename…</span>
+                <span class="hl">Convert with Roue…</span>
+              </div>
+              <svg class="mini-wheel" viewBox="-180 -180 360 360" aria-hidden="true"><path class="mw-slice" d="M-21.4 -53.9L-62.9 -158.0A170 170 0 0 1 62.9 -158.0L21.4 -53.9A58 58 0 0 0 -21.4 -53.9Z"/><path class="mw-slice" d="M22.9 -53.3L67.2 -156.1A170 170 0 0 1 156.1 -67.2L53.3 -22.9A58 58 0 0 0 22.9 -53.3Z"/><path class="mw-slice" d="M53.9 -21.4L158.0 -62.9A170 170 0 0 1 158.0 62.9L53.9 21.4A58 58 0 0 0 53.9 -21.4Z"/><path class="mw-slice mw-lit" d="M53.3 22.9L156.1 67.2A170 170 0 0 1 67.2 156.1L22.9 53.3A58 58 0 0 0 53.3 22.9Z"/><path class="mw-slice" d="M21.4 53.9L62.9 158.0A170 170 0 0 1 -62.9 158.0L-21.4 53.9A58 58 0 0 0 21.4 53.9Z"/><path class="mw-slice" d="M-22.9 53.3L-67.2 156.1A170 170 0 0 1 -156.1 67.2L-53.3 22.9A58 58 0 0 0 -22.9 53.3Z"/><path class="mw-slice" d="M-53.9 21.4L-158.0 62.9A170 170 0 0 1 -158.0 -62.9L-53.9 -21.4A58 58 0 0 0 -53.9 21.4Z"/><path class="mw-slice" d="M-53.3 -22.9L-156.1 -67.2A170 170 0 0 1 -67.2 -156.1L-22.9 -53.3A58 58 0 0 0 -53.3 -22.9Z"/><circle class="mw-hub" r="50"/></svg>
+            </div>
+            <h3>Right-click in Files</h3>
+            <p>Select one photo or forty, right-click, <strong>Convert with Roue…</strong>. The wheel opens right at the pointer, with the presets that fit everything you selected. One notification at the end.</p>
+          </article>
+          <article class="card way">
+            <div class="way-art term" aria-hidden="true">
+              <span><b>$</b> roue gif demo.mov</span>
+              <span class="ok">✓ demo.mov → demo.gif (1.2 MB)</span>
+              <span><b>$</b> roue share-10mb *.mov</span>
+            </div>
+            <h3>The command line</h3>
+            <p>Every preset is a command: <code>roue jpg *.HEIC</code>. Folders, parallel jobs, JSON output and clear exit codes, for scripts and power users.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Use cases -->
+    <section class="section alt" aria-labelledby="uses-title">
+      <div class="wrap">
+        <header class="section-head">
+          <p class="kicker">Made for the everyday</p>
+          <h2 id="uses-title">The conversions you keep searching for</h2>
+          <p>No more "convert mov to mp4 linux" at 11 pm. Each one is a single drop.</p>
+        </header>
+        <div class="cards uses">
+          <article class="card use">
+            <div class="flow"><span class="chip image">HEIC</span><span class="arrow" aria-hidden="true">→</span><span class="chip image">JPG</span></div>
+            <h3>Photos from your iPhone</h3>
+            <p>HEIC files nothing else opens become JPGs that open everywhere.</p>
+            <p class="tile-ref">Preset: <b>JPG</b></p>
+          </article>
+          <article class="card use">
+            <div class="flow"><span class="chip video">MOV · 300 MB</span><span class="arrow" aria-hidden="true">→</span><span class="chip video">MP4 · 9.6 MB</span></div>
+            <h3>Too big for chat</h3>
+            <p>A two-pass encode that lands under 10 MB, sized from the video's length.</p>
+            <p class="tile-ref">Preset: <b>Under 10 MB</b></p>
+          </article>
+          <article class="card use">
+            <div class="flow"><span class="chip image">JPG + GPS</span><span class="arrow" aria-hidden="true">→</span><span class="chip image">JPG, clean</span></div>
+            <h3>Post without your location</h3>
+            <p>Drops GPS, camera and date details before you share a photo.</p>
+            <p class="tile-ref">Preset: <b>Remove metadata</b></p>
+          </article>
+          <article class="card use">
+            <div class="flow"><span class="chip video">MP4</span><span class="arrow" aria-hidden="true">→</span><span class="chip video">GIF</span></div>
+            <h3>A GIF for your README</h3>
+            <p>15 fps, palette-optimised, loops forever. Looks good, stays small.</p>
+            <p class="tile-ref">Preset: <b>GIF</b></p>
+          </article>
+          <article class="card use">
+            <div class="flow"><span class="chip document">PDF · 40 MB</span><span class="arrow" aria-hidden="true">→</span><span class="chip document">PDF · 6 MB</span></div>
+            <h3>A scan too big to email</h3>
+            <p>Ghostscript shrinks image-heavy PDFs. Kept only if it's actually smaller.</p>
+            <p class="tile-ref">Preset: <b>Compress PDF</b></p>
+          </article>
+          <article class="card use">
+            <div class="flow"><span class="chip video">Video</span><span class="arrow" aria-hidden="true">→</span><span class="chip audio">MP3</span></div>
+            <h3>Just the audio</h3>
+            <p>Pull the soundtrack out of a talk or a clip, or turn a recording into a tiny Opus voice note.</p>
+            <p class="tile-ref">Preset: <b>MP3</b></p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Presets -->
+    <section id="presets" class="section" aria-labelledby="presets-title">
+      <div class="wrap">
+        <header class="section-head">
+          <p class="kicker">Built in</p>
+          <h2 id="presets-title">Ready-made presets, sensible defaults</h2>
+          <p>Each preset does one thing well. Turn off the ones you never use, tweak the rest, or <a href="docs/custom-presets.html">write your own</a>.</p>
+        </header>
+        <div class="kinds">
+<!-- presets:start -->
+        <article class="kind kind-image">
+          <h3><span class="dot" aria-hidden="true"></span>Images</h3>
+          <ul role="list">
+            <li title="Photos that open everywhere. Transparent areas become white."><span class="pname">JPG</span><code class="pext">.jpg</code></li>
+            <li title="Lossless, keeps transparency. Good for screenshots and graphics."><span class="pname">PNG</span><code class="pext">.png</code></li>
+            <li title="Small files for the web, with transparency."><span class="pname">WebP</span><code class="pext">.webp</code></li>
+            <li title="Next-generation format, the smallest files at the same quality."><span class="pname">AVIF</span><code class="pext">.avif</code></li>
+            <li title="Scale the image down to 50%."><span class="pname">Half size</span><code class="pext">same</code></li>
+            <li title="Shrink wide images to 1080 pixels across. Smaller images are left as is."><span class="pname">1080 px wide</span><code class="pext">same</code></li>
+            <li title="Scale up to 200%. Vector images are re-rendered sharp."><span class="pname">Double size</span><code class="pext">.png</code></li>
+            <li title="Smaller JPG at quality 75. Kept only if it&#x27;s actually smaller."><span class="pname">Compress</span><code class="pext">.jpg</code></li>
+            <li title="Drop location, camera and date details before sharing."><span class="pname">Remove metadata</span><code class="pext">same</code></li>
+          </ul>
+        </article>
+        <article class="kind kind-video">
+          <h3><span class="dot" aria-hidden="true"></span>Video</h3>
+          <ul role="list">
+            <li title="H.264 + AAC, plays on every phone, browser and chat app."><span class="pname">MP4</span><code class="pext">.mp4</code></li>
+            <li title="Looping GIF at 15 fps, up to 720 px wide. Great for READMEs."><span class="pname">GIF</span><code class="pext">.gif</code></li>
+            <li title="VP9 + Opus, open formats for the web."><span class="pname">WebM</span><code class="pext">.webm</code></li>
+            <li title="Fits free chat upload limits (Discord). Sized with a two-pass encode."><span class="pname">Under 10 MB</span><code class="pext">.mp4</code></li>
+            <li title="Fits most email attachment limits."><span class="pname">Under 25 MB</span><code class="pext">.mp4</code></li>
+            <li title="720p H.264 at a lower bitrate. Kept only if it&#x27;s actually smaller."><span class="pname">Smaller video</span><code class="pext">.mp4</code></li>
+            <li title="Remove the sound. The picture is copied untouched, so it&#x27;s instant."><span class="pname">Mute</span><code class="pext">same</code></li>
+          </ul>
+        </article>
+        <article class="kind kind-audio">
+          <h3><span class="dot" aria-hidden="true"></span>Audio</h3>
+          <ul role="list">
+            <li title="Plays anywhere. Also pulls the soundtrack out of a video."><span class="pname">MP3</span><code class="pext">.mp3</code></li>
+            <li title="Tiny files that keep voices clear. Ideal for voice notes and podcasts."><span class="pname">Opus</span><code class="pext">.opus</code></li>
+            <li title="Uncompressed audio for editors and samplers."><span class="pname">WAV</span><code class="pext">.wav</code></li>
+            <li title="Lossless and smaller than WAV."><span class="pname">FLAC</span><code class="pext">.flac</code></li>
+            <li title="Normalise loudness (EBU R128) so quiet and loud recordings match."><span class="pname">Even out volume</span><code class="pext">same</code></li>
+          </ul>
+        </article>
+        <article class="kind kind-document">
+          <h3><span class="dot" aria-hidden="true"></span>Documents</h3>
+          <ul role="list">
+            <li title="Word, Excel, PowerPoint, LibreOffice and Markdown files to PDF."><span class="pname">PDF</span><code class="pext">.pdf</code></li>
+            <li title="Markdown, OpenDocument and RTF to .docx."><span class="pname">Word</span><code class="pext">.docx</code></li>
+            <li title="Markdown to a single self-contained HTML file."><span class="pname">Web page</span><code class="pext">.html</code></li>
+            <li title="Shrink scans and image-heavy PDFs for email. Kept only if smaller."><span class="pname">Compress PDF</span><code class="pext">.pdf</code></li>
+            <li title="One PNG image per page, in a new folder."><span class="pname">Pages to PNG</span><code class="pext">pages · .png</code></li>
+            <li title="Pull the text out of a PDF (no OCR yet)."><span class="pname">Text</span><code class="pext">.txt</code></li>
+          </ul>
+        </article>
+<!-- presets:end -->
+        </div>
+        <p class="center"><a class="btn btn-ghost" href="docs/presets.html">See every preset and what it takes</a></p>
+      </div>
+    </section>
+
+    <!-- Tutorial -->
+    <section id="tutorial" class="section alt" aria-labelledby="tutorial-title">
+      <div class="wrap">
+        <header class="section-head">
+          <p class="kicker">Tutorial</p>
+          <h2 id="tutorial-title">Your first conversion in a minute</h2>
+        </header>
+        <ol class="steps" role="list">
+          <li>
+            <h3>Install</h3>
+            <p>Get the <code>.deb</code> from <a href="https://github.com/guilyx/roue/releases/latest">Releases</a>, then:</p>
+            <pre><code>sudo apt install ./roue_0.1.0_all.deb
+roue setup</code></pre>
+          </li>
+          <li>
+            <h3>Open the wheel</h3>
+            <p>Press <kbd>Super</kbd>&nbsp;<kbd>Shift</kbd>&nbsp;<kbd>D</kbd>. Each slice is a preset; drag a file over it and the slices change to the ones that fit.</p>
+          </li>
+          <li>
+            <h3>Drop, or copy and click</h3>
+            <p>Drop a file on a slice. Or select files in Files, press <kbd>Ctrl</kbd>&nbsp;<kbd>C</kbd>, open the wheel and click a slice.</p>
+          </li>
+          <li>
+            <h3>Find it next to the original</h3>
+            <p><code>IMG_2041.HEIC</code> gives <code>IMG_2041.jpg</code>, and a notification says when it's ready. Changed your mind? <code>roue undo</code> moves it to the trash.</p>
+          </li>
+        </ol>
+        <p class="center"><a class="btn btn-primary" href="docs/getting-started.html">Read the full tutorial</a></p>
+      </div>
+    </section>
+
+    <!-- Screenshots -->
+    <section class="section" aria-labelledby="shots-title">
+      <div class="wrap">
+        <header class="section-head">
+          <p class="kicker">Screenshots</p>
+          <h2 id="shots-title">At home on GNOME</h2>
+          <p>Built with GTK&nbsp;4 and libadwaita. Follows your light or dark style.</p>
+        </header>
+        <div class="shots">
+          <figure class="shot wide">
+            <img src="assets/screenshots/wheel.png" width="1280" height="720" loading="lazy" alt="The Roue wheel open over GNOME Files after right-clicking a screen recording: slices for MP4, GIF, WebM, Under 10 MB, Under 25 MB, Smaller video, Mute and More…. The pointer is on Under 10 MB, which turns red while the centre explains what it does.">
+            <figcaption>The wheel, opened from Files on a screen recording</figcaption>
+          </figure>
+          <figure class="shot main">
+            <picture>
+              <source srcset="assets/screenshots/panel-dark.png" media="(prefers-color-scheme: dark)">
+              <img src="assets/screenshots/panel-light.png" width="800" height="640" loading="lazy" alt="The Roue full panel: a search box, then tiles grouped into Images, Video, Audio and Documents, each with a coloured icon, a name and the output format.">
+            </picture>
+            <figcaption>The full panel, behind <strong>More…</strong></figcaption>
+          </figure>
+          <figure class="shot">
+            <picture>
+              <source srcset="assets/screenshots/preferences-dark.png" media="(prefers-color-scheme: dark)">
+              <img src="assets/screenshots/preferences.png" width="800" height="640" loading="lazy" alt="Roue preferences: keyboard shortcut, Shift-drag, staying in the background, where to save results, notifications and parallel conversions.">
+            </picture>
+            <figcaption>Preferences</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- Custom presets -->
+    <section class="section alt" aria-labelledby="custom-title">
+      <div class="wrap split">
+        <div>
+          <p class="kicker">Make it yours</p>
+          <h2 id="custom-title">Presets are just YAML</h2>
+          <p>Drop a file in <code>~/.config/roue/presets/</code> and a new preset joins the wheel, the panel and the command line. Use the built-in image, video, document and PDF backends, or wrap any tool with <code>{in}</code> and <code>{out}</code>.</p>
+          <ul class="ticks" role="list">
+            <li>Override a built-in preset by reusing its id</li>
+            <li>Mistakes are explained in plain words, never fatal</li>
+            <li>Share them as a file, or send a pull request</li>
+          </ul>
+          <p><a href="docs/custom-presets.html">Write your first preset →</a></p>
+        </div>
+        <pre class="code-card" aria-label="Example preset file"><code><span class="c"># ~/.config/roue/presets/thumbnail.yaml</span>
+<span class="k">id</span>: thumbnail
+<span class="k">name</span>: Thumbnail
+<span class="k">description</span>: 320 px wide WebP, for blog posts.
+<span class="k">group</span>: image
+<span class="k">accepts</span>: [<span class="s">"image/*"</span>]
+<span class="k">output_ext</span>: webp
+<span class="k">suffix</span>: <span class="s">" (thumb)"</span>
+<span class="k">backend</span>: image
+<span class="k">params</span>:
+  <span class="k">width</span>: 320
+  <span class="k">quality</span>: 80</code></pre>
+      </div>
+    </section>
+
+    <!-- Wayland vs X11 -->
+    <section class="section" aria-labelledby="session-title">
+      <div class="wrap">
+        <header class="section-head">
+          <p class="kicker">Wayland &amp; X11</p>
+          <h2 id="session-title">Works the right way on both</h2>
+          <p>Wayland keeps each app's drags private, by design. Roue respects that instead of fighting it, and gives X11 a little extra magic.</p>
+        </header>
+        <div class="cards two">
+          <article class="card session">
+            <h3>Wayland <span class="tag">Ubuntu's default</span></h3>
+            <ul class="ticks" role="list">
+              <li><kbd>Super</kbd>&nbsp;<kbd>Shift</kbd>&nbsp;<kbd>D</kbd> opens the wheel</li>
+              <li>Copy files with <kbd>Ctrl</kbd>&nbsp;<kbd>C</kbd>, press the hotkey, click a slice</li>
+              <li>Drag files onto the wheel</li>
+              <li>Right-click <strong>Convert with Roue…</strong> in Files: the wheel opens at the pointer</li>
+            </ul>
+          </article>
+          <article class="card session">
+            <h3>X11</h3>
+            <ul class="ticks" role="list">
+              <li>Everything Wayland gets, plus:</li>
+              <li><strong>Shift-drag</strong>: hold <kbd>Shift</kbd> while dragging any file and the wheel springs open around the pointer. Release Shift, drop on a slice.</li>
+              <li>The hotkey's wheel opens centred on the pointer and stays on top</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Privacy -->
+    <section class="section privacy" aria-labelledby="privacy-title">
+      <div class="wrap privacy-inner">
+        <div class="privacy-icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><rect x="9" y="21" width="30" height="21" rx="5"/><path d="M16 21v-6a8 8 0 0 1 16 0v6"/><circle cx="24" cy="31" r="3"/></svg>
+        </div>
+        <div>
+          <h2 id="privacy-title">Your files never leave your computer</h2>
+          <p>Roue runs FFmpeg, libvips, Ghostscript, Pandoc and LibreOffice on your machine. It doesn't open a single network connection: no uploads, no accounts, no analytics. Turn the Wi-Fi off and it works exactly the same.</p>
+          <p><a href="docs/privacy.html">Read the privacy page</a></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="section alt" aria-labelledby="faq-title">
+      <div class="wrap narrow">
+        <header class="section-head">
+          <p class="kicker">FAQ</p>
+          <h2 id="faq-title">Questions, answered</h2>
+        </header>
+        <div class="faq">
+          <details>
+            <summary>Where do converted files go?</summary>
+            <p>Next to the original, with the same name and the new extension: <code>IMG_2041.HEIC</code> gives <code>IMG_2041.jpg</code>. You can pick a single output folder in Preferences instead. If the original's folder is read-only, results go to Downloads.</p>
+          </details>
+          <details>
+            <summary>Can it overwrite my files?</summary>
+            <p>No. If <code>photo.jpg</code> exists, you get <code>photo (2).jpg</code>. Results are written to a hidden temporary folder first and moved into place in a way that refuses to replace anything. Undo moves results to the trash; nothing is ever deleted.</p>
+          </details>
+          <details>
+            <summary>Which distributions and desktops does it support?</summary>
+            <p>Any Linux with Python 3.12+ and GTK&nbsp;4 with libadwaita 1.5+: Ubuntu 24.04, Debian 13, Fedora 40 and newer. The hotkey is set up automatically on GNOME; on KDE, Xfce and others you add it in your keyboard settings in a few clicks.</p>
+          </details>
+          <details>
+            <summary>Why can't I Shift-drag on Wayland?</summary>
+            <p>Wayland doesn't let one app see another app's drags. That's a privacy feature, not a bug. On Wayland, use the Files menu, the hotkey, or copy-then-click.</p>
+          </details>
+          <details>
+            <summary>My HEIC photos won't convert.</summary>
+            <p>Your libheif needs its HEVC decoder: <code>sudo apt install libheif-plugin-libde265</code>. Run <code>roue doctor</code> to check every tool at once.</p>
+          </details>
+          <details>
+            <summary>Is it really free?</summary>
+            <p>Yes. Roue is free software under the GPL-3.0-or-later license. No paid tier, no ads, no tracking.</p>
+          </details>
+        </div>
+        <p class="center"><a href="docs/faq.html">More questions in the docs →</a></p>
+      </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="section final" aria-labelledby="final-title">
+      <div class="wrap final-inner">
+        <img src="assets/icon.svg" alt="" width="88" height="88">
+        <h2 id="final-title">Give your files a spin</h2>
+        <p>Free, local, and one keystroke away.</p>
+        <div class="cta-row center-row">
+          <a class="btn btn-primary" href="https://github.com/guilyx/roue/releases/latest">Download Roue</a>
+          <a class="btn btn-ghost" href="https://github.com/guilyx/roue">Star on GitHub</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <a class="brand" href="./"><img src="assets/icon.svg" alt="" width="24" height="24"><span>Roue</span></a>
+        <p class="muted small">Drop a file, get the file you wanted. Made for the Linux desktop, with FFmpeg, libvips, Ghostscript, Pandoc and LibreOffice doing the heavy lifting.</p>
+      </div>
+      <nav aria-label="Documentation">
+        <h2>Docs</h2>
+        <ul role="list">
+          <li><a href="docs/getting-started.html">Getting started</a></li>
+          <li><a href="docs/install.html">Install</a></li>
+          <li><a href="docs/presets.html">Presets</a></li>
+          <li><a href="docs/cli.html">Command line</a></li>
+        </ul>
+      </nav>
+      <nav aria-label="Project">
+        <h2>Project</h2>
+        <ul role="list">
+          <li><a href="https://github.com/guilyx/roue">Source code</a></li>
+          <li><a href="https://github.com/guilyx/roue/issues">Issues</a></li>
+          <li><a href="https://github.com/guilyx/roue/releases">Releases</a></li>
+          <li><a href="docs/contributing.html">Contributing</a></li>
+        </ul>
+      </nav>
+      <nav aria-label="About">
+        <h2>About</h2>
+        <ul role="list">
+          <li><a href="docs/privacy.html">Privacy</a></li>
+          <li><a href="https://github.com/guilyx/roue/blob/main/LICENSE">GPL-3.0-or-later</a></li>
+          <li><a href="https://github.com/guilyx/roue/blob/main/SECURITY.md">Security</a></li>
+        </ul>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>
