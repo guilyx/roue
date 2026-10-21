@@ -9,7 +9,7 @@ description = "Drop a file, get the file you wanted. A drag-and-drop file conver
 readme = "README.md"
 license = "GPL-3.0-or-later"
 license-files = ["LICENSE"]
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 authors = [{ name = "Erwin Lejeune" }]
 keywords = ["converter", "gtk", "gnome", "ffmpeg", "libvips", "drag-and-drop", "linux"]
 classifiers = [
@@ -18,6 +18,8 @@ classifiers = [
   "Intended Audience :: End Users/Desktop",
   "Operating System :: POSIX :: Linux",
   "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Topic :: Multimedia :: Graphics :: Graphics Conversion",
@@ -61,7 +63,7 @@ include = ["src", "tests", "data", "nautilus", "docs", "README.md", "LICENSE", "
 
 [tool.ruff]
 line-length = 100
-target-version = "py312"
+target-version = "py310"
 src = ["src", "tests"]
 
 [tool.ruff.lint]
@@ -72,7 +74,7 @@ ignore = ["RET504"]
 "tests/**" = ["PTH"]
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.10"
 strict = true
 warn_unreachable = true
 files = ["src/roue/engine", "src/roue/cli.py", "src/roue/integrations", "src/roue/radial.py"]

@@ -11,7 +11,7 @@ Press a key, drop a file on a slice of the wheel, done. No dialogs, no editors, 
 
 [![CI](https://github.com/guilyx/roue/actions/workflows/ci.yml/badge.svg)](https://github.com/guilyx/roue/actions/workflows/ci.yml)
 [![License: GPL v3+](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg)](LICENSE)
-[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-3776ab.svg)](https://www.python.org)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org)
 [![GTK 4 + libadwaita](https://img.shields.io/badge/GTK%204-libadwaita-4a86cf.svg)](https://gnome.pages.gitlab.gnome.org/libadwaita/)
 
 [Website](https://guilyx.github.io/roue/) · [Docs](https://guilyx.github.io/roue/docs/) · [Install](#install) · [Presets](#presets) · [Contributing](CONTRIBUTING.md)
@@ -55,7 +55,7 @@ conversion is done.
 
 ## Install
 
-### Ubuntu 24.04+ / Debian 13+
+### Ubuntu 22.04+ / Debian 12+
 
 ```bash
 wget -qO- https://guilyx.github.io/roue/install.sh | sh
@@ -80,8 +80,10 @@ pipx install --system-site-packages git+https://github.com/guilyx/roue
 roue setup          # launcher, Files menu, hotkey
 ```
 
-Optional: `pandoc` (Markdown), `libreoffice-writer` (office documents to PDF),
-`python3-xlib` (Shift-drag on X11). Run **`roue doctor`** to see what's missing.
+On Ubuntu 22.04 and Debian 12, leave out `libheif-plugin-libde265`: their libheif
+already reads HEIC. Optional: `pandoc` (Markdown), `libreoffice-writer` (office
+documents to PDF), `python3-xlib` (Shift-drag on X11). Run **`roue doctor`** to
+see what's missing.
 
 ### For contributors
 
@@ -143,7 +145,7 @@ telemetry. Roue works with Wi-Fi off.
 
 ## How it's built
 
-Python 3.12, GTK 4 and libadwaita for the wheel and the panel, and a GTK-free engine that
+Python 3.10+, GTK 4 and libadwaita for the wheel and the panel, and a GTK-free engine that
 drives FFmpeg, libvips (or ImageMagick), Ghostscript, Pandoc and LibreOffice.
 One engine, three front doors. Details in the [architecture docs](https://guilyx.github.io/roue/docs/architecture.html).
 

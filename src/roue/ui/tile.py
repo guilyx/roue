@@ -9,6 +9,7 @@ from gi.repository import GLib, Gtk
 from ..engine.backends import missing_tools
 from ..engine.presets import Preset
 from ..engine.tools import label
+from .compat import foreground_color
 
 
 class ProgressRing(Gtk.DrawingArea):
@@ -44,7 +45,7 @@ class ProgressRing(Gtk.DrawingArea):
         return GLib.SOURCE_CONTINUE
 
     def _draw(self, _area: Gtk.DrawingArea, cr: object, width: int, height: int) -> None:
-        color = self.get_color()
+        color = foreground_color(self)
         line = 4.0
         radius = min(width, height) / 2 - line
         cx, cy = width / 2, height / 2

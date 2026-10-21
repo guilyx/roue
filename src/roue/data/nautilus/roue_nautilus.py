@@ -21,14 +21,18 @@ from typing import Any
 
 import gi
 
-# Nautilus 43-48 ship the 4.0 extension API, Nautilus 49+ (Ubuntu 25.10+) ship 4.1.
-for _version in ("4.1", "4.0"):
+# Nautilus 43-48 ship the 4.0 extension API, Nautilus 49+ (Ubuntu 25.10+) ship 4.1,
+# Nautilus 42 (Ubuntu 22.04) ships 3.0, which runs on GTK 3.
+for _version in ("4.1", "4.0", "3.0"):
     try:
         gi.require_version("Nautilus", _version)
         break
-    except ValueError:  # not installed, or the host already loaded the other one
+    except ValueError:  # not installed, or the host already loaded another one
         continue
 from gi.repository import Gio, GLib, GObject, Nautilus  # noqa: E402
+
+# The GDK of the Files process: GTK 3 with the 3.0 API, GTK 4 after.
+GDK_VERSION = "3.0" if Nautilus._version == "3.0" else "4.0"
 
 APP_ID = "io.github.guilyx.Roue"
 OBJECT_PATH = "/io/github/guilyx/Roue"
@@ -138,7 +142,7 @@ def _spawn(args: list[str]) -> None:
 def _platform_data() -> dict[str, GLib.Variant]:
     """An activation token, so the desktop lets the wheel take focus."""
     try:
-        gi.require_version("Gdk", "4.0")
+        gi.require_version("Gdk", GDK_VERSION)
         from gi.repository import Gdk
 
         try:  # GLib >= 2.80 moved it to GioUnix; Gio.DesktopAppInfo is deprecated
@@ -192,7 +196,9 @@ def _activate(action: str, parameter: GLib.Variant, fallback: list[str]) -> None
 
 
 class RoueMenuProvider(GObject.GObject, Nautilus.MenuProvider):
-    def get_file_items(self, files: list[Nautilus.FileInfo]) -> list[Nautilus.MenuItem]:
+    def get_file_items(self, *args: Any) -> list[Nautilus.MenuItem]:
+        # Nautilus 43+ passes the files, Nautilus 42 (window, files).
+        files: list[Nautilus.FileInfo] = args[-1]
         if not files:
             return []
         paths: list[str] = []

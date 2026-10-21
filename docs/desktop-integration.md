@@ -55,9 +55,11 @@ pointer. On GNOME, a small Shell extension does both for Roue's wheel:
 
 It touches only Roue's wheel window, nothing else. Its id is
 `roue@guilyx.github.io`. The `.deb` installs it; `roue setup`, **Set Up
-Roue** or **Preferences > General** turn it on. GNOME only discovers new
-extensions when your session starts, so after a fresh install it starts the
-next time you log in.
+Roue** or **Preferences > General** turn it on. GNOME 42–44 (Ubuntu 22.04,
+Debian 12) need an older extension format: there, turning it on also puts a
+copy in that format in `~/.local/share/gnome-shell/extensions/`. GNOME only
+discovers new extensions when your session starts, so after a fresh install it
+starts the next time you log in.
 
 Without it Roue still works: the wheel opens where GNOME puts new windows, and
 **Ctrl+C**, then the hotkey, avoids dragging altogether. Turn it off in
@@ -173,8 +175,8 @@ The item only appears when at least one preset fits.
   Debian/Ubuntu, `nautilus-python` on Fedora, `python-nautilus` on Arch.
 - The `.deb` installs the extension system-wide. Otherwise `roue setup` adds it
   to `~/.local/share/nautilus-python/extensions/`.
-- Works with both Files extension APIs: 4.0 (Nautilus 43–48, Ubuntu 24.04) and
-  4.1 (Nautilus 49+, Ubuntu 25.10 and 26.04).
+- Works with all three Files extension APIs: 3.0 (Nautilus 42, Ubuntu 22.04),
+  4.0 (Nautilus 43–48, Ubuntu 24.04) and 4.1 (Nautilus 49+, Ubuntu 25.10 and 26.04).
 - Restart Files once to load it: `nautilus -q`, or the **Restart Files**
   button in **Set Up Roue**. Files' open windows close.
 - Folders and remote locations without a local path don't get the menu.

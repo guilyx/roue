@@ -86,10 +86,15 @@ def install_desktop_files(
 def nautilus_python_available() -> bool:
     """True if the Files (Nautilus) Python extension host is installed."""
     candidates = [
-        Path("/usr/lib/x86_64-linux-gnu/nautilus/extensions-4/libnautilus-python.so"),
-        Path("/usr/lib/aarch64-linux-gnu/nautilus/extensions-4/libnautilus-python.so"),
-        Path("/usr/lib64/nautilus/extensions-4/libnautilus-python.so"),
-        Path("/usr/lib/nautilus/extensions-4/libnautilus-python.so"),
+        Path(lib) / "nautilus" / folder / "libnautilus-python.so"
+        for lib in (
+            "/usr/lib/x86_64-linux-gnu",
+            "/usr/lib/aarch64-linux-gnu",
+            "/usr/lib64",
+            "/usr/lib",
+        )
+        # extensions-4 since Nautilus 43, extensions-3.0 in Nautilus 42 (Ubuntu 22.04)
+        for folder in ("extensions-4", "extensions-3.0")
     ]
     return any(p.exists() for p in candidates)
 

@@ -92,6 +92,33 @@ def test_preferences_open(monkeypatch: pytest.MonkeyPatch) -> None:
     assert run_app(check, monkeypatch) == {"ok": True}
 
 
+def test_history_and_about_open(monkeypatch: pytest.MonkeyPatch) -> None:
+    def check(app: RoueApplication, results: dict[str, object]) -> None:
+        app.show_history()
+        app.show_about()
+        results["ok"] = True
+
+    assert run_app(check, monkeypatch) == {"ok": True}
+
+
+def test_preference_rows_report_changes(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Switch and number rows behave the same with older libadwaita."""
+
+    def check(app: RoueApplication, results: dict[str, object]) -> None:
+        from roue.ui import compat
+
+        seen: list[object] = []
+        switch = compat.SwitchRow(title="Notifications")
+        switch.connect("notify::active", lambda row, _p: seen.append(row.get_active()))
+        switch.set_active(True)
+        spin = compat.SpinRow.new_with_range(0, 64, 1)
+        spin.connect("notify::value", lambda row, _p: seen.append(row.get_value()))
+        spin.set_value(3)
+        results["seen"] = seen
+
+    assert run_app(check, monkeypatch)["seen"] == [True, 3.0]
+
+
 def test_wheel_with_files_offers_the_best_presets(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
@@ -191,9 +218,10 @@ def test_setup_dialog_lists_missing_tools(monkeypatch: pytest.MonkeyPatch) -> No
     def check(app: RoueApplication, results: dict[str, object]) -> None:
         from gi.repository import Adw
 
-        app.show_welcome()
-        dialog = app.panel.get_visible_dialog() if app.panel else None
-        assert isinstance(dialog, Adw.Dialog)
+        dialog = app.show_welcome()
+        assert dialog.get_visible()
+        if hasattr(Adw, "Dialog"):  # libadwaita 1.5+ shows it inside the panel
+            assert app.panel and app.panel.get_visible_dialog() is dialog
         titles = []
         for group in dialog._groups:  # type: ignore[attr-defined]
             row = group.get_first_child()

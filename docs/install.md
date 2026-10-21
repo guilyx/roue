@@ -1,8 +1,8 @@
 # Install
 
-Roue needs Linux, Python 3.12+, and GTK 4.12+ with libadwaita 1.5+ for the
+Roue needs Linux, Python 3.10+, and GTK 4.6+ with libadwaita 1.1+ for the
 wheel and the panel.
-Ubuntu 24.04, Debian 13, Fedora 40 and newer all qualify. The command line and
+Ubuntu 22.04, Debian 12, Fedora 40 and newer all qualify. The command line and
 the conversion engine work without GTK.
 
 Tested on Ubuntu 24.04 (GNOME 46, Wayland) and Ubuntu 26.04 (GNOME 50,
@@ -66,6 +66,9 @@ sudo apt install ffmpeg libvips-tools ghostscript python3-gi python3-gi-cairo \
   gir1.2-gtk-4.0 gir1.2-adw-1 python3-nautilus libheif-plugin-libde265 pipx
 ```
 
+On Ubuntu 22.04 and Debian 12, leave out `libheif-plugin-libde265`: their
+libheif already reads HEIC.
+
 Then install Roue for your user and hook it into the desktop:
 
 ```sh
@@ -107,7 +110,8 @@ greyed out with a hint.
 
 **HEIC photos** need the HEVC decoder plugin for libheif. On Ubuntu and
 Debian: `sudo apt install libheif-plugin-libde265`. Writing **AVIF** needs the
-AV1 encoder plugin: `sudo apt install libheif-plugin-aomenc`.
+AV1 encoder plugin: `sudo apt install libheif-plugin-aomenc`. (Ubuntu 22.04 and
+Debian 12 build both into libheif, so there's nothing to add.)
 
 **Markdown to PDF** uses the first PDF engine it finds (`typst`, `weasyprint`,
 `wkhtmltopdf`, `tectonic`, `xelatex`, `pdflatex`). With none installed, Pandoc

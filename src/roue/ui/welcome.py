@@ -16,33 +16,30 @@ from gi.repository import Adw, Gdk, Gio, GLib, Gtk
 
 from ..engine import tools
 from ..integrations import desktop, gnome_shell, hotkey, packages, session, x11_drag
+from . import compat
 
 if TYPE_CHECKING:
     from .application import RoueApplication
 
 
-class WelcomeDialog(Adw.Dialog):
+class WelcomeDialog(compat.Dialog):
     def __init__(self, app: RoueApplication):
         super().__init__(title="Set Up Roue", content_width=560, content_height=680)
         self.app = app
         self._busy = False
         self.toasts = Adw.ToastOverlay()
-        view = Adw.ToolbarView()
-        view.add_top_bar(Adw.HeaderBar())
         self.page = Adw.PreferencesPage()
-        view.set_content(self.page)
         done = Gtk.Button(label="Done", halign=Gtk.Align.CENTER, margin_top=12, margin_bottom=12)
         done.add_css_class("pill")
         done.add_css_class("suggested-action")
         done.connect("clicked", lambda _b: self.close())
-        view.add_bottom_bar(done)
-        self.toasts.set_child(view)
+        self.toasts.set_child(compat.toolbar_view(Adw.HeaderBar(), self.page, done))
         self.set_child(self.toasts)
         self._groups: list[Adw.PreferencesGroup] = []
         self.refresh()
         self.connect("closed", self._on_closed)
 
-    def _on_closed(self, _dialog: Adw.Dialog) -> None:
+    def _on_closed(self, _dialog: Gtk.Widget) -> None:
         if not self.app.settings.welcome_done:
             self.app.settings.welcome_done = True
             self.app.settings.save()
@@ -234,7 +231,7 @@ class WelcomeDialog(Adw.Dialog):
             return
         self._busy = True
         button.set_sensitive(False)
-        button.set_child(Adw.Spinner() if hasattr(Adw, "Spinner") else Gtk.Spinner(spinning=True))
+        button.set_child(compat.spinner())
         try:
             proc = Gio.Subprocess.new(packages.install_argv(names), Gio.SubprocessFlags.NONE)
         except GLib.Error as exc:
