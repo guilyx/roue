@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "roue"
-version = "0.2.0"
+version = "0.2.1"
 description = "Drop a file, get the file you wanted. A drag-and-drop file converter for Linux."
 readme = "README.md"
 license = "GPL-3.0-or-later"
