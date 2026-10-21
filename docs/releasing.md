@@ -31,25 +31,54 @@ Until the key exists, nothing breaks: the `.deb` builds without the update
 channel, the Website workflow skips `/apt`, and `install.sh` installs the
 latest release's `.deb` instead.
 
-## Each release
+## Once: let the workflow open pull requests
 
-1. Bump `__version__` in `src/roue/__init__.py`.
-2. Move the *Unreleased* notes in `CHANGELOG.md` to a new
-   `## [X.Y.Z] - YYYY-MM-DD` section.
-3. Commit, tag and push the tag:
+In the repository's **Settings → Actions → General → Workflow permissions**,
+tick **Allow GitHub Actions to create and approve pull requests**.
+release-please needs it to open the release pull request.
 
-   ```sh
-   git tag vX.Y.Z
-   git push origin vX.Y.Z
-   ```
+## Each release: merge the release pull request
 
-The **Release** workflow checks that the tag matches `__version__`, builds the
-sdist, the wheel and the `.deb`, writes `SHA256SUMS`, and creates the GitHub
-release with the changelog section as notes. It then starts the **Website**
-workflow, which downloads the `.deb` files of the last five releases, builds
-the signed APT repository with `scripts/apt-repo.sh`, and publishes it under
-`https://guilyx.github.io/roue/apt/`. Within a day, Software Updater offers
-the new version to everyone who installed the `.deb`.
+Releases are automatic, driven by [Conventional Commits](https://www.conventionalcommits.org)
+(see [Contributing](contributing.md)):
+
+1. Merge pull requests as usual. After each merge to `main`, the **Release**
+   workflow runs [release-please](https://github.com/googleapis/release-please),
+   which keeps one pull request open, titled `chore: release X.Y.Z`. It bumps
+   the version (`pyproject.toml`, `src/roue/__init__.py`, the website) and adds
+   the changelog section, both computed from the commits since the last
+   release: `fix:` → patch, `feat:` → minor (while below 1.0), `feat!:` →
+   major. `docs:`, `chore:`, `ci:` and `test:` commits don't make a release
+   on their own.
+2. When you want to ship, **merge that pull request**. That's the release:
+   the workflow tags `vX.Y.Z`, creates the GitHub release, builds the sdist,
+   the wheel and the `.deb` (with `SHA256SUMS`) and attaches them.
+3. It then starts the **Website** workflow, which downloads the `.deb` files of
+   the last five releases, builds the signed APT repository with
+   `scripts/apt-repo.sh`, and publishes it under
+   `https://guilyx.github.io/roue/apt/`. Within a day, Software Updater offers
+   the new version to everyone who installed Roue.
+
+The release pull request is made with the workflow's token, so GitHub doesn't
+run CI on it. That's fine: it only changes version numbers and the changelog,
+and every commit it lists was checked when it merged.
+
+The `.deb` gets its version from `src/roue/__init__.py`. `packaging/deb/build.sh`
+also stamps it into the man page and the AppStream release list.
+
+### The first release
+
+release-please starts counting from 0.1.0 (`.release-please-manifest.json`),
+and 0.1.0 itself is the one release made by hand. After `scripts/apt-key.sh`
+(so 0.1.0 already carries the update channel):
+
+```sh
+git tag v0.1.0 && git push origin v0.1.0
+```
+
+A pushed `vX.Y.Z` tag goes through the same publish steps, with the matching
+`CHANGELOG.md` section as release notes. You can also use it to re-publish a
+release by hand.
 
 ## Checks that guard the channel
 

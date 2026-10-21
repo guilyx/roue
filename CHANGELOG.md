@@ -1,13 +1,13 @@
 # Changelog
 
-All notable changes to Roue are documented here.
+All notable changes to Roue are documented here. Roue follows
+[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+New entries are written by [release-please](https://github.com/googleapis/release-please)
+from the commit messages (`feat:` → Added, `fix:` → Fixed) when a release is
+made; see [Releasing](docs/releasing.md).
 
-## [Unreleased]
-
-## [0.1.0] - Unreleased
+## [0.1.0] - 2026-10-21
 
 First public release.
 

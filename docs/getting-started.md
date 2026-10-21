@@ -5,16 +5,16 @@ the wheel (with the hotkey), the Files right-click menu, and the terminal.
 
 ## 1. Install
 
-On Ubuntu or Debian, grab `roue_0.1.0_all.deb` from the
-[latest release](https://github.com/guilyx/roue/releases/latest), then:
+On Ubuntu 24.04+ or Debian 13+, one command installs Roue and keeps it up
+to date through Software Updater:
 
 ```sh
-sudo apt install ./roue_0.1.0_all.deb
-roue setup
+wget -qO- https://guilyx.github.io/roue/install.sh | sh
 ```
 
-`roue setup` adds the **Super+Shift+D** hotkey, which opens the wheel. The app
-launcher and the Files menu come with the package.
+It also runs `roue setup`, which adds the **Super+Shift+D** hotkey (it opens
+the wheel). The app launcher and the Files menu come with the package. The
+first time you open Roue, **Set Up Roue** shows anything left to do.
 
 On another distribution, see [Install](install.md). Then check everything is
 in place:

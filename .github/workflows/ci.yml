@@ -33,6 +33,10 @@ jobs:
         run: mypy
       - name: Shell scripts
         run: shellcheck website/install.sh scripts/*.sh packaging/deb/build.sh packaging/deb/postinst packaging/deb/prerm
+      - name: Workflows
+        run: |
+          python -m pip install actionlint-py
+          actionlint
 
   test:
     name: Tests (Ubuntu 24.04, all tools)

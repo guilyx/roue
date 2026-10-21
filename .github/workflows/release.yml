@@ -1,18 +1,52 @@
 name: Release
 
+# Every push to main runs release-please: it keeps a "chore: release X.Y.Z"
+# pull request up to date with the next version (from Conventional Commit
+# messages: fix → patch, feat → minor while below 1.0) and the changelog.
+# Merging that pull request tags vX.Y.Z and creates the GitHub release; the
+# publish job then attaches the .deb, the wheel and the sdist, and publishes
+# the update channel. Pushing a vX.Y.Z tag by hand publishes it the same way.
+
 on:
   push:
+    branches: [main]
     tags: ["v*"]
 
 permissions:
-  contents: write
-  actions: write  # to start the Website workflow, which publishes the update channel
+  contents: write  # tags, releases, the release branch
+  pull-requests: write  # the release pull request
+  actions: write  # start the Website workflow, which publishes the update channel
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  release:
+  release-please:
+    if: github.ref_type == 'branch'
     runs-on: ubuntu-24.04
+    outputs:
+      created: ${{ steps.release.outputs.release_created }}
+      tag: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - id: release
+        uses: googleapis/release-please-action@v4
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  publish:
+    needs: release-please
+    # A release release-please just made, or a tag pushed by hand.
+    if: always() && (github.ref_type == 'tag' || needs.release-please.outputs.created == 'true')
+    runs-on: ubuntu-24.04
+    env:
+      TAG: ${{ github.ref_type == 'tag' && github.ref_name || needs.release-please.outputs.tag }}
+      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.TAG }}
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
@@ -20,8 +54,8 @@ jobs:
       - name: Check the tag matches the version
         run: |
           version=$(sed -n 's/^__version__ = "\(.*\)"$/\1/p' src/roue/__init__.py)
-          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
-            echo "::error::Tag $GITHUB_REF_NAME doesn't match __version__ $version"
+          if [ "v$version" != "$TAG" ]; then
+            echo "::error::Tag $TAG doesn't match __version__ $version"
             exit 1
           fi
 
@@ -33,37 +67,43 @@ jobs:
       - name: Build .deb
         run: packaging/deb/build.sh
 
-      - name: Extract release notes
-        run: |
-          version="${GITHUB_REF_NAME#v}"
-          awk -v v="$version" '
-            $0 ~ "^## \\[" v "\\]" {found=1; next}
-            found && /^## \[/ {exit}
-            found {print}
-          ' CHANGELOG.md > release-notes.md
-          echo "" >> release-notes.md
-          {
-            echo "**Install on Ubuntu 24.04+ or Debian 13+:** \`wget -qO- https://guilyx.github.io/roue/install.sh | sh\`"
-            echo ""
-            echo "Or download \`roue_${version}_all.deb\` and run \`sudo apt install ./roue_${version}_all.deb\`."
-            echo "Already installed? Software Updater offers this version."
-          } >> release-notes.md
-
       - name: Checksums
-        run: cd dist && sha256sum * > SHA256SUMS
+        run: cd dist && sha256sum -- * > SHA256SUMS
 
-      - uses: softprops/action-gh-release@v3
-        with:
-          body_path: release-notes.md
-          files: |
-            dist/*.deb
-            dist/*.whl
-            dist/*.tar.gz
-            dist/SHA256SUMS
+      - name: Release notes
+        run: |
+          version="${TAG#v}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            # release-please wrote them from the commits.
+            gh release view "$TAG" --json body --jq .body > release-notes.md
+          else
+            awk -v v="$version" '
+              $0 ~ "^## \\[" v "\\]" {found=1; next}
+              found && /^## \[/ {exit}
+              found {print}
+            ' CHANGELOG.md > release-notes.md
+          fi
+          if ! grep -q "install.sh" release-notes.md; then
+            {
+              echo ""
+              echo "**Install on Ubuntu 24.04+ or Debian 13+:** \`wget -qO- https://guilyx.github.io/roue/install.sh | sh\`"
+              echo ""
+              echo "Or download \`roue_${version}_all.deb\` and run \`sudo apt install ./roue_${version}_all.deb\`."
+              echo "Already installed? Software Updater offers this version."
+            } >> release-notes.md
+          fi
+
+      - name: Publish the GitHub release
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" dist/* --clobber
+            gh release edit "$TAG" --notes-file release-notes.md
+          else
+            gh release create "$TAG" dist/* --verify-tag --title "Roue ${TAG#v}" \
+              --notes-file release-notes.md
+          fi
 
       - name: Publish to the update channel
-        env:
-          GH_TOKEN: ${{ github.token }}
         # Releases made with the workflow token don't trigger other workflows,
         # but starting one by hand does.
         run: gh workflow run pages.yml --ref main

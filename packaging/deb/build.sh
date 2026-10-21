@@ -64,8 +64,21 @@ EOF
 # Belt and braces: caches belong to dpkg triggers, never ship them.
 rm -f "$SHARE/applications/mimeinfo.cache" "$SHARE/icons/hicolor/icon-theme.cache"
 
-install -Dm0644 "$ROOT/data/io.github.guilyx.Roue.metainfo.xml" \
-    "$SHARE/metainfo/io.github.guilyx.Roue.metainfo.xml"
+# Software centres show the AppStream release list. Releases only bump the
+# version number, so list this version here if it isn't yet.
+STAMP="${SOURCE_DATE_EPOCH:-$(git -C "$ROOT" log -1 --format=%ct 2>/dev/null || date +%s)}"
+install -d "$SHARE/metainfo"
+"$PYTHON" - "$ROOT/data/io.github.guilyx.Roue.metainfo.xml" "$VERSION" \
+    "$(date -u -d "@$STAMP" +%F)" > "$SHARE/metainfo/io.github.guilyx.Roue.metainfo.xml" <<'EOF'
+import sys
+
+path, version, day = sys.argv[1:]
+text = open(path, encoding="utf-8").read()
+if f'<release version="{version}"' not in text:
+    entry = f'<releases>\n    <release version="{version}" date="{day}"/>'
+    text = text.replace("<releases>", entry, 1)
+sys.stdout.write(text)
+EOF
 
 # 4. The update channel: Software Updater then offers new Roue versions.
 # Only once the signing key exists (scripts/apt-key.sh), or apt would fail.
@@ -85,7 +98,6 @@ fi
 
 # 5. Docs and man page.
 install -Dm0644 "$HERE/copyright" "$DOC/copyright"
-STAMP="${SOURCE_DATE_EPOCH:-$(git -C "$ROOT" log -1 --format=%ct 2>/dev/null || date +%s)}"
 cat > "$STAGE/changelog" <<CHANGELOG
 roue ($VERSION) unstable; urgency=medium
 
@@ -96,7 +108,8 @@ roue ($VERSION) unstable; urgency=medium
 CHANGELOG
 gzip -9nc "$STAGE/changelog" > "$DOC/changelog.gz"
 install -d "$SHARE/man/man1"
-gzip -9nc "$ROOT/packaging/man/roue.1" > "$SHARE/man/man1/roue.1.gz"
+sed "s/\"roue [0-9][0-9.]*\"/\"roue $VERSION\"/" "$ROOT/packaging/man/roue.1" |
+    gzip -9nc > "$SHARE/man/man1/roue.1.gz"
 
 # 6. Control files.
 find "$PKG" -type d -exec chmod 0755 {} +
