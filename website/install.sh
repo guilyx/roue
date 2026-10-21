@@ -50,6 +50,24 @@ fi
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 
+# apt-get as root. Software Updater (PackageKit) refreshes apt's package lists
+# in the background, and apt-get fails at once while it does: only the dpkg
+# lock has a timeout. So wait for the other program, up to 5 minutes.
+apt_get() {
+    waited=0
+    until $SUDO apt-get -o DPkg::Lock::Timeout=300 "$@" 2>"$tmp/apt-errors"; do
+        # "E: " isn't translated, and the error names the lock file.
+        if [ "$waited" -ge 300 ] || ! grep -q '^E: .*/lock' "$tmp/apt-errors"; then
+            cat "$tmp/apt-errors" >&2
+            return 1
+        fi
+        [ "$waited" -gt 0 ] || say "Another program is using apt (Software Updater?). Waiting for it to finish…"
+        sleep 5
+        waited=$((waited + 5))
+    done
+    cat "$tmp/apt-errors" >&2
+}
+
 if fetch "$SITE/apt/roue-archive-keyring.gpg" "$tmp/keyring.gpg"; then
     say "Adding Roue's update channel"
     $SUDO install -m 0644 "$tmp/keyring.gpg" "$KEYRING"
@@ -63,9 +81,9 @@ Signed-By: $KEYRING
 EOF
     # Same text as the file the package ships, so dpkg doesn't ask about it.
     $SUDO install -m 0644 "$tmp/roue.sources" "$SOURCES"
-    $SUDO apt-get update
+    apt_get update
     say "Installing Roue"
-    $SUDO apt-get install -y -o Dpkg::Options::=--force-confdef roue
+    apt_get install -y -o Dpkg::Options::=--force-confdef roue
 else
     # No update channel published yet: take the newest release instead.
     say "Downloading the latest release"
@@ -78,7 +96,7 @@ else
     chmod 0644 "$tmp/roue.deb"
     chmod 0755 "$tmp"
     say "Installing Roue"
-    $SUDO apt-get install -y "$tmp/roue.deb"
+    apt_get install -y "$tmp/roue.deb"
 fi
 
 # Hotkey, Files menu, GNOME helper: per user, so not as root.
