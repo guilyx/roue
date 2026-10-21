@@ -25,12 +25,11 @@ class RoueExtension {
     _onWindowCreated(window) {
         if (window.get_client_type() !== Meta.WindowClientType.WAYLAND)
             return; // on X11 the app places the wheel itself
-        const actor = window.get_compositor_private();
-        if (!actor)
-            return;
-        // A Wayland window has no app id or title yet when it is created.
-        const handler = actor.connect('first-frame', () => {
-            actor.disconnect(handler);
+        // A Wayland window has no app id or title yet when it is created. When
+        // it is first shown it has both, and GNOME has placed it. (GNOME 42
+        // doesn't emit first-frame for these windows.)
+        const handler = window.connect('shown', () => {
+            window.disconnect(handler);
             const app = window.get_gtk_application_id() ?? window.get_wm_class();
             if (app === APP_ID && window.get_title() === WHEEL_TITLE)
                 this._placeWheel(window);

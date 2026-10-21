@@ -113,14 +113,11 @@ const shell = {
 };
 const gi = {Meta: {WindowClientType: {WAYLAND: 0, X11: 1}}};
 const init = new Function('imports', 'global', `${source}\nreturn init;`)({gi}, shell);
-let firstFrame = null;
-const actor = {
-    connect: (signal, callback) => { firstFrame = callback; return 3; },
-    disconnect: id => calls.push(['actor-disconnect', id]),
-};
+let shown = null;
 const wheel = {
+    connect: (signal, callback) => { calls.push(['connect', signal]); shown = callback; return 3; },
+    disconnect: id => calls.push(['window-disconnect', id]),
     get_client_type: () => 0,
-    get_compositor_private: () => actor,
     get_gtk_application_id: () => 'io.github.guilyx.Roue',
     get_wm_class: () => null,
     get_title: () => 'Convert with Roue',
@@ -134,7 +131,7 @@ const wheel = {
 const extension = init();
 extension.enable();
 handlers['window-created'](null, wheel);
-firstFrame();
+shown();
 extension.disable();
 print(JSON.stringify(calls));
 """
@@ -148,7 +145,8 @@ def test_legacy_helper_keeps_the_wheel_on_top_at_the_pointer(tmp_path: Path) -> 
     proc = subprocess.run(["gjs", str(driver)], capture_output=True, text=True, timeout=60)
     assert proc.returncode == 0, proc.stderr
     assert json.loads(proc.stdout) == [
-        ["actor-disconnect", 3],
+        ["connect", "shown"],
+        ["window-disconnect", 3],
         ["make_above"],
         ["move_frame", True, 0, 32],  # centred on the pointer, kept below the top bar
         ["disconnect", 7],
