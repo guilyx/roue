@@ -86,7 +86,7 @@ jobs:
         run: |
           {
             echo ""
-            echo "**Install on Ubuntu 24.04+ or Debian 13+:** \`wget -qO- https://guilyx.github.io/roue/install.sh | sh\`"
+            echo "**Install on Ubuntu 22.04+ or Debian 12+:** \`wget -qO- https://guilyx.github.io/roue/install.sh | sh\`"
             echo ""
             echo "Already installed? Software Updater offers this version."
           } >> release-notes.md
