@@ -2,7 +2,7 @@ name: Release
 
 # Every merge to main is released, when it changes something for users.
 # scripts/release.py reads the commits since the last tag (Conventional
-# Commits): feat → minor, fix/perf → patch, feat! → major (minor below 1.0);
+# Commits): feat → minor, fix/perf → patch, feat! → major;
 # docs/chore/ci/test only → no release. It stamps the version and the
 # changelog; this workflow commits that, tags vX.Y.Z, builds the .deb, the
 # wheel and the sdist, creates the GitHub release and publishes the update

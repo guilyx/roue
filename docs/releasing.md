@@ -40,7 +40,7 @@ tag ([Conventional Commits](https://www.conventionalcommits.org), see
 
 | Commits in the merge | Release |
 |---|---|
-| `feat!:` or a `BREAKING CHANGE:` footer | major (minor while below 1.0) |
+| `feat!:` or a `BREAKING CHANGE:` footer | major: 0.3.0 → 1.0.0, 1.2.0 → 2.0.0 |
 | `feat:` | minor: 0.1.0 → 0.2.0 |
 | `fix:`, `perf:`, `revert:` | patch: 0.1.0 → 0.1.1 |
 | only `docs:`, `chore:`, `ci:`, `test:`… | none: nothing changed for users |

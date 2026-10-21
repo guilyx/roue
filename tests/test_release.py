@@ -27,7 +27,7 @@ def commits(*subjects: str) -> list:
     [
         ("0.1.0", ["fix: keep sample rate"], "0.1.1"),
         ("0.1.0", ["fix: a", "feat(ui): wheel"], "0.2.0"),
-        ("0.1.3", ["feat!: new preset format"], "0.2.0"),  # breaking stays minor below 1.0
+        ("0.1.3", ["feat!: new preset format"], "1.0.0"),  # breaking is major, even below 1.0
         ("1.4.2", ["refactor!: drop the panel"], "2.0.0"),
         ("1.4.2", ["perf: faster thumbnails"], "1.4.3"),
         ("0.1.0", ["docs: typo", "chore(deps): bump actions", "ci: lint"], None),

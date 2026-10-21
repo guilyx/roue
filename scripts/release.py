@@ -5,7 +5,7 @@ Usage: python scripts/release.py [--github-output FILE]
 The Release workflow runs this after every merge to main. Commit messages
 follow Conventional Commits and decide the version:
 
-- ``feat!:`` or a ``BREAKING CHANGE:`` footer: major (minor while below 1.0)
+- ``feat!:`` or a ``BREAKING CHANGE:`` footer: major (0.x too: 0.3.0 → 1.0.0)
 - ``feat:``: minor
 - ``fix:``, ``perf:``, ``revert:``: patch
 - anything else (``docs:``, ``chore:``, ``ci:``, ``test:``...): no release
@@ -64,7 +64,7 @@ def bump(version: str, commits: list[Commit]) -> str | None:
     major, minor, patch = (int(part) for part in version.split("."))
     relevant = [c for c in commits if not c.is_release]
     if any(c.breaking for c in relevant):
-        return f"{major + 1}.0.0" if major >= 1 else f"0.{minor + 1}.0"
+        return f"{major + 1}.0.0"
     if any(c.kind == "feat" for c in relevant):
         return f"{major}.{minor + 1}.0"
     if any(c.kind in ("fix", "perf", "revert") for c in relevant):
