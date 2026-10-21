@@ -119,11 +119,11 @@ For X11 Shift-drag, use an X11 session or `Xephyr :2 & DISPLAY=:2 ...`.
 
 - [Conventional Commits](https://www.conventionalcommits.org): `feat: add
   instagram-square preset`, `fix(ffmpeg): keep sample rate when normalizing`,
-  `docs: ...`, `test: ...`, `chore: ...`. They decide the next version:
-  `fix:` makes a patch release, `feat:` a minor one, `feat!:` (or a
-  `BREAKING CHANGE:` footer) a major one, and the other types none. With
-  squash merges, the PR title is the commit message, so it follows the same
-  rule.
+  `docs: ...`, `test: ...`, `chore: ...`. Every merge to `main` is
+  released automatically, and these prefixes decide the version: `fix:` makes
+  a patch release, `feat:` a minor one, `feat!:` (or a `BREAKING CHANGE:`
+  footer) a major one, and the other types none. With squash merges, the PR
+  title is the commit message, so it follows the same rule.
 - One topic per PR. Small is great.
 - Before pushing: `make check`.
 - The PR template has a short checklist. CI runs lint, types, the full test

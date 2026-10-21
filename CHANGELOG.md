@@ -3,9 +3,9 @@
 All notable changes to Roue are documented here. Roue follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-New entries are written by [release-please](https://github.com/googleapis/release-please)
-from the commit messages (`feat:` → Added, `fix:` → Fixed) when a release is
-made; see [Releasing](docs/releasing.md).
+Every merge to `main` that contains a `feat:`, `fix:` or `perf:` commit is
+released automatically, and its section here is written from those commit
+messages; see [Releasing](docs/releasing.md).
 
 ## [0.1.0] - 2026-10-21
 
@@ -89,5 +89,4 @@ First public release.
 - `roue setup` checks for `python3-nautilus` with the `.deb` too, and only
   asks you to restart Files when Files started before the menu was installed.
 
-[Unreleased]: https://github.com/guilyx/roue/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/guilyx/roue/releases/tag/v0.1.0
