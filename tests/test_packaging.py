@@ -67,3 +67,53 @@ def test_installer_fails_at_once_on_other_apt_errors(tmp_path: Path) -> None:
     assert proc.returncode != 0
     assert (tmp_path / "calls").read_text().count("call") == 1
     assert "Unable to locate package roue" in proc.stderr
+
+
+def _run_installer(tmp_path: Path, *, roue_channel_works: bool) -> subprocess.CompletedProcess[str]:
+    """Run install.sh with stand-ins for apt-get, sudo, install, wget and roue.
+
+    The full apt-get update fails, as it does when another repository is broken.
+    """
+    fakes = {
+        "apt-get": (
+            f'echo "$*" >> "{tmp_path}/apt-get.log"\n'
+            'case "$*" in\n'
+            f"  *sourcelist=*) exit {0 if roue_channel_works else 100} ;;\n"
+            "  *update*) echo \"E: The repository 'https://pkgs.netbird.io/debian stable"
+            " Release' no longer has a Release file.\" >&2; exit 100 ;;\n"
+            "esac\n"
+        ),
+        "sudo": 'exec "$@"\n',
+        "install": "",  # not the system's keyring and sources folders
+        "wget": 'echo key > "$2"\n',
+        "roue": "",
+    }
+    for name, body in fakes.items():
+        fake = tmp_path / name
+        fake.write_text("#!/bin/sh\n" + body)
+        fake.chmod(0o755)
+    return subprocess.run(
+        ["sh", str(ROOT / "website" / "install.sh")],
+        capture_output=True,
+        text=True,
+        env={**os.environ, "PATH": f"{tmp_path}:{os.environ['PATH']}"},
+        check=False,
+    )
+
+
+def test_installer_gets_past_other_broken_repositories(tmp_path: Path) -> None:
+    proc = _run_installer(tmp_path, roue_channel_works=True)
+    assert proc.returncode == 0, proc.stderr
+    calls = (tmp_path / "apt-get.log").read_text().splitlines()
+    assert len(calls) == 3
+    assert calls[0].endswith(" update")
+    assert "sourcelist=/etc/apt/sources.list.d/roue.sources" in calls[1]
+    assert "List-Cleanup=0" in calls[1]  # keeps the other repositories' lists
+    assert calls[2].endswith(" roue")
+    assert "pkgs.netbird.io" in proc.stderr
+
+
+def test_installer_stops_when_roues_channel_fails(tmp_path: Path) -> None:
+    proc = _run_installer(tmp_path, roue_channel_works=False)
+    assert proc.returncode != 0
+    assert not any("install" in c for c in (tmp_path / "apt-get.log").read_text().splitlines())

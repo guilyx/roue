@@ -81,7 +81,13 @@ Signed-By: $KEYRING
 EOF
     # Same text as the file the package ships, so dpkg doesn't ask about it.
     $SUDO install -m 0644 "$tmp/roue.sources" "$SOURCES"
-    apt_get update
+    # One broken source elsewhere (a dead repository, a missing key) fails the
+    # whole update. Roue only needs its own channel, so fetch that on its own.
+    if ! apt_get update; then
+        say "apt couldn't update some of your other sources (above). Fetching Roue's channel on its own"
+        apt_get update -o Dir::Etc::sourcelist="$SOURCES" -o Dir::Etc::sourceparts=- \
+            -o APT::Get::List-Cleanup=0
+    fi
     say "Installing Roue"
     apt_get install -y -o Dpkg::Options::=--force-confdef roue
 else
