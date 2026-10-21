@@ -10,7 +10,7 @@ convert.
 
 ## Set up (5 minutes)
 
-You need Ubuntu 24.04+ (or any distro with GTK 4.14+ and libadwaita 1.5+).
+You need Ubuntu 22.04+ (or any distro with GTK 4.6+ and libadwaita 1.1+). Newer GTK and libadwaita get the newer dialogs; `src/roue/ui/compat.py` holds the fallbacks.
 
 ```bash
 # 1. System packages: GTK bindings and the conversion tools

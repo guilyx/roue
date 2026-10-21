@@ -10,13 +10,14 @@ from __future__ import annotations
 import itertools
 import logging
 import os
+import sys
 import threading
 import time
 import traceback
 from collections.abc import Callable, Iterable
 from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass, field
-from enum import StrEnum
+from enum import Enum
 from pathlib import Path
 
 from .backends import backend_for, missing_tools
@@ -28,6 +29,16 @@ from .presets import Preset
 from .tools import install_hint, label
 
 log = logging.getLogger(__name__)
+
+if sys.version_info >= (3, 11):
+    from enum import StrEnum
+else:  # Python 3.10 (Ubuntu 22.04)
+
+    class StrEnum(str, Enum):
+        """Members are strings too, like Python 3.11's ``enum.StrEnum``."""
+
+        def __str__(self) -> str:
+            return str.__str__(self)
 
 
 class JobState(StrEnum):

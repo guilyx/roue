@@ -30,6 +30,7 @@ from ..engine.runner import Batch, JobState, Runner, human_size
 from ..engine.settings import Settings
 from ..integrations import session, x11_drag
 from ..integrations.desktop import package_data
+from . import compat
 from .panel import DropPanel
 from .wheel import WheelWindow
 
@@ -267,10 +268,12 @@ class RoueApplication(Adw.Application):
             log.debug("Couldn't place the wheel: %s", exc)
         return GLib.SOURCE_REMOVE
 
-    def show_welcome(self) -> None:
+    def show_welcome(self) -> Gtk.Widget:
         from .welcome import WelcomeDialog
 
-        WelcomeDialog(self).present(self.show_panel())
+        dialog = WelcomeDialog(self)
+        dialog.present(self.show_panel())
+        return dialog
 
     def _welcome_once(self) -> None:
         if not self.settings.welcome_done:
@@ -287,7 +290,12 @@ class RoueApplication(Adw.Application):
         HistoryDialog(self.history).present(self.show_panel())
 
     def show_about(self) -> None:
-        about = Adw.AboutDialog(
+        compat.show_about(
+            self.show_panel(),
+            (
+                "Powered by",
+                ["FFmpeg", "libvips", "ImageMagick", "LibreOffice", "Pandoc", "Ghostscript"],
+            ),
             application_name=APP_NAME,
             application_icon=APP_ID,
             version=__version__,
@@ -298,11 +306,6 @@ class RoueApplication(Adw.Application):
             license_type=Gtk.License.GPL_3_0,
             developers=["Erwin Lejeune https://github.com/guilyx"],
         )
-        about.add_credit_section(
-            "Powered by",
-            ["FFmpeg", "libvips", "ImageMagick", "LibreOffice", "Pandoc", "Ghostscript"],
-        )
-        about.present(self.show_panel())
 
     def undo(self) -> None:
         result = self.history.undo_last()
@@ -356,16 +359,14 @@ class RoueApplication(Adw.Application):
                 return
             except GLib.Error as exc:
                 log.debug("Couldn't open %s with a token: %s", uri, exc.message)
-        launcher = Gtk.FileLauncher(file=Gio.File.new_for_uri(uri))
-        launcher.launch(self._visible_panel(), None, None)
+        compat.launch(self._visible_panel(), uri)
 
     def _on_show_in_folder(self, _action: Gio.SimpleAction, param: GLib.Variant) -> None:
         uri = param.unpack()
         token = self._take_activation_token()
 
         def fallback() -> None:
-            launcher = Gtk.FileLauncher(file=Gio.File.new_for_uri(uri))
-            launcher.open_containing_folder(self._visible_panel(), None, None)
+            compat.show_in_folder(self._visible_panel(), uri)
 
         bus = self.get_dbus_connection()
         if not token or bus is None or self._visible_panel():

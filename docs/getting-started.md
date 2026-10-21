@@ -5,7 +5,7 @@ the wheel (with the hotkey), the Files right-click menu, and the terminal.
 
 ## 1. Install
 
-On Ubuntu 24.04+ or Debian 13+, one command installs Roue and keeps it up
+On Ubuntu 22.04+ or Debian 12+, one command installs Roue and keeps it up
 to date through Software Updater:
 
 ```sh

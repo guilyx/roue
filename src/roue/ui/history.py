@@ -8,25 +8,22 @@ from pathlib import Path
 from gi.repository import Adw, GLib, Gtk
 
 from ..engine.history import History
+from . import compat
 
 
-class HistoryDialog(Adw.Dialog):
+class HistoryDialog(compat.Dialog):
     def __init__(self, history: History):
         super().__init__(title="Recent Conversions")
         self.set_content_width(520)
         self.set_content_height(560)
-        view = Adw.ToolbarView()
-        view.add_top_bar(Adw.HeaderBar())
         entries = history.entries()
         if not entries:
-            view.set_content(
-                Adw.StatusPage(
-                    icon_name="document-open-recent-symbolic",
-                    title="Nothing Yet",
-                    description="Conversions show up here.",
-                )
+            empty = Adw.StatusPage(
+                icon_name="document-open-recent-symbolic",
+                title="Nothing Yet",
+                description="Conversions show up here.",
             )
-            self.set_child(view)
+            self.set_child(compat.toolbar_view(Adw.HeaderBar(), empty))
             return
         page = Adw.PreferencesPage()
         group = Adw.PreferencesGroup()
@@ -47,5 +44,4 @@ class HistoryDialog(Adw.Dialog):
                 row.add_suffix(button)
             group.add(row)
         page.add(group)
-        view.set_content(page)
-        self.set_child(view)
+        self.set_child(compat.toolbar_view(Adw.HeaderBar(), page))

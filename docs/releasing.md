@@ -94,3 +94,4 @@ version. Each new GNOME release (every March and September) needs its number
 added to `shell-version` in
 `src/roue/data/gnome-shell/roue@guilyx.github.io/metadata.json` (currently 45
 to 50). Check the extension still works in that version before listing it.
+The copy for GNOME 42–44, in `gnome-shell/legacy/`, never needs new versions.

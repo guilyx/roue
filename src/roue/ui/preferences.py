@@ -12,6 +12,7 @@ from ..engine.backends import missing_tools
 from ..engine.presets import GROUPS, user_preset_dir
 from ..integrations import gnome_shell, hotkey, session, x11_drag
 from ..integrations.desktop import roue_command
+from . import compat
 
 if TYPE_CHECKING:
     from .application import RoueApplication
@@ -34,7 +35,7 @@ params:
 """
 
 
-class PreferencesDialog(Adw.PreferencesDialog):
+class PreferencesDialog(compat.PreferencesDialog):
     def __init__(self, app: RoueApplication):
         super().__init__(title="Preferences")
         self.app = app
@@ -48,11 +49,11 @@ class PreferencesDialog(Adw.PreferencesDialog):
         self.settings.save()
         self.app.settings_changed()
 
-    def _switch(self, title: str, subtitle: str, key: str) -> Adw.SwitchRow:
-        row = Adw.SwitchRow(title=title, subtitle=subtitle)
+    def _switch(self, title: str, subtitle: str, key: str) -> Adw.ActionRow:
+        row = compat.SwitchRow(title=title, subtitle=subtitle)
         row.set_active(bool(getattr(self.settings, key)))
 
-        def changed(r: Adw.SwitchRow, _pspec: object) -> None:
+        def changed(r: Adw.ActionRow, _pspec: object) -> None:
             setattr(self.settings, key, r.get_active())
             self._save()
 
@@ -133,12 +134,12 @@ class PreferencesDialog(Adw.PreferencesDialog):
                 "recursive_folders",
             )
         )
-        jobs = Adw.SpinRow.new_with_range(0, 64, 1)
+        jobs = compat.SpinRow.new_with_range(0, 64, 1)
         jobs.set_title("Parallel conversions")
         jobs.set_subtitle("0 means one per processor core")
         jobs.set_value(self.settings.max_jobs)
 
-        def jobs_changed(row: Adw.SpinRow, _pspec: object) -> None:
+        def jobs_changed(row: Adw.ActionRow, _pspec: object) -> None:
             self.settings.max_jobs = int(row.get_value())
             self._save()
 
@@ -194,19 +195,13 @@ class PreferencesDialog(Adw.PreferencesDialog):
         self.reset_folder.set_visible(path is not None)
 
     def _on_pick_folder(self, _button: Gtk.Button) -> None:
-        dialog = Gtk.FileDialog(title="Save Results In")
-
-        def done(d: Gtk.FileDialog, result: Gio.AsyncResult) -> None:
-            try:
-                folder = d.select_folder_finish(result)
-            except GLib.Error:
-                return
-            if folder and folder.get_path():
+        def chosen(folder: Gio.File) -> None:
+            if folder.get_path():
                 self.settings.output_dir = folder.get_path()
                 self._save()
                 self._refresh_folder()
 
-        dialog.select_folder(self.get_root(), None, done)
+        compat.choose_folder(self.get_root(), "Save Results In", chosen)
 
     def _on_reset_folder(self, _button: Gtk.Button) -> None:
         self.settings.output_dir = None
@@ -229,9 +224,7 @@ class PreferencesDialog(Adw.PreferencesDialog):
         docs_row.add_suffix(Gtk.Image.new_from_icon_name("adw-external-link-symbolic"))
         docs_row.connect(
             "activated",
-            lambda *_: Gtk.UriLauncher(uri=f"{WEBSITE}docs/custom-presets.html").launch(
-                self.get_root(), None, None
-            ),
+            lambda *_: compat.launch(self.get_root(), f"{WEBSITE}docs/custom-presets.html"),
         )
         custom.add(docs_row)
         for problem in self.app.registry.problems:
@@ -243,7 +236,7 @@ class PreferencesDialog(Adw.PreferencesDialog):
         for group, presets in self.app.registry.by_group().items():
             box = Adw.PreferencesGroup(title=GROUPS.get(group, group.title()))
             for preset in presets:
-                row = Adw.SwitchRow(title=preset.name, subtitle=preset.description)
+                row = compat.SwitchRow(title=preset.name, subtitle=preset.description)
                 row.set_active(preset.id not in self.settings.disabled_presets)
                 if missing_tools(preset):
                     row.set_subtitle(f"{preset.description} (needs tools, see Tools)")
@@ -252,7 +245,7 @@ class PreferencesDialog(Adw.PreferencesDialog):
             page.add(box)
         return page
 
-    def _on_preset_toggled(self, row: Adw.SwitchRow, _pspec: object, preset_id: str) -> None:
+    def _on_preset_toggled(self, row: Adw.ActionRow, _pspec: object, preset_id: str) -> None:
         disabled = [p for p in self.settings.disabled_presets if p != preset_id]
         if not row.get_active():
             disabled.append(preset_id)
@@ -265,9 +258,7 @@ class PreferencesDialog(Adw.PreferencesDialog):
         example = folder / "example.yaml.disabled"
         if not any(folder.iterdir()):
             example.write_text(EXAMPLE_PRESET.format(website=WEBSITE), encoding="utf-8")
-        Gtk.FileLauncher(file=Gio.File.new_for_path(str(folder))).launch(
-            self.get_root(), None, None
-        )
+        compat.launch(self.get_root(), folder.as_uri())
 
     # -- Tools ------------------------------------------------------------------
 

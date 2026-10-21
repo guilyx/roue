@@ -9,6 +9,8 @@ it to PDF.
 
 from __future__ import annotations
 
+import subprocess
+from functools import cache
 from pathlib import Path
 
 from .. import tools
@@ -37,6 +39,19 @@ OFFICE_INPUTS = (
 
 # LibreOffice export filters for formats where the default guess is wrong.
 _LO_FILTERS = {"docx": 'docx:"MS Word 2007 XML"', "txt": "txt:Text"}
+
+
+@cache
+def embed_option(pandoc: str) -> str:
+    """Pandoc's option for a single-file web page: ``--embed-resources`` since
+    Pandoc 2.19, ``--self-contained`` before (Ubuntu 22.04 has 2.9)."""
+    try:
+        proc = subprocess.run(
+            [pandoc, "--help"], capture_output=True, text=True, timeout=10, check=False
+        )
+    except (OSError, subprocess.SubprocessError):
+        return "--self-contained"
+    return "--embed-resources" if "--embed-resources" in proc.stdout else "--self-contained"
 
 
 def route_for(mime: str) -> str | None:
@@ -115,7 +130,7 @@ class DocumentBackend:
         title = ["--metadata", f"pagetitle={ctx.source.stem}"]
         failure = "Pandoc couldn't convert this document."
         if ext == "html":
-            cmd = [*base, "--standalone", "--embed-resources", *title, "-o", str(ctx.output)]
+            cmd = [*base, "--standalone", embed_option(exe), *title, "-o", str(ctx.output)]
             ctx.run(cmd, failure=failure, cwd=ctx.source.parent)
         elif ext == "pdf":
             engine = tools.pdf_engine()

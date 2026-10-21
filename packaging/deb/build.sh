@@ -3,7 +3,7 @@
 #
 # Usage: packaging/deb/build.sh [output-dir]
 #
-# Needs dpkg-deb, python3 (>= 3.12), gzip and gpg. The package installs the
+# Needs dpkg-deb, python3 (>= 3.10), gzip and gpg. The package installs the
 # pure-Python roue package into /usr/lib/python3/dist-packages and the
 # desktop integration (launcher, D-Bus service, icons, Files menu, GNOME
 # helper extension) under /usr/share. Icon and desktop caches are refreshed

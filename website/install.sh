@@ -28,13 +28,13 @@ else
     fail "this script needs wget or curl."
 fi
 
-# GTK 4.12+ and libadwaita 1.5: Ubuntu 24.04, Debian 13 and newer.
+# Python 3.10+, GTK 4.6+ and libadwaita 1.1+: Ubuntu 22.04, Debian 12 and newer.
 if [ -r /etc/os-release ]; then
     # shellcheck source=/dev/null
     . /etc/os-release
     case "${ID:-}:${VERSION_ID:-}" in
-        ubuntu:2[0-3].*|debian:1[0-2]|debian:1[0-2].*)
-            fail "Roue needs Ubuntu 24.04 or Debian 13 or newer (found ${PRETTY_NAME:-unknown})." ;;
+        ubuntu:[0-9].*|ubuntu:1[0-9].*|ubuntu:2[01].*|debian:[0-9]|debian:[0-9].*|debian:1[01]|debian:1[01].*)
+            fail "Roue needs Ubuntu 22.04 or Debian 12 or newer (found ${PRETTY_NAME:-unknown})." ;;
     esac
 fi
 

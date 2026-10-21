@@ -19,6 +19,7 @@ from ..engine.detect import mime_type
 from ..engine.presets import GROUPS, Preset
 from ..engine.runner import Batch, Job, JobState
 from ..integrations import session
+from . import compat
 from .tile import PresetTile
 
 if TYPE_CHECKING:
@@ -45,10 +46,7 @@ class DropPanel(Adw.ApplicationWindow):
         self._running: set[Batch] = set()
 
         self.toasts = Adw.ToastOverlay()
-        view = Adw.ToolbarView()
-        view.add_top_bar(self._build_header())
-        view.set_content(self._build_body())
-        view.add_bottom_bar(self._build_status())
+        view = compat.toolbar_view(self._build_header(), self._build_body(), self._build_status())
         self.toasts.set_child(view)
         self.set_content(self.toasts)
 
@@ -359,28 +357,21 @@ class DropPanel(Adw.ApplicationWindow):
                 return
 
     def choose_files(self, preset: Preset | None) -> None:
-        dialog = Gtk.FileDialog(title=f"Convert to {preset.name}" if preset else "Choose Files")
+        file_filter = None
         if preset:
             file_filter = Gtk.FileFilter(name=f"Files {preset.name} can take")
             for pattern in preset.accepts:
                 file_filter.add_mime_type(pattern)
-            filters = Gio.ListStore.new(Gtk.FileFilter)
-            filters.append(file_filter)
-            dialog.set_filters(filters)
-            dialog.set_default_filter(file_filter)
 
-        def done(d: Gtk.FileDialog, result: Gio.AsyncResult) -> None:
-            try:
-                files = d.open_multiple_finish(result)
-            except GLib.Error:
-                return  # cancelled
-            paths = _paths_from(files[i] for i in range(files.get_n_items()))
+        def chosen(files: list[Gio.File]) -> None:
+            paths = _paths_from(files)
             if preset:
                 self.app.convert(preset, paths)
             else:
                 self.stage(paths)
 
-        dialog.open_multiple(self, None, done)
+        title = f"Convert to {preset.name}" if preset else "Choose Files"
+        compat.choose_files(self, title, chosen, file_filter)
 
     # -- jobs -----------------------------------------------------------------
 

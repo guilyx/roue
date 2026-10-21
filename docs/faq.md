@@ -58,7 +58,7 @@ results go to the trash; run it again to go one step further back.
 
 ## HEIC photos fail with "libvips couldn't convert this image".
 
-Your libheif is missing its HEVC decoder. On Ubuntu and Debian:
+Your libheif is missing its HEVC decoder. On Ubuntu 24.04+ and Debian 13+:
 
 ```sh
 sudo apt install libheif-plugin-libde265
@@ -114,8 +114,8 @@ off **Preferences > General > Stay in the background**.
 
 ## Which desktops are supported?
 
-The wheel, the panel and the command line work on any Linux desktop with GTK 4
-and libadwaita 1.5+. The automatic hotkey setup and the Files menu target GNOME;
+The wheel, the panel and the command line work on any Linux desktop with GTK 4.6+
+and libadwaita 1.1+. The automatic hotkey setup and the Files menu target GNOME;
 on KDE, Xfce and others, add the hotkey by hand
 ([how](desktop-integration.md#the-hotkey)). Menus for Dolphin, Nemo and Thunar
 are planned.

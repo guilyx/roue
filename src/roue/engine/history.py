@@ -13,7 +13,7 @@ import shutil
 import subprocess
 import time
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 from urllib.parse import quote
@@ -143,7 +143,7 @@ def _home_trash(path: Path) -> bool:
                 name = f"{path.stem}.{n}{path.suffix}"
         else:
             return False
-        stamp = datetime.fromtimestamp(time.time(), tz=UTC).astimezone()
+        stamp = datetime.fromtimestamp(time.time(), tz=timezone.utc).astimezone()
         with os.fdopen(fd, "w", encoding="utf-8") as handle:
             handle.write(
                 "[Trash Info]\n"

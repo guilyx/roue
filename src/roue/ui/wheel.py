@@ -27,6 +27,7 @@ from gi.repository import Adw, Gdk, Gio, GLib, Gtk
 from ..engine.detect import mime_type
 from ..engine.presets import Preset
 from ..radial import DEFAULT, choose_presets, clamp_center, slice_anchor, slice_at, slice_span
+from . import compat
 
 if TYPE_CHECKING:
     from .application import RoueApplication
@@ -499,27 +500,17 @@ class WheelWindow(Gtk.Window):
         GLib.timeout_add(320, self._close_now)
 
     def _pick_files(self, preset: Preset) -> None:
-        dialog = Gtk.FileDialog(title=f"Convert to {preset.name}")
         file_filter = Gtk.FileFilter(name=f"Files {preset.name} can take")
         for pattern in preset.accepts:
             file_filter.add_mime_type(pattern)
-        filters = Gio.ListStore.new(Gtk.FileFilter)
-        filters.append(file_filter)
-        dialog.set_filters(filters)
 
-        def done(d: Gtk.FileDialog, result: Gio.AsyncResult) -> None:
-            try:
-                picked = d.open_multiple_finish(result)
-            except GLib.Error:
-                return
-            paths = [
-                Path(p) for i in range(picked.get_n_items()) if (p := picked.get_item(i).get_path())
-            ]
+        def chosen(picked: list[Gio.File]) -> None:
+            paths = [Path(p) for f in picked if (p := f.get_path())]
             if paths:
                 self.app.convert(preset, paths)
                 self.dismiss()
 
-        dialog.open_multiple(self, None, done)
+        compat.choose_files(self, f"Convert to {preset.name}", chosen, file_filter)
 
     def dismiss(self) -> None:
         self._closing = True
