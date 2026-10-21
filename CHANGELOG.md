@@ -7,6 +7,12 @@ Every merge to `main` that contains a `feat:`, `fix:` or `perf:` commit is
 released automatically, and its section here is written from those commit
 messages; see [Releasing](docs/releasing.md).
 
+## [0.2.0] - 2026-10-21
+
+### Added
+
+- run on Ubuntu 22.04 and Debian 12 ([2921090](https://github.com/guilyx/roue/commit/29210904f2bb70d81ebcc6c91d122e8a44966cc8))
+
 ## [0.1.0] - 2026-10-21
 
 First public release.
@@ -89,4 +95,5 @@ First public release.
 - `roue setup` checks for `python3-nautilus` with the `.deb` too, and only
   asks you to restart Files when Files started before the menu was installed.
 
+[0.2.0]: https://github.com/guilyx/roue/releases/tag/v0.2.0
 [0.1.0]: https://github.com/guilyx/roue/releases/tag/v0.1.0
