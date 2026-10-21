@@ -5,8 +5,8 @@ wheel and the panel.
 Ubuntu 22.04, Debian 12, Fedora 40 and newer all qualify. The command line and
 the conversion engine work without GTK.
 
-Tested on Ubuntu 24.04 (GNOME 46, Wayland) and Ubuntu 26.04 (GNOME 50,
-Python 3.14).
+Tested on Ubuntu 22.04 (GNOME 42, Python 3.10), Ubuntu 24.04 (GNOME 46) and
+Ubuntu 26.04 (GNOME 50, Python 3.14), on Wayland.
 
 ## Ubuntu and Debian: one command
 

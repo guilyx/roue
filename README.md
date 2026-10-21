@@ -67,7 +67,7 @@ runs `roue setup` (Files menu, **Super+Shift+D** hotkey, GNOME helper).
 
 Or download `roue_<version>_all.deb` from the [latest release](https://github.com/guilyx/roue/releases/latest) and run `sudo apt install ./roue_<version>_all.deb`. The first time you open Roue, **Set Up Roue** offers a button for everything that isn't ready yet, missing tools included.
 
-**Updates** arrive through Software Updater, like any Ubuntu app. Roue itself never touches the network. Tested on Ubuntu 24.04 (GNOME 46) and 26.04 (GNOME 50), on Wayland.
+**Updates** arrive through Software Updater, like any Ubuntu app. Roue itself never touches the network. Tested on Ubuntu 22.04 (GNOME 42), 24.04 (GNOME 46) and 26.04 (GNOME 50), on Wayland.
 
 ### Any distribution, from source
 
