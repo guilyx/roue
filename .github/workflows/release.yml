@@ -1,69 +1,102 @@
 name: Release
 
+# Every merge to main is released, when it changes something for users.
+# scripts/release.py reads the commits since the last tag (Conventional
+# Commits): feat → minor, fix/perf → patch, feat! → major;
+# docs/chore/ci/test only → no release. It stamps the version and the
+# changelog; this workflow commits that, tags vX.Y.Z, builds the .deb, the
+# wheel and the sdist, creates the GitHub release and publishes the update
+# channel, so Software Updater offers the new version.
+
 on:
   push:
-    tags: ["v*"]
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
-  contents: write
-  actions: write  # to start the Website workflow, which publishes the update channel
+  contents: write  # the release commit, the tag and the release
+  actions: write  # start the Website workflow, which publishes the update channel
+
+concurrency:
+  group: release  # one at a time, in merge order
+  cancel-in-progress: false
 
 jobs:
   release:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: main  # the newest main, with any release commit an earlier run pushed
+          fetch-depth: 0  # every commit and tag since the last release
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
-      - name: Check the tag matches the version
+      - name: Check the update channel's key is committed
+        id: key
         run: |
-          version=$(sed -n 's/^__version__ = "\(.*\)"$/\1/p' src/roue/__init__.py)
-          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
-            echo "::error::Tag $GITHUB_REF_NAME doesn't match __version__ $version"
+          if [ -f packaging/apt/roue-archive-keyring.asc ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::Not releasing yet: run scripts/apt-key.sh first, so every release can update itself (docs/releasing.md)."
+          fi
+
+      - name: Work out the version
+        id: next
+        if: steps.key.outputs.ok == 'true'
+        run: python scripts/release.py --github-output "$GITHUB_OUTPUT"
+
+      - name: Commit and tag
+        id: tag
+        if: steps.next.outputs.tag
+        env:
+          TAG: ${{ steps.next.outputs.tag }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          base=$(git rev-parse HEAD)
+          git diff --quiet || git commit -am "chore(release): $TAG"
+          git tag -a "$TAG" -m "Roue ${TAG#v}"
+          if git push --atomic origin HEAD:main "$TAG"; then
+            echo "pushed=true" >> "$GITHUB_OUTPUT"
+          elif git fetch origin main && [ "$(git rev-parse FETCH_HEAD)" != "$base" ]; then
+            # Someone merged meanwhile: that merge's own run releases these
+            # commits along with its own.
+            echo "::notice::main moved during the release; the next run releases these changes."
+          else
+            echo "::error::Couldn't push the release commit to main. If main is protected, let GitHub Actions push to it."
             exit 1
           fi
 
-      - name: Build sdist and wheel
+      - name: Build sdist, wheel and .deb
+        if: steps.tag.outputs.pushed
         run: |
           python -m pip install build
           python -m build --outdir dist
+          packaging/deb/build.sh
+          cd dist && sha256sum -- * > SHA256SUMS
 
-      - name: Build .deb
-        run: packaging/deb/build.sh
-
-      - name: Extract release notes
-        run: |
-          version="${GITHUB_REF_NAME#v}"
-          awk -v v="$version" '
-            $0 ~ "^## \\[" v "\\]" {found=1; next}
-            found && /^## \[/ {exit}
-            found {print}
-          ' CHANGELOG.md > release-notes.md
-          echo "" >> release-notes.md
-          {
-            echo "**Install on Ubuntu 24.04+ or Debian 13+:** \`wget -qO- https://guilyx.github.io/roue/install.sh | sh\`"
-            echo ""
-            echo "Or download \`roue_${version}_all.deb\` and run \`sudo apt install ./roue_${version}_all.deb\`."
-            echo "Already installed? Software Updater offers this version."
-          } >> release-notes.md
-
-      - name: Checksums
-        run: cd dist && sha256sum * > SHA256SUMS
-
-      - uses: softprops/action-gh-release@v3
-        with:
-          body_path: release-notes.md
-          files: |
-            dist/*.deb
-            dist/*.whl
-            dist/*.tar.gz
-            dist/SHA256SUMS
-
-      - name: Publish to the update channel
+      - name: Publish the GitHub release
+        if: steps.tag.outputs.pushed
         env:
           GH_TOKEN: ${{ github.token }}
-        # Releases made with the workflow token don't trigger other workflows,
-        # but starting one by hand does.
+          TAG: ${{ steps.next.outputs.tag }}
+          VERSION: ${{ steps.next.outputs.version }}
+        run: |
+          {
+            echo ""
+            echo "**Install on Ubuntu 24.04+ or Debian 13+:** \`wget -qO- https://guilyx.github.io/roue/install.sh | sh\`"
+            echo ""
+            echo "Already installed? Software Updater offers this version."
+          } >> release-notes.md
+          gh release create "$TAG" dist/* --verify-tag --title "Roue $VERSION" \
+            --notes-file release-notes.md
+
+      - name: Publish to the update channel
+        if: steps.tag.outputs.pushed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # Pushes and releases made with the workflow token don't trigger
+        # other workflows, but starting one by hand does.
         run: gh workflow run pages.yml --ref main

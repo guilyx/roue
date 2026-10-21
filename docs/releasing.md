@@ -1,7 +1,7 @@
 # Releasing
 
 This page is for maintainers. It covers the update channel's signing key and
-how to cut a release.
+how releases happen.
 
 ## Once: the signing key
 
@@ -27,29 +27,56 @@ Then:
 - **Move the backup offline** (a password manager, an encrypted drive). If the
   key is lost, every user has to trust a new key by hand.
 
-Until the key exists, nothing breaks: the `.deb` builds without the update
-channel, the Website workflow skips `/apt`, and `install.sh` installs the
-latest release's `.deb` instead.
+Committing the key is also what starts releases: until it exists, the
+Release workflow makes none, so no `.deb` ever goes out without its update
+channel. (Local and CI builds still work without it.)
 
-## Each release
+## Each merge is a release
 
-1. Bump `__version__` in `src/roue/__init__.py`.
-2. Move the *Unreleased* notes in `CHANGELOG.md` to a new
-   `## [X.Y.Z] - YYYY-MM-DD` section.
-3. Commit, tag and push the tag:
+There's nothing to do by hand. After every merge to `main`, the **Release**
+workflow runs `scripts/release.py`, which reads the commits since the last
+tag ([Conventional Commits](https://www.conventionalcommits.org), see
+[Contributing](contributing.md)) and picks the version:
 
-   ```sh
-   git tag vX.Y.Z
-   git push origin vX.Y.Z
-   ```
+| Commits in the merge | Release |
+|---|---|
+| `feat!:` or a `BREAKING CHANGE:` footer | major: 0.3.0 → 1.0.0, 1.2.0 → 2.0.0 |
+| `feat:` | minor: 0.1.0 → 0.2.0 |
+| `fix:`, `perf:`, `revert:` | patch: 0.1.0 → 0.1.1 |
+| only `docs:`, `chore:`, `ci:`, `test:`… | none: nothing changed for users |
 
-The **Release** workflow checks that the tag matches `__version__`, builds the
-sdist, the wheel and the `.deb`, writes `SHA256SUMS`, and creates the GitHub
-release with the changelog section as notes. It then starts the **Website**
-workflow, which downloads the `.deb` files of the last five releases, builds
-the signed APT repository with `scripts/apt-repo.sh`, and publishes it under
-`https://guilyx.github.io/roue/apt/`. Within a day, Software Updater offers
-the new version to everyone who installed the `.deb`.
+When there's a release to make, the workflow:
+
+1. writes the version into `pyproject.toml`, `src/roue/__init__.py` and the
+   website, and adds a `CHANGELOG.md` section listing the `feat`/`fix`
+   commits;
+2. commits that as `chore(release): vX.Y.Z`, tags `vX.Y.Z` and pushes both
+   to `main`;
+3. builds the sdist, the wheel and the `.deb` (with `SHA256SUMS`) and creates
+   the GitHub release with the changelog section as notes;
+4. starts the **Website** workflow, which downloads the `.deb` files of the
+   last five releases, builds the signed APT repository with
+   `scripts/apt-repo.sh`, and publishes it under
+   `https://guilyx.github.io/roue/apt/`. Within a day, Software Updater
+   offers the new version to everyone who installed Roue.
+
+The `.deb` gets its version from `src/roue/__init__.py`;
+`packaging/deb/build.sh` also stamps it into the man page and the AppStream
+release list.
+
+Good to know:
+
+- **No releases before the key.** Until `packaging/apt/roue-archive-keyring.asc`
+  is committed, the workflow skips releasing, so every release can update
+  itself. The first run after that releases the version already in the files
+  (0.1.0) with its hand-written changelog section.
+- **Merges close together** are released one at a time, in order. If a merge
+  lands while a release is being pushed, that merge's own run releases both.
+- **Protected `main`:** the workflow pushes the release commit with the
+  workflow token. If `main` requires pull requests, allow GitHub Actions to
+  bypass that rule, or the run stops with an error.
+- To release by hand (say, after fixing a failed run), start the **Release**
+  workflow from the Actions tab: it releases whatever is unreleased.
 
 ## Checks that guard the channel
 
