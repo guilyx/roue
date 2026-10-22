@@ -4,7 +4,8 @@
 
 | | Wayland (Ubuntu's default) | X11 |
 |---|---|---|
-| Hotkey (Super+Shift+D) opens the wheel | ✓ | ✓ |
+| Ctrl+Shift+right-click in Files → wheel at the pointer | ✓ | ✓ |
+| Hotkey (Super+Shift+D) opens the wheel for the files selected in Files | ✓ | ✓ |
 | Files right-click → wheel at the pointer | ✓ | ✓ |
 | Copy files, then press the hotkey | ✓ | ✓ |
 | Drag onto the wheel or the panel | ✓ | ✓ |

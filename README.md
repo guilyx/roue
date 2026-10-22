@@ -40,18 +40,19 @@ Results land next to the original (`photo.jpg`, `clip (10MB).mp4`) and
 
 | | How | Best for |
 |---|---|---|
-| 🎡 **The wheel** | Press **Super+Shift+D** and drop files on a slice. On X11, just **hold Shift while dragging** any file and the wheel opens around the pointer. | Everyday use |
-| 🖱️ **Files menu** | Right-click files in Files (Nautilus) → **Convert with Roue…**: the wheel opens at the pointer | Batches, Wayland |
+| 🎡 **The wheel** | In Files, **Ctrl+Shift+right-click** a file, or select files and press **Super+Shift+D** (Super is the Windows key): the wheel opens at the pointer. Elsewhere, the hotkey opens a ring to drop files on. On X11, **hold Shift while dragging** any file. | Everyday use |
+| 🖱️ **Files menu** | Right-click files in Files (Nautilus) → **Convert with Roue…**: the wheel opens at the pointer | Batches |
 | ⌨️ **Command line** | `roue jpg IMG_0042.heic` | Scripts, power users |
 
-The wheel shows the (up to) seven presets that fit your files best. Its
+The wheel shows the (up to) seven presets that fit your files best, never a
+format they can't become. Its
 **More…** slice opens the full panel with every preset. All three ways share
 the same engine, presets and settings, and a notification tells you when a
 conversion is done.
 
 > **Wayland vs X11** — Wayland keeps other apps' drags private (on purpose), so
-> Shift-drag only works on X11. On Wayland, use the Files menu, the hotkey, or
-> copy files (Ctrl+C), press the hotkey and click a slice.
+> Shift-drag only works on X11. Everything else, Ctrl+Shift+right-click and the
+> hotkey included, works on both.
 
 ## Install
 

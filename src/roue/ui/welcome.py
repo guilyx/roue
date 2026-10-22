@@ -153,7 +153,9 @@ class WelcomeDialog(compat.Dialog):
             row = self._row(title, "Files needs a restart to show the menu (its windows close)")
             row.add_suffix(self._button("Restart Files", self._restart_files))
             return row
-        return self._row(title, "Select files, right-click, Convert with Roue…", done=True)
+        return self._row(
+            title, "Ctrl+Shift+right-click files, or right-click > Convert with Roue…", done=True
+        )
 
     def _hotkey_row(self) -> Adw.ActionRow:
         binding = hotkey.current_binding()

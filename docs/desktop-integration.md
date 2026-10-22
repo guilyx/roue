@@ -1,26 +1,28 @@
 # Desktop integration
 
-Roue has three front doors: the **wheel** (opened by the hotkey, by Shift-drag
-on X11, or from the Files menu), the **Files right-click menu**, and the
-**command line**. This page covers how they plug into your desktop.
+Roue has three front doors: the **wheel** (opened from Files with
+Ctrl+Shift+right-click or the right-click menu, by the hotkey, or by Shift-drag
+on X11), the **Files right-click menu**, and the **command line**. This page covers how they plug into your desktop.
 
 ## The wheel
 
 The wheel is a ring of slices, one per preset. It shows up to seven presets
 that fit your files best, most relevant first, and a last slice, **More…**,
-that opens the full panel with every preset.
+that opens the full panel with every preset. It never shows a format your
+files can't become: until it knows the files, it's an empty ring.
 
 It comes in two forms:
 
 - **At the pointer**, over a lightly dimmed screen, when Roue already knows
-  the files: **Convert with Roue…** in Files, or Shift-drag on X11. Click a
+  the files: **Ctrl+Shift+right-click** or **Convert with Roue…** in Files,
+  the hotkey with files selected in Files, or Shift-drag on X11. Click a
   slice to convert. Click outside the wheel, press **Esc**, or switch to
   another window to cancel.
-- **As a small round window** you drop files onto, when you press the hotkey.
-  It starts with a handful of popular presets and re-arranges itself to fit
-  the file you drag over it. Files you copied with **Ctrl+C** are picked up
-  when it opens (once per copy), and **Ctrl+V** reads the clipboard again.
-  Click a slice with no files to pick some with a file chooser.
+- **As a small empty ring** you drop files onto, when you press the hotkey
+  anywhere else. The slices appear for the file you drag over it. Click it
+  (or press **Enter**) to choose files instead. Files you copied with
+  **Ctrl+C** are picked up when it opens (once per copy), and **Ctrl+V** reads
+  the clipboard again.
 
 After you pick a slice, the wheel closes and the conversion runs in the
 background. A notification says when it's done.
@@ -62,12 +64,17 @@ discovers new extensions when your session starts, so after a fresh install it
 starts the next time you log in.
 
 Without it Roue still works: the wheel opens where GNOME puts new windows, and
-**Ctrl+C**, then the hotkey, avoids dragging altogether. Turn it off in
+Ctrl+Shift+right-click in Files avoids dragging altogether. Turn it off in
 **Preferences > General** or in GNOME's Extensions app.
 
 ## The hotkey
 
-**Super+Shift+D** opens the wheel.
+**Super+Shift+D** opens the wheel. **Super** is the Windows key.
+
+- **With files selected in Files** (Files in front), the wheel opens at the
+  pointer for them. Roue asks its Files extension what's selected, so this
+  needs the [Files menu](#files-nautilus-right-click-menu) to be installed.
+- **Anywhere else**, it opens the empty ring to drop files on.
 
 Wayland doesn't let apps grab keys for themselves, so Roue registers an
 ordinary custom shortcut, exactly like the ones you'd create in Settings, that
@@ -135,8 +142,8 @@ close it.
 With the [GNOME helper](#the-gnome-helper) on, the wheel stays on top, so this
 doesn't happen to it. If a maximised window covers the panel, start dragging
 your file, press **Super** to open the Activities overview, hover the Roue
-window until it comes forward, then drop. Or skip the drag: **Ctrl+C**,
-**Super+Shift+D**, click a slice.
+window until it comes forward, then drop. Or skip the drag:
+Ctrl+Shift+right-click the file in Files.
 
 ### Staying in the background
 
@@ -161,7 +168,7 @@ It works by noticing when a drag starts on the X server, so it needs
 **Preferences > General > Shift-drag**.
 
 Wayland keeps each app's drags private by design, so no app can see a drag
-start elsewhere. There, use the Files menu or the hotkey. GNOME 49 and newer
+start elsewhere. There, use Ctrl+Shift+right-click in Files or the hotkey. GNOME 49 and newer
 (Ubuntu 25.10, 26.04) have no X11 session at all, so Shift-drag is for X11
 sessions of Xfce, MATE, Cinnamon and the like.
 
@@ -171,6 +178,13 @@ Right-click files and choose **Convert with Roue…**. The wheel opens at the
 pointer with the presets that fit every selected file, most relevant first.
 The item only appears when at least one preset fits.
 
+**Ctrl+Shift+right-click** skips the menu: Files selects the file you click,
+as usual, and the wheel opens instead of the menu. Click a file that's already
+selected and the wheel takes the whole selection. Where nothing fits (a
+folder, empty space), Files' own menu shows as usual. Files has no API for
+mouse shortcuts, so the extension listens to right-clicks on Files' windows
+just before Files does.
+
 - Needs the Nautilus Python extension host: `python3-nautilus` on
   Debian/Ubuntu, `nautilus-python` on Fedora, `python-nautilus` on Arch.
 - The `.deb` installs the extension system-wide. Otherwise `roue setup` adds it
@@ -179,6 +193,11 @@ The item only appears when at least one preset fits.
   4.0 (Nautilus 43–48, Ubuntu 24.04) and 4.1 (Nautilus 49+, Ubuntu 25.10 and 26.04).
 - Restart Files once to load it: `nautilus -q`, or the **Restart Files**
   button in **Set Up Roue**. Files' open windows close.
+- It also tells the hotkey what's selected: the Roue app asks
+  `io.github.guilyx.Roue.Files.GetSelection` on `/io/github/guilyx/Roue/Files`
+  (bus name `org.gnome.Nautilus`). It answers only while a Files window is in
+  front, or was a moment ago (the hotkey's key grab takes the focus away
+  briefly on X11).
 - Folders and remote locations without a local path don't get the menu.
 
 The menu asks the Roue app (over D-Bus, starting it if needed) to show the
@@ -206,7 +225,7 @@ Actions you can trigger from scripts:
 
 | Action | Parameter | What it does |
 |---|---|---|
-| `show-wheel` | none | Open the wheel to drop files on (what the hotkey does). |
+| `show-wheel` | none | What the hotkey does: the wheel for the files selected in Files, if Files is in front, else the empty ring to drop files on. |
 | `wheel-files` | `as` (paths) | Open the wheel at the pointer for these files. |
 | `show-panel` | none | Open the full panel. |
 | `stage-files` | `as` (paths) | Open the panel with these files ready. |

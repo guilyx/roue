@@ -61,6 +61,9 @@ else:
         def do_get_mime_type(self) -> str:
             return self._mime
 
+        def do_get_uri(self) -> str:
+            return str(self._file.get_uri())
+
     @pytest.fixture
     def extension() -> ModuleType:
         spec = importlib.util.spec_from_file_location("roue_nautilus", EXTENSION)
@@ -103,3 +106,53 @@ else:
         # The .deb may have installed the real desktop file: look up one that can't exist.
         monkeypatch.setattr(extension, "APP_ID", "io.github.guilyx.Roue.NotInstalled")
         assert extension._platform_data() == {}
+
+    def test_ctrl_shift_right_click_is_about_the_clicked_file(extension: ModuleType) -> None:
+        a, b, c = (FileInfo(f"/tmp/{n}.jpg", "image/jpeg") for n in "abc")
+        before = [a.get_uri()]
+        # Files 42 adds the clicked file to the selection, newer Files replace it.
+        assert extension._clicked(before, [a, c]) == [c]
+        assert extension._clicked(before, [c]) == [c]
+        # A file that was already selected: the whole selection, as with the menu.
+        assert extension._clicked([a.get_uri(), b.get_uri()], [a, b]) == [a, b]
+
+    class Window:
+        """Just enough of a Files window."""
+
+        def __init__(self, active: bool):
+            self.active = active
+
+        def get_property(self, name: str) -> bool:
+            assert name == "is-active"
+            return self.active
+
+    def test_hotkey_gets_the_selection_of_files_in_front(
+        extension: ModuleType, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        files = extension._Files()
+        window = Window(active=True)
+        key = hash(window)
+        files._windows[key] = window
+        files._selection[key] = [FileInfo("/tmp/a.jpg", "image/jpeg")]
+        files._active = (key, 0.0)
+        assert files.front_selection() == ["/tmp/a.jpg"]
+        # The hotkey's key grab takes the focus from Files for a moment (X11).
+        window.active = False
+        now = 1000.0
+        monkeypatch.setattr(extension.time, "monotonic", lambda: now)
+        files._active = (key, now - 0.2)
+        assert files.front_selection() == ["/tmp/a.jpg"]
+        # Files was left a while ago: the hotkey is for something else.
+        files._active = (key, now - 5)
+        assert files.front_selection() == []
+        # Folders and files nothing can convert don't count.
+        files._active = (key, 0.0)
+        window.active = True
+        files._selection[key] = [FileInfo("/tmp", "inode/directory", True)]
+        assert files.front_selection() == []
+
+    def test_outside_files_the_extension_hooks_nothing(extension: ModuleType) -> None:
+        files = extension._Files()
+        files.start()  # not inside Files: no windows to watch, nothing on the bus
+        files.remember(None, [FileInfo("/tmp/a.jpg", "image/jpeg")])
+        assert files._windows == {} and files._selection == {} and not files._exported

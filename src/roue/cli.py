@@ -356,7 +356,8 @@ def cmd_doctor(args: argparse.Namespace) -> int:
     print(f"    {session.trigger_explanation()}")
     binding = hotkey.current_binding()
     mark = s.green("✓") if binding else s.yellow("-")
-    print(f"  {mark} {'Hotkey':<12} {s.dim(binding or 'not set · run: roue setup')}")
+    shown = hotkey.explain(binding) if binding else "not set · run: roue setup"
+    print(f"  {mark} {'Hotkey':<12} {s.dim(shown)}")
     has_ext = desktop.desktop_targets()["nautilus"].exists() or desktop.system_installed("nautilus")
     mark = s.green("✓") if has_ext else s.yellow("-")
     detail = "installed" if has_ext else "not installed · run: roue setup"
@@ -469,7 +470,7 @@ def cmd_setup(args: argparse.Namespace) -> int:
         if hotkey.can_install():
             try:
                 hotkey.install(wheel, args.binding)
-                print(f"  {s.green('✓')} hotkey {args.binding} opens the wheel")
+                print(f"  {s.green('✓')} hotkey {hotkey.explain(args.binding)} opens the wheel")
             except hotkey.HotkeyError as exc:
                 print(f"  {s.red('✗')} hotkey: {exc}")
         else:

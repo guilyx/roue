@@ -14,9 +14,6 @@ from dataclasses import dataclass
 from .engine.backends import is_available
 from .engine.presets import Preset, PresetRegistry
 
-#: Presets shown before any file is known (the hotkey with nothing copied).
-STARTER_IDS = ("jpg", "webp", "mp4", "gif", "share-10mb", "mp3", "pdf")
-
 #: Presets per wheel; one more slice holds "More…". Pie menus stay fast up to ~8.
 MAX_PRESETS = 7
 
@@ -86,13 +83,12 @@ def choose_presets(
 ) -> tuple[list[Preset], bool]:
     """Presets for the wheel, best first, and whether more exist beyond them.
 
-    With files, these are the presets that take all of them (most relevant
-    kind first). Without files, a starter set across kinds.
+    These are the presets that take all the files (most relevant kind first).
+    Without files there are none: the wheel never offers a format it can't
+    make from what you drop.
     """
     mimes = list(mimes)
-    if mimes:
-        candidates = [p for p in registry.matching(mimes) if is_available(p)]
-    else:
-        candidates = [registry.get(i) for i in STARTER_IDS if i in registry]
-        candidates = [p for p in candidates if is_available(p)]
-    return candidates[:limit], len(candidates) > limit or not mimes
+    if not mimes:
+        return [], False
+    candidates = [p for p in registry.matching(mimes) if is_available(p)]
+    return candidates[:limit], len(candidates) > limit

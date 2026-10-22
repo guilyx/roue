@@ -4,8 +4,10 @@ One instance per session, reachable on D-Bus as ``io.github.guilyx.Roue``.
 Actions exposed over ``org.gtk.Actions`` (used by the Files extension and
 the hotkey):
 
-- ``show-wheel``: the wheel as a small window to drop files on (the hotkey)
-- ``wheel-files`` (``as``): the wheel at the pointer for these files (Files menu)
+- ``show-wheel``: the hotkey. The wheel at the pointer for the files selected in
+  Files, when Files is in front; else a small window to drop files on
+- ``wheel-files`` (``as``): the wheel at the pointer for these files (Files menu,
+  Ctrl+Shift+right-click)
 - ``show-panel``
 - ``stage-files`` (``as``): open the panel with files ready to convert
 - ``run-preset`` (``(sas)``): convert files right away
@@ -35,6 +37,11 @@ from .panel import DropPanel
 from .wheel import WheelWindow
 
 log = logging.getLogger(__name__)
+
+#: Roue's extension in Files answers here with what's selected there.
+FILES_BUS_NAME = "org.gnome.Nautilus"
+FILES_OBJECT_PATH = "/io/github/guilyx/Roue/Files"
+FILES_INTERFACE = "io.github.guilyx.Roue.Files"
 
 
 class _TokenLaunchContext(Gio.AppLaunchContext):
@@ -113,7 +120,10 @@ class RoueApplication(Adw.Application):
         args = [a for a in command_line.get_arguments()[1:] if not a.startswith("--")]
         files = [cwd / a for a in args]
         if options.get("wheel"):
-            self.show_wheel(files, overlay=bool(files))
+            if files:
+                self.show_wheel(files, overlay=True)
+            else:
+                self.open_wheel()
             return 0
         self.show_panel()
         if files and self.panel:
@@ -179,7 +189,7 @@ class RoueApplication(Adw.Application):
 
     def _install_actions(self) -> None:
         simple = {
-            "show-wheel": lambda *_: self.show_wheel(),
+            "show-wheel": lambda *_: self.open_wheel(),
             "show-panel": lambda *_: self.show_panel(),
             "preferences": lambda *_: self.show_preferences(),
             "welcome": lambda *_: self.show_welcome(),
@@ -213,6 +223,35 @@ class RoueApplication(Adw.Application):
             self.panel = DropPanel(self)
         self.panel.present()
         return self.panel
+
+    def open_wheel(self) -> None:
+        """The hotkey: the wheel at the pointer for the files selected in Files,
+        when Files is in front, else the wheel to drop files on."""
+        bus = self.get_dbus_connection()
+        if bus is None:
+            self.show_wheel()
+            return
+
+        def done(connection: Gio.DBusConnection, result: Gio.AsyncResult) -> None:
+            try:
+                (paths,) = connection.call_finish(result).unpack()
+            except GLib.Error:  # Files isn't running, or without Roue's extension
+                paths = []
+            files = [Path(p) for p in paths if Path(p).is_file()]
+            self.show_wheel(files, overlay=bool(files))
+
+        bus.call(
+            FILES_BUS_NAME,
+            FILES_OBJECT_PATH,
+            FILES_INTERFACE,
+            "GetSelection",
+            None,
+            GLib.VariantType("(as)"),
+            Gio.DBusCallFlags.NO_AUTO_START,
+            500,
+            None,
+            done,
+        )
 
     def show_wheel(
         self,
