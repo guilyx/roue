@@ -7,7 +7,6 @@ import pytest
 from roue.engine.presets import load_presets
 from roue.radial import (
     MAX_PRESETS,
-    STARTER_IDS,
     Geometry,
     choose_presets,
     clamp_center,
@@ -76,8 +75,7 @@ def test_choose_presets_for_a_pdf_has_no_more() -> None:
     assert not more
 
 
-def test_starter_set_without_files() -> None:
+def test_no_presets_without_files() -> None:
+    # The wheel never offers a format before it knows what it'll convert.
     registry = load_presets(include_user=False)
-    presets, more = choose_presets(registry)
-    assert [p.id for p in presets] == list(STARTER_IDS)
-    assert more  # "More…" always leads to the full panel
+    assert choose_presets(registry) == ([], False)

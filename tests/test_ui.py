@@ -170,17 +170,92 @@ def test_more_opens_the_panel_with_the_files(
     assert results == {"staged": [photo], "panel": True}
 
 
-def test_floating_wheel_without_files_shows_a_starter_set(
-    monkeypatch: pytest.MonkeyPatch,
+def test_floating_wheel_without_files_is_an_empty_ring(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
+    photo = tmp_path / "IMG_0001.heic"
+    photo.write_bytes(b"x")
+
     def check(app: RoueApplication, results: dict[str, object]) -> None:
         wheel = app.show_wheel()
         results["overlay"] = wheel.overlay
-        results["ids"] = [s.preset.id if s.preset else None for s in wheel.view.slices]
+        results["empty"] = [s.title for s in wheel.view.slices]
+        results["hub"] = wheel.view.hub_title.get_text()
+        wheel.stage([photo])  # dropped, pasted or chosen: now it shows what fits
+        results["photo"] = [s.preset.id if s.preset else None for s in wheel.view.slices][:2]
 
     results = run_app(check, monkeypatch)
     assert results["overlay"] is False
-    assert results["ids"] == ["jpg", "webp", "mp4", "gif", "share-10mb", "mp3", "pdf", None]
+    assert results["empty"] == []
+    assert results["hub"] == "Drop files"
+    assert results["photo"] == ["jpg", "png"]
+
+
+class FilesOnTheBus:
+    """Stands in for the session bus, answering for Roue's extension in Files."""
+
+    def __init__(self, selection: list[str] | None):
+        self.selection = selection  # None: Files isn't running
+        self.asked: list[tuple[str, str]] = []
+
+    def call(self, name: str, _path: str, _iface: str, method: str, *args: object) -> None:
+        self.asked.append((name, method))
+        args[-1](self, None)  # type: ignore[operator]
+
+    def call_finish(self, _result: object) -> GLib.Variant:
+        if self.selection is None:
+            raise GLib.Error("org.freedesktop.DBus.Error.ServiceUnknown")
+        return GLib.Variant("(as)", (self.selection,))
+
+
+@pytest.mark.parametrize("case", ["photo", "nothing selected", "Files not running", "file gone"])
+def test_hotkey_opens_the_wheel_for_what_is_selected_in_files(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, case: str
+) -> None:
+    photo = tmp_path / "IMG_0001.heic"
+    photo.write_bytes(b"x")
+    selection = {
+        "photo": [str(photo)],
+        "nothing selected": [],
+        "Files not running": None,
+        "file gone": [str(tmp_path / "gone.jpg")],
+    }[case]
+    bus = FilesOnTheBus(selection)
+
+    def check(app: RoueApplication, results: dict[str, object]) -> None:
+        monkeypatch.setattr(app, "get_dbus_connection", lambda: bus)
+        app.activate_action("show-wheel", None)
+        assert app.wheel
+        results["files"] = app.wheel.files
+        results["slices"] = len(app.wheel.view.slices)
+
+    results = run_app(check, monkeypatch)
+    assert bus.asked == [("org.gnome.Nautilus", "GetSelection")]
+    if case == "photo":  # the wheel at the pointer, with what fits the photo
+        assert results["files"] == [photo]
+        assert results["slices"]
+    else:  # the empty ring to drop files on
+        assert results == {"files": [], "slices": 0}
+
+
+def test_empty_wheel_takes_keys_and_clicks(monkeypatch: pytest.MonkeyPatch) -> None:
+    from gi.repository import Gdk
+
+    def check(app: RoueApplication, results: dict[str, object]) -> None:
+        wheel = app.show_wheel()
+        asked: list[str] = []
+        monkeypatch.setattr(wheel, "choose_files", lambda: asked.append("choose"))
+        handled = [
+            wheel._on_key(None, key, 0, 0)  # type: ignore[arg-type]
+            for key in (Gdk.KEY_Right, Gdk.KEY_1, Gdk.KEY_Return)
+        ]
+        size = wheel.view.geometry.size
+        wheel._on_click(None, 1, size / 2 + 100, size / 2)  # type: ignore[arg-type]
+        results["handled"], results["asked"] = handled, asked
+
+    results = run_app(check, monkeypatch)
+    assert results["handled"] == [False, False, True]
+    assert results["asked"] == ["choose", "choose"]
 
 
 def test_notifications_are_built_without_errors(

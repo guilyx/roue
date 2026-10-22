@@ -26,7 +26,7 @@
     </ul>
     <p>Three ways in:</p>
     <ul>
-      <li>The wheel, opened with a hotkey (Super+Shift+D by default), or around the pointer by Shift-dragging any file on X11</li>
+      <li>The wheel, opened at the pointer by Ctrl+Shift+right-clicking files in Files, by a hotkey (Super+Shift+D by default) for the files selected in Files, or by Shift-dragging any file on X11</li>
       <li>"Convert with Roue…" in the right-click menu of Files, which opens the wheel at the pointer</li>
       <li>The roue command, for scripts</li>
     </ul>

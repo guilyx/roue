@@ -4,13 +4,16 @@ It comes in two forms, sharing one view:
 
 - **overlay**: a transparent layer over the screen with the wheel centred on
   the pointer. Used when the files are already known (Files > Convert with
-  Roue…) and for Shift-drag on X11. Clicking outside the wheel, or switching
-  to another window, closes it.
-- **floating**: a small round window to drop files on (the hotkey). It also
-  picks up files copied with Ctrl+C.
+  Roue…, Ctrl+Shift+right-click, the hotkey with files selected in Files) and
+  for Shift-drag on X11. Clicking outside the wheel, or switching to another
+  window, closes it.
+- **floating**: a small round window to drop files on (the hotkey when Files
+  isn't in front). Click it to choose files. It also picks up files copied
+  with Ctrl+C.
 
-Up to seven presets fit the files best; the last slice, "More…", opens the
-full panel.
+Slices only ever show presets that take the files: up to seven that fit them
+best, and "More…", which opens the full panel. Until files are known, the
+wheel is an empty ring to drop them on.
 """
 
 from __future__ import annotations
@@ -76,7 +79,7 @@ class Slice:
 
 def files_label(files: list[Path]) -> str:
     if not files:
-        return "Drop a file"
+        return "Drop files"
     if len(files) == 1:
         return files[0].name
     return f"{len(files)} files"
@@ -252,7 +255,7 @@ class WheelView(Gtk.Overlay):
         if self.dim:
             cr.set_source_rgba(0, 0, 0, self.dim * self._open)
             cr.paint()
-        if self.center is None or not self.slices:
+        if self.center is None:
             return
         g = self.geometry
         cx, cy = self.center
@@ -270,6 +273,22 @@ class WheelView(Gtk.Overlay):
         cr.fill()
 
         base = (0.19, 0.19, 0.21) if dark else (1.0, 1.0, 1.0)
+        if not self.slices:
+            # No files yet: an empty ring to drop them on.
+            outer, inner = g.outer * scale, g.inner * scale
+            cr.new_path()
+            cr.arc(cx, cy, outer, 0, 2 * math.pi)
+            cr.arc_negative(cx, cy, inner, 2 * math.pi, 0)
+            cr.close_path()
+            cr.set_source_rgba(*base, 0.97 * alpha)
+            cr.fill()
+            edge = 1.0 if dark else 0.0
+            cr.set_source_rgba(edge, edge, edge, 0.28 * alpha)
+            cr.set_line_width(2)
+            cr.set_dash([10, 8])
+            cr.arc(cx, cy, outer - 14 * scale, 0, 2 * math.pi)
+            cr.stroke()
+            cr.set_dash([])
         count = len(self.slices)
         for index, item in enumerate(self.slices):
             start, end = slice_span(index, count)
@@ -422,7 +441,7 @@ class WheelWindow(Gtk.Window):
         registry = self.app.registry.without(self.app.settings.disabled_presets)
         presets, more = choose_presets(registry, mimes)
         slices = [Slice.for_preset(p) for p in presets]
-        if more or not slices:
+        if more or (mimes and not slices):  # nothing fits: the panel explains why
             slices.append(Slice.more())
         self.view.set_slices(slices, self.choose)
         self._refresh_hub()
@@ -442,7 +461,9 @@ class WheelWindow(Gtk.Window):
         elif self._dragged:
             view.set_hub(files_label(self._dragged), text or "Drop on a slice")
         else:
-            view.set_hub("Drop a file", text or "on a slice. Or copy files first.")
+            view.set_hub(
+                files_label([]), text or ("here" if self.overlay else "here, or click to choose")
+            )
 
     def stage(self, files: list[Path]) -> None:
         self.files = [p for p in files if p.exists()]
@@ -485,7 +506,7 @@ class WheelWindow(Gtk.Window):
             self.dismiss()
             return
         if not files:
-            self._pick_files(item.preset)
+            self.choose_files()
             return
         matching = [p for p in files if item.preset.accepts_file(p)]
         if not matching:
@@ -499,18 +520,19 @@ class WheelWindow(Gtk.Window):
         self._closing = True
         GLib.timeout_add(320, self._close_now)
 
-    def _pick_files(self, preset: Preset) -> None:
-        file_filter = Gtk.FileFilter(name=f"Files {preset.name} can take")
-        for pattern in preset.accepts:
+    def choose_files(self) -> None:
+        """Pick files to convert; the wheel then shows what fits them."""
+        file_filter = Gtk.FileFilter(name="Files Roue can convert")
+        registry = self.app.registry.without(self.app.settings.disabled_presets)
+        for pattern in sorted({p for preset in registry for p in preset.accepts}):
             file_filter.add_mime_type(pattern)
 
         def chosen(picked: list[Gio.File]) -> None:
             paths = [Path(p) for f in picked if (p := f.get_path())]
             if paths:
-                self.app.convert(preset, paths)
-                self.dismiss()
+                self.stage(paths)
 
-        compat.choose_files(self, f"Convert to {preset.name}", chosen, file_filter)
+        compat.choose_files(self, "Choose files to convert", chosen, file_filter)
 
     def dismiss(self) -> None:
         self._closing = True
@@ -550,6 +572,8 @@ class WheelWindow(Gtk.Window):
             self.choose(index)
         elif self.overlay and not self.view.in_wheel(x, y):
             self.dismiss()
+        elif not self.view.slices:
+            self.choose_files()
 
     def _on_key(self, _c: Gtk.EventControllerKey, keyval: int, _code: int, state: int) -> bool:
         self._guessed_center = False  # keyboard user: keep the wheel where it is
@@ -557,6 +581,10 @@ class WheelWindow(Gtk.Window):
         current = self.view.hover
         if keyval == Gdk.KEY_Escape:
             self.dismiss()
+        elif not count and keyval in (Gdk.KEY_Return, Gdk.KEY_KP_Enter, Gdk.KEY_space):
+            self.choose_files()
+        elif not count and keyval not in (Gdk.KEY_v, Gdk.KEY_V):
+            return False
         elif keyval in (Gdk.KEY_Right, Gdk.KEY_Down, Gdk.KEY_Tab):
             self.view.focus_slice(0 if current is None else (current + 1) % count)
             self._refresh_hub()
@@ -590,8 +618,11 @@ class WheelWindow(Gtk.Window):
 
     def _on_drag_leave(self, _target: Gtk.DropTarget) -> None:
         self._dragged = []
-        self.view.set_hover(None)
-        self._refresh_hub()
+        if self.files:
+            self.view.set_hover(None)
+            self._refresh_hub()
+        else:
+            self._rebuild()  # back to the empty ring
 
     def _on_drag_motion(self, target: Gtk.DropTarget, x: float, y: float) -> Gdk.DragAction:
         if self.view.center is None:

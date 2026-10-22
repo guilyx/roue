@@ -8,6 +8,7 @@ Wayland doesn't let apps grab keys, so on GNOME we register a regular
 from __future__ import annotations
 
 import ast
+import re
 import shutil
 import subprocess
 
@@ -18,6 +19,22 @@ DEFAULT_BINDING = "<Super><Shift>d"
 _SCHEMA = "org.gnome.settings-daemon.plugins.media-keys"
 _ENTRY_SCHEMA = f"{_SCHEMA}.custom-keybinding"
 _PATH = "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/roue/"
+
+
+_KEY_NAMES = {"primary": "Ctrl", "control": "Ctrl", "ctrl": "Ctrl"}
+
+
+def label(binding: str) -> str:
+    """A binding as people say it: ``<Super><Shift>d`` is ``Super+Shift+D``."""
+    mods = [_KEY_NAMES.get(m.lower(), m.capitalize()) for m in re.findall(r"<([^>]+)>", binding)]
+    key = re.sub(r"<[^>]+>", "", binding)
+    return "+".join([*mods, key.upper() if len(key) == 1 else key.capitalize()])
+
+
+def explain(binding: str) -> str:
+    """The label, plus where Super is: people know it as the Windows key."""
+    text = label(binding)
+    return f"{text} (Super is the Windows key)" if "Super" in text else text
 
 
 class HotkeyError(Exception):
@@ -98,7 +115,7 @@ def remove() -> bool:
 
 
 def manual_instructions(command: str, binding: str = DEFAULT_BINDING) -> str:
-    pretty = binding.replace("<", "").replace(">", "+").replace("+d", "+D")
+    pretty = label(binding)
     return (
         "Add a custom keyboard shortcut in your desktop's settings:\n"
         f"  Name:     Roue\n  Command:  {command}\n  Shortcut: {pretty}\n"
