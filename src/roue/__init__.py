@@ -1,6 +1,6 @@
 """Roue: drop a file, get the file you wanted."""
 
-__version__ = "0.2.1"
+__version__ = "0.2.2"
 
 APP_ID = "io.github.guilyx.Roue"
 APP_NAME = "Roue"
