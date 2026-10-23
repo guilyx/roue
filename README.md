@@ -259,3 +259,13 @@ the [Code of Conduct](CODE_OF_CONDUCT.md). Security issues: see [SECURITY.md](SE
 ## License
 
 [GPL-3.0-or-later](LICENSE). Roue calls external programs; each keeps its own license.
+
+## Star history
+
+<a href="https://www.star-history.com/#guilyx/roue&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=guilyx/roue&type=Date&theme=dark">
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=guilyx/roue&type=Date">
+    <img alt="Star history of guilyx/roue" src="https://api.star-history.com/svg?repos=guilyx/roue&type=Date">
+  </picture>
+</a>
