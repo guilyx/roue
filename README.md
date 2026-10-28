@@ -264,8 +264,8 @@ the [Code of Conduct](CODE_OF_CONDUCT.md). Security issues: see [SECURITY.md](SE
 
 <a href="https://www.star-history.com/#guilyx/roue&Date">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=guilyx/roue&type=Date&theme=dark">
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=guilyx/roue&type=Date">
-    <img alt="Star history of guilyx/roue" src="https://api.star-history.com/svg?repos=guilyx/roue&type=Date">
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=guilyx/roue&type=Date&logscale&theme=dark">
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=guilyx/roue&type=Date&logscale">
+    <img alt="Star history of guilyx/roue" src="https://api.star-history.com/svg?repos=guilyx/roue&type=Date&logscale">
   </picture>
 </a>
