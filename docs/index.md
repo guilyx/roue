@@ -18,6 +18,8 @@ and LibreOffice.
 - **[Command line](cli.md)**: `roue convert`, `roue list`, `roue doctor` and friends.
 - **[Desktop integration](desktop-integration.md)**: the wheel, the hotkey, the
   Files menu, Shift-drag on X11, and D-Bus.
+- **[AI agents](agents.md)**: let Claude Code, Codex, Cursor and other agents
+  convert files with Roue, through its MCP server.
 
 ## Good to know
 

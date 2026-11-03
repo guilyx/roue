@@ -16,6 +16,7 @@ roue setup                   add the launcher, hotkey and Files menu
 roue wheel [FILE...]         open the wheel (the hotkey runs this)
 roue panel [FILE...]         open the full panel
 roue quit                    stop Roue running in the background
+roue mcp                     serve Roue's tools to AI agents (MCP over stdio)
 ```
 
 ## `roue convert`
@@ -155,6 +156,12 @@ roue panel                     # open the full panel
 roue panel a.png b.png         # open it with these files ready ("pick a tile")
 roue panel --preferences       # open Preferences
 ```
+
+## `roue mcp`
+
+Runs Roue's [MCP](https://modelcontextprotocol.io) server on stdin and stdout,
+so AI agents can list presets, convert files and undo. Agents start it
+themselves; see [AI agents](agents.md) to hook it up.
 
 ## Environment
 

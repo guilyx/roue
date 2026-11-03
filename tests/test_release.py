@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 from pathlib import Path
 
@@ -81,3 +82,5 @@ def test_versions_live_where_set_version_looks() -> None:
         "Version " + release.current_version() + " ·" in (root / "website/index.html").read_text()
     )
     assert release.changelog_section((root / "CHANGELOG.md").read_text(), release.current_version())
+    plugin = json.loads((root / "plugin/.claude-plugin/plugin.json").read_text())
+    assert plugin["version"] == release.current_version()

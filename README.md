@@ -136,9 +136,10 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 | 🎡 **The wheel** | In Files, **Ctrl+Shift+right-click** a file, or select files and press **Super+Shift+D**: the wheel opens at the pointer. Elsewhere, the hotkey opens a ring to drop files on. On X11, **hold Shift while dragging** any file. | Everyday use |
 | 🖱️ **Files menu** | Right-click files in Files (Nautilus) → **Convert with Roue…** | Discovering it |
 | ⌨️ **Command line** | `roue jpg IMG_0042.heic` | Scripts, power users |
+| 🤖 **AI agents** | Ask Claude Code, Codex or Cursor to convert files: they use `roue mcp` | Letting your assistant do it |
 
 The wheel shows up to seven presets that fit your files best. Its **More…**
-slice opens the full panel with every preset. All three share the same engine,
+slice opens the full panel with every preset. They all share the same engine,
 presets and settings.
 
 > **Wayland or X11?** Both. Wayland keeps other apps' drags private (on purpose),
@@ -170,6 +171,19 @@ roue panel                         # the full panel with every preset
 `--json` gives machine-readable output. Exit codes: `0` ok, `1` a conversion failed, `2` usage error.
 
 </details>
+
+## For AI agents
+
+Roue ships an MCP server, `roue mcp`, so your agent can convert files for you,
+locally: *"make these screenshots WebP"*, *"shrink demo.mov for Discord"*.
+In Claude Code, one line installs it with a skill that knows every preset:
+
+```text
+/plugin install roue --marketplace guilyx/roue
+```
+
+Codex: `codex mcp add roue -- roue mcp`. Cursor, VS Code and others: see
+[AI agents](https://guilyx.github.io/roue/docs/agents.html).
 
 ## Presets
 
@@ -245,7 +259,8 @@ More in the [FAQ](https://guilyx.github.io/roue/docs/faq.html).
 
 Python 3.10+, GTK 4 and libadwaita for the wheel and the panel, a Files
 extension, and a GTK-free engine that drives FFmpeg, libvips (or ImageMagick),
-Ghostscript, Pandoc and LibreOffice. One engine, three front doors. Details in
+Ghostscript, Pandoc and LibreOffice. One engine, a few front doors: the wheel,
+Files, the terminal and AI agents. Details in
 the [architecture docs](https://guilyx.github.io/roue/docs/architecture.html).
 
 ## Contributing

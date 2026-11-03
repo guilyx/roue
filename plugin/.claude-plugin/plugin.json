@@ -1,0 +1,20 @@
+{
+  "name": "roue",
+  "displayName": "Roue",
+  "version": "0.3.0",
+  "description": "Convert images, video, audio and documents on your computer with Roue: HEIC to JPG, video to GIF or under 10 MB, Word to PDF, audio to MP3. Nothing is uploaded.",
+  "author": {
+    "name": "Erwin Lejeune",
+    "url": "https://github.com/guilyx"
+  },
+  "homepage": "https://guilyx.github.io/roue/docs/agents.html",
+  "repository": "https://github.com/guilyx/roue",
+  "license": "GPL-3.0-or-later",
+  "keywords": ["converter", "ffmpeg", "heic", "pdf", "linux", "ubuntu"],
+  "mcpServers": {
+    "roue": {
+      "command": "roue",
+      "args": ["mcp"]
+    }
+  }
+}

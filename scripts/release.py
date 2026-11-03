@@ -11,7 +11,7 @@ follow Conventional Commits and decide the version:
 - anything else (``docs:``, ``chore:``, ``ci:``, ``test:``...): no release
 
 With a release to make, it writes the version into ``pyproject.toml``,
-``src/roue/__init__.py`` and the website, adds a ``CHANGELOG.md`` section,
+``src/roue/__init__.py``, the website and the agent plugin, adds a ``CHANGELOG.md`` section,
 and writes the notes to ``release-notes.md``. The very first release (no tag
 yet) ships the version already in the files, with its hand-written notes.
 Nothing is committed or tagged here: the workflow does that.
@@ -139,6 +139,10 @@ def set_version(version: str) -> None:
         "src/roue/__init__.py": (r'^__version__ = "[^"]*"$', f'__version__ = "{version}"'),
         "pyproject.toml": (r'^version = "[^"]*"$', f'version = "{version}"'),
         "website/index.html": (r"Version \d+\.\d+\.\d+ ·", f"Version {version} ·"),
+        "plugin/.claude-plugin/plugin.json": (
+            r'^  "version": "[^"]*",$',
+            f'  "version": "{version}",',
+        ),
     }
     for name, (pattern, replacement) in edits.items():
         path = ROOT / name

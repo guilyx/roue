@@ -1,0 +1,15 @@
+{
+  "name": "roue",
+  "description": "Roue, the local file converter for Linux, for AI agents.",
+  "owner": {
+    "name": "Erwin Lejeune",
+    "url": "https://github.com/guilyx"
+  },
+  "plugins": [
+    {
+      "name": "roue",
+      "source": "./plugin",
+      "description": "Convert images, video, audio and documents on your computer with Roue. Nothing is uploaded."
+    }
+  ]
+}

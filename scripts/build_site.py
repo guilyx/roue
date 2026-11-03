@@ -50,6 +50,7 @@ NAV: list[tuple[str, str]] = [
     ("presets", "Presets"),
     ("custom-presets", "Custom presets"),
     ("cli", "Command line"),
+    ("agents", "AI agents"),
     ("desktop-integration", "Desktop integration"),
     ("privacy", "Privacy"),
     ("faq", "FAQ"),
