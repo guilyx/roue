@@ -7,6 +7,12 @@ Every merge to `main` that contains a `feat:`, `fix:` or `perf:` commit is
 released automatically, and its section here is written from those commit
 messages; see [Releasing](docs/releasing.md).
 
+## [0.4.0] - 2026-11-03
+
+### Added
+
+- **agents:** convert files from AI agents, with an MCP server and a skill ([528936b](https://github.com/guilyx/roue/commit/528936b8441e77325f96a650badf3ab78a642a68))
+
 ## [0.3.0] - 2026-10-22
 
 ### Added
@@ -113,6 +119,7 @@ First public release.
 - `roue setup` checks for `python3-nautilus` with the `.deb` too, and only
   asks you to restart Files when Files started before the menu was installed.
 
+[0.4.0]: https://github.com/guilyx/roue/releases/tag/v0.4.0
 [0.3.0]: https://github.com/guilyx/roue/releases/tag/v0.3.0
 [0.2.2]: https://github.com/guilyx/roue/releases/tag/v0.2.2
 [0.2.1]: https://github.com/guilyx/roue/releases/tag/v0.2.1
