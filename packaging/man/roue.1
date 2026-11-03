@@ -87,6 +87,11 @@ Open the full panel, optionally with files ready to convert.
 .TP
 .B quit
 Stop Roue running in the background.
+.TP
+.B mcp
+Serve Roue's tools to AI agents with the Model Context Protocol, over standard
+input and output. Agents start it themselves, for example with
+.BR "claude mcp add roue \-\- roue mcp" .
 .SH EXIT STATUS
 0 on success, 1 if a conversion failed, 2 on usage errors (such as an unknown
 preset), 130 when interrupted.

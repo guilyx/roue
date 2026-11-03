@@ -10,6 +10,7 @@ roue history / roue undo     recent conversions, and undo the last one
 roue setup                   add the launcher, hotkey and Files menu
 roue wheel [FILE...]         open the wheel (the hotkey runs this)
 roue panel [FILE...]         open the full panel
+roue mcp                     serve Roue's tools to AI agents (MCP over stdio)
 """
 
 from __future__ import annotations
@@ -49,6 +50,7 @@ COMMANDS = (
     "wheel",
     "gui",
     "quit",
+    "mcp",
 )
 
 
@@ -521,6 +523,12 @@ def cmd_quit(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def cmd_mcp(args: argparse.Namespace) -> int:
+    from . import mcp
+
+    return mcp.main()
+
+
 # -- parser ----------------------------------------------------------------
 
 
@@ -590,6 +598,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = sub.add_parser("quit", help="stop Roue running in the background")
     p.set_defaults(func=cmd_quit)
+
+    p = sub.add_parser("mcp", help="serve Roue's tools to AI agents (MCP over stdio)")
+    p.set_defaults(func=cmd_mcp)
 
     # "roue gui ARGS..." (used by D-Bus activation) is handled in main(): argparse
     # can't pass through options like --gapplication-service untouched.

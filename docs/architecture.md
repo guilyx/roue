@@ -2,7 +2,9 @@
 
 **One engine, three front doors.** The wheel (and the full panel behind its
 **More…**), the Files menu and the command line are thin layers over the same
-engine. No conversion logic lives in UI code.
+engine. No conversion logic lives in UI code. AI agents come in through a
+fourth, `roue mcp`, which serves the same engine over the Model Context
+Protocol.
 
 ```text
             ┌──────────────┐  ┌─────────────────┐  ┌──────────────┐
@@ -39,7 +41,8 @@ src/roue/
 ├── ui/                the GTK 4 / libadwaita app (wheel, panel, preferences)
 ├── integrations/      hotkey, desktop files, notifications, X11 Shift-drag
 ├── data/              .desktop and D-Bus templates, icons, Files extension
-└── cli.py             the roue command
+├── cli.py             the roue command
+└── mcp.py             roue mcp: the engine as MCP tools, for AI agents
 ```
 
 ## Presets are data
