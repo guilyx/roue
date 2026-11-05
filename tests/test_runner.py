@@ -10,8 +10,13 @@ from typing import Any
 import pytest
 
 from roue.engine.backends.base import friendly_failure
-from roue.engine.presets import Preset, parse_preset
-from roue.engine.runner import Job, JobState, Runner, expand_inputs, human_size
+from roue.engine.history import History
+from roue.engine.presets import Preset, load_presets, parse_preset
+from roue.engine.runner import Job, JobState, Runner, expand_inputs, human_size, natural_key
+
+from .test_pdfimages import jpeg
+
+MERGE = load_presets(include_user=False).get("merge-pdf")
 
 
 def command_preset(command: str, **extra: Any) -> Preset:
@@ -185,6 +190,43 @@ def test_expand_inputs(workdir: Path) -> None:
     deep = expand_inputs([workdir], recursive=True)
     assert [p.name for p in flat] == ["a.txt"]
     assert sorted(p.name for p in deep) == ["a.txt", "b.txt"]
+
+
+def test_folders_list_their_files_in_natural_order(workdir: Path) -> None:
+    for name in ("scan 10.jpg", "scan 2.jpg", "Scan 1.jpg"):
+        write(workdir / name)
+    assert [p.name for p in expand_inputs([workdir])] == ["Scan 1.jpg", "scan 2.jpg", "scan 10.jpg"]
+    assert sorted(["b10", "b9", "a"], key=natural_key) == ["a", "b9", "b10"]
+
+
+def test_merge_puts_the_files_in_one_pdf_in_the_order_given(workdir: Path) -> None:
+    # JPEGs go into the PDF untouched, so this needs no conversion tools.
+    second = workdir / "b.jpg"
+    second.write_bytes(jpeg(scan=b"SECOND"))
+    first = workdir / "a.jpg"
+    first.write_bytes(jpeg(scan=b"FIRST"))
+    clip = write(workdir / "clip.mp4")
+    batch = Runner().run(MERGE, [second, first, clip, workdir / "gone.jpg"])
+    [job] = batch.jobs
+    assert job.state == JobState.DONE, job.message
+    assert job.inputs == [second, first]
+    assert job.label == "b.jpg + 1 more"
+    assert job.message == "Left out clip.mp4, gone.jpg: 'Merge into PDF' can't take them."
+    assert job.input_bytes == second.stat().st_size + first.stat().st_size
+    assert batch.summary() == "2 files merged into one"
+    [result] = job.outputs
+    assert result == workdir / "b (merged).pdf"
+    data = result.read_bytes()
+    assert data.index(b"SECOND") < data.index(b"FIRST")
+    entry = History(workdir / "history.jsonl").record(batch)
+    assert entry is not None and entry.sources == [str(second), str(first)]
+
+
+def test_merge_with_nothing_that_fits_is_skipped(workdir: Path) -> None:
+    [job] = Runner().run(MERGE, [write(workdir / "clip.mp4")]).jobs
+    assert job.state == JobState.SKIPPED
+    assert job.message == "'Merge into PDF' can't take any of these files."
+    assert Runner().run(MERGE, []).jobs == []
 
 
 def test_output_dir_option(workdir: Path, tmp_path: Path) -> None:

@@ -39,6 +39,10 @@ ready, and the exact command to install what's missing.
 Several files work the same way: select them, then Ctrl+Shift+right-click one
 of them. Click outside the wheel or press **Esc** to put it away.
 
+Several files also get **Merge into PDF**: PDFs, photos, scans and documents
+become one PDF, pages in file name order (`scan 2` before `scan 10`). It's the
+first slice for several PDFs, and the last one for several photos.
+
 ### The hotkey: Super+Shift+D
 
 **Super** is the Windows key (on some keyboards, the one with the Ubuntu
@@ -99,6 +103,7 @@ roue list --for clip.mov        # only the ones that fit this file
 roue convert gif clip.mov       # convert
 roue gif clip.mov               # same thing, shorter
 roue share-10mb *.mp4 -o ~/out  # many files, results in another folder
+roue merge-pdf cover.pdf scans/ # one PDF, pages in the order given
 ```
 
 Each finished file prints one line:

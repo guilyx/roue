@@ -47,6 +47,8 @@ def test_order_follows_groups() -> None:
         ({"output": "zip"}, "output must be"),
         ({"suffix": "a/b"}, "suffix"),
         ({"backend": "command"}, "params.command"),
+        ({"combine": "yes"}, "combine must be true or false"),
+        ({"combine": True, "output": "folder"}, "writes one file"),
     ],
 )
 def test_invalid_presets_explain_themselves(change: dict[str, object], message: str) -> None:
@@ -103,6 +105,19 @@ def test_matching_ranks_the_files_own_kind_first() -> None:
     assert registry.matching(["image/png", "video/mp4"]) == []
     jpg_targets = [p.id for p in registry.matching(["image/jpeg"])]
     assert "jpg" not in jpg_targets and "webp" in jpg_targets
+
+
+def test_merging_needs_two_files_and_leads_for_documents() -> None:
+    registry = load_presets(include_user=False)
+    one_pdf = [p.id for p in registry.matching(["application/pdf"])]
+    assert "merge-pdf" not in one_pdf
+    two_pdfs = [p.id for p in registry.matching(["application/pdf"] * 2)]
+    assert two_pdfs[0] == "merge-pdf" and "compress-pdf" in two_pdfs
+    mixed = registry.matching(["application/pdf", "image/png", "application/msword"])
+    assert [p.id for p in mixed] == ["merge-pdf"]
+    photos = [p.id for p in registry.matching(["image/heic", "image/jpeg"])]
+    assert photos[-1] == "merge-pdf" and photos[0] != "merge-pdf"
+    assert registry.matching(["application/pdf", "video/mp4"]) == []
 
 
 def test_unknown_preset_suggests_close_ids() -> None:

@@ -19,6 +19,8 @@ except ValueError:
 
 from gi.repository import Gio, GLib  # noqa: E402
 
+from roue.engine.presets import Preset  # noqa: E402
+from roue.engine.runner import Batch  # noqa: E402
 from roue.ui.application import RoueApplication  # noqa: E402
 
 
@@ -151,6 +153,30 @@ def test_picking_a_slice_converts_and_closes(
     results = run_app(check, monkeypatch)
     assert calls == [("jpg", [photo])]
     assert results["chosen"] == 0
+
+
+def test_merging_from_the_wheel_puts_pages_in_name_order(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    files = [tmp_path / name for name in ("scan 10.pdf", "scan 2.pdf", "Scan 1.pdf")]
+    for path in files:
+        path.write_bytes(b"%PDF-1.4\n")
+    monkeypatch.setattr("roue.radial.is_available", lambda preset: True)
+    submitted: list[tuple[str, list[Path]]] = []
+
+    def submit(preset: Preset, paths: list[Path], **options: object) -> Batch:
+        submitted.append((preset.id, paths))
+        return Batch(preset=preset, jobs=[])
+
+    def check(app: RoueApplication, results: dict[str, object]) -> None:
+        monkeypatch.setattr(app.runner, "submit", submit)
+        wheel = app.show_wheel(files, overlay=True)
+        results["first"] = wheel.view.slices[0].title
+        wheel.choose(0)
+
+    results = run_app(check, monkeypatch)
+    assert results["first"] == "Merge into PDF"
+    assert submitted == [("merge-pdf", [files[2], files[1], files[0]])]
 
 
 def test_more_opens_the_panel_with_the_files(

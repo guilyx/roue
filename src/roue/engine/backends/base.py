@@ -64,7 +64,7 @@ def friendly_failure(output: str, default: str, mime: str = "") -> str:
 
 @dataclass
 class JobContext:
-    """Everything a backend needs to convert one file."""
+    """Everything a backend needs to convert one file (or combine several)."""
 
     source: Path
     preset: Preset
@@ -73,8 +73,11 @@ class JobContext:
     output: Path
     cancel_event: threading.Event = field(default_factory=threading.Event)
     on_progress: ProgressCallback | None = None
+    #: Every file, in order, for presets that combine files; ``source`` is the first.
+    inputs: list[Path] = field(default_factory=list)
     _probe: MediaInfo | None = None
     _proc: subprocess.Popen[str] | None = None
+    _children: list[JobContext] = field(default_factory=list)
     _lock: threading.Lock = field(default_factory=threading.Lock)
 
     @property
@@ -101,15 +104,35 @@ class JobContext:
         if self.cancel_event.is_set():
             raise Cancelled()
 
+    def child(self, source: Path, mime: str, workdir: Path, output: Path) -> JobContext:
+        """A context for one step of this job, such as one file of a merge.
+
+        It shares this job's cancellation: cancelling the job stops its tools too.
+        """
+        sub = JobContext(
+            source=source,
+            preset=self.preset,
+            mime=mime,
+            workdir=workdir,
+            output=output,
+            cancel_event=self.cancel_event,
+        )
+        with self._lock:
+            self._children.append(sub)
+        return sub
+
     def cancel(self) -> None:
         self.cancel_event.set()
         with self._lock:
             proc = self._proc
+            children = list(self._children)
         if proc and proc.poll() is None:
             try:
                 os.killpg(proc.pid, signal.SIGTERM)
             except (ProcessLookupError, PermissionError):
                 proc.terminate()
+        for sub in children:
+            sub.cancel()
 
     def run(
         self,
@@ -120,11 +143,13 @@ class JobContext:
         parse: str = "stdout",
         env: Mapping[str, str] | None = None,
         cwd: Path | None = None,
+        ok_codes: tuple[int, ...] = (0,),
     ) -> str:
         """Run a tool, feed lines of ``parse`` to ``on_line``, and return its output.
 
         Raises ConversionError with ``failure`` (or a better guess from the
-        tool's output) when the tool fails, and Cancelled when cancelled.
+        tool's output) when the tool exits with a code outside ``ok_codes``,
+        and Cancelled when cancelled.
         """
         self.check_cancelled()
         full_env = {**os.environ, "LC_ALL": "C", **(env or {})}
@@ -164,7 +189,7 @@ class JobContext:
             self._proc = None
         self.check_cancelled()
         output = "".join(tail)
-        if proc.returncode != 0:
+        if proc.returncode not in ok_codes:
             raise ConversionError(
                 friendly_failure(output, failure, self.mime), details=output.strip()
             )

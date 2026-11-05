@@ -407,9 +407,9 @@ class DropPanel(Adw.ApplicationWindow):
         failed = [j for j in batch.jobs if j.state == JobState.FAILED]
         if failed:
             first = failed[0]
-            title = f"{first.source.name}: {first.message}"
+            title = f"{first.label}: {first.message}"
             if len(failed) > 1:
-                title = f"{len(failed)} files failed. {first.source.name}: {first.message}"
+                title = f"{len(failed)} files failed. {first.label}: {first.message}"
             toast = Adw.Toast(title=GLib.markup_escape_text(title), timeout=8)
         elif batch.count(JobState.DONE) == 0:
             skipped = next((j for j in batch.jobs if j.message), None)

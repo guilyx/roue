@@ -91,4 +91,10 @@ def choose_presets(
     if not mimes:
         return [], False
     candidates = [p for p in registry.matching(mimes) if is_available(p)]
-    return candidates[:limit], len(candidates) > limit
+    shown = candidates[:limit]
+    # Several photos: their formats fill the wheel, but merging them into one
+    # PDF is too useful to hide behind More…, so it takes the last slice.
+    combine = next((p for p in candidates[limit:] if p.combine), None)
+    if combine and shown:
+        shown[-1] = combine
+    return shown, len(candidates) > limit

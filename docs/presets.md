@@ -53,6 +53,7 @@ the ones that fit a file.
 | `pdf` | PDF | DOC, RTF, old Office files, DOCX/XLSX/PPTX, OpenDocument, Markdown, reStructuredText, Org, plain text, CSV | `.pdf` | Word, Excel, PowerPoint, LibreOffice and Markdown files to PDF. |
 | `docx` | Word | ODT, RTF, DOC, Markdown, reStructuredText, Org, HTML | `.docx` | Markdown, OpenDocument and RTF to .docx. |
 | `html` | Web page | Markdown, reStructuredText, Org | `.html` | Markdown to a single self-contained HTML file. |
+| `merge-pdf` | Merge into PDF | PDF, any image, DOC, RTF, old Office files, DOCX/XLSX/PPTX, OpenDocument, Markdown, reStructuredText, Org, plain text, CSV | `.pdf`, ` (merged)` | Put PDFs, images and documents together in one PDF. |
 | `compress-pdf` | Compress PDF | PDF | `.pdf`, ` (compressed)`, only if smaller | Shrink scans and image-heavy PDFs for email. Kept only if smaller. |
 | `pdf-to-png` | Pages to PNG | PDF | folder of `.png`, ` (pages)` | One PNG image per page, in a new folder. |
 | `pdf-to-text` | Text | PDF | `.txt` | Pull the text out of a PDF (no OCR yet). |

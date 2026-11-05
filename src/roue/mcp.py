@@ -51,7 +51,8 @@ PARSE_ERROR, INVALID_REQUEST, METHOD_NOT_FOUND, INVALID_PARAMS, INTERNAL_ERROR =
 INSTRUCTIONS = f"""\
 {APP_NAME} converts files on this computer: images, video, audio and documents.
 Nothing is uploaded. Call list_presets with the user's files to see which
-presets fit them, then convert with a preset id. Results are written next to
+presets fit them, then convert with a preset id. To join PDFs, images and
+documents into one PDF, convert them together with merge-pdf. Results are written next to
 the originals (or to output_dir) and never overwrite anything. undo_last moves
 the latest results to the trash. If a preset says available: false,
 check_tools shows the command that installs what's missing. Docs: {WEBSITE}"""
@@ -79,7 +80,8 @@ TOOLS: list[Json] = [
         "name": "list_presets",
         "title": "List presets",
         "description": (
-            "List Roue's conversion presets (JPG, WebP, MP4, GIF, 'Under 10 MB', MP3, PDF...). "
+            "List Roue's conversion presets (JPG, WebP, MP4, GIF, 'Under 10 MB', MP3, PDF, "
+            "merge into one PDF...). "
             "With files, only the presets that fit all of them, most relevant first. "
             "Pass a preset's id to convert."
         ),
@@ -115,7 +117,8 @@ TOOLS: list[Json] = [
             "Convert files with a preset, locally. Folders are converted file by file. "
             "Each result is written next to its original (photo.HEIC -> photo.jpg), or "
             "to output_dir, and never replaces an existing file: Roue picks a free name "
-            "instead. Returns the paths it wrote."
+            "instead. Presets with combine: true (merge-pdf) put all the files into one "
+            "result instead, in the order given. Returns the paths it wrote."
         ),
         "inputSchema": {
             "type": "object",
@@ -222,6 +225,8 @@ def _preset_json(preset: Preset) -> Json:
         "output_ext": preset.output_ext,
         "available": is_available(preset),
     }
+    if preset.combine:
+        data["combine"] = True  # all the files go into one result
     if not data["available"]:
         data["needs"] = _needs(preset)
     return data
@@ -276,6 +281,8 @@ def _job_json(job: Job) -> Json:
         "input_bytes": job.input_bytes,
         "output_bytes": job.output_bytes,
     }
+    if job.preset.combine:
+        data["inputs"] = [str(p) for p in job.inputs]
     if job.error and job.error.hint:
         data["hint"] = job.error.hint
     return data
@@ -419,7 +426,7 @@ class _Progress:
             params: Json = {
                 "progressToken": self.call.progress_token,
                 "progress": value,
-                "message": f"{job.source.name}: {job.state.value}",
+                "message": f"{job.label}: {job.state.value}",
             }
             if self.total is not None:
                 params["total"] = self.total

@@ -105,6 +105,7 @@ class _Catalog:
                     "group": p.group,
                     "accepts": list(p.accepts),
                     "rejects": list(p.rejects),
+                    "combine": p.combine,
                     "available": is_available(p),
                 }
                 for p in registry
@@ -139,11 +140,13 @@ class _Catalog:
         found = [
             p
             for p in self.presets()
-            if p.get("available", True) and all(accepts(p, m) for m in mimes)
+            if p.get("available", True)
+            and all(accepts(p, m) for m in mimes)
+            and (len(mimes) > 1 or not p.get("combine"))  # merging needs two files
         ]
         kinds = [_kind(m) for m in mimes]
         main = max(set(kinds), key=kinds.count)
-        return sorted(found, key=lambda p: p.get("group") != main)
+        return sorted(found, key=lambda p: (p.get("group") != main, not p.get("combine")))
 
 
 _catalog = _Catalog()
@@ -431,7 +434,8 @@ class RoueMenuProvider(GObject.GObject, Nautilus.MenuProvider):
         item = Nautilus.MenuItem(
             name="Roue::Wheel",
             label="Convert with Roue…",
-            tip=f"{len(presets)} ways to convert: " + ", ".join(p["name"] for p in presets[:4]),
+            tip=f"{len(presets)} way{'s' if len(presets) != 1 else ''} to convert: "
+            + ", ".join(p["name"] for p in presets[:4]),
         )
         item.connect("activate", self._wheel, paths)
         return [item]

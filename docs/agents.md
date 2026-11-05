@@ -76,7 +76,7 @@ into your agent's skills folder (for Claude Code, `~/.claude/skills/`).
 |---|---|
 | `list_presets` | The presets, or only those that fit the given files, most relevant first. Each says whether its tools are installed. |
 | `file_info` | Type, size, length, codecs and resolution of files, and the presets that fit them. |
-| `convert` | Convert files or folders with a preset. Takes `output_dir` and `recursive`, like the command line. Returns the paths it wrote, and sizes before and after. |
+| `convert` | Convert files or folders with a preset. Takes `output_dir` and `recursive`, like the command line. Returns the paths it wrote, and sizes before and after. With `merge-pdf`, all the files go into one PDF, in the order given. |
 | `undo_last` | Move the files the last conversion wrote to the trash. |
 | `check_tools` | Which conversion tools are installed, and the command that installs the missing ones. |
 

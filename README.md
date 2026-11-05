@@ -38,6 +38,7 @@ LibreOffice) and almost no fast, friendly way to use them. Roue is that way in.
 | 🎞️ A clip you want as a GIF for a README | **GIF** |
 | 📄 A `.docx` someone wants as a PDF | **PDF** |
 | 🎙️ A voice memo that won't play in the car | **MP3** |
+| 🧾 Scans, photos and PDFs to send as one file | **Merge into PDF** |
 | 🕵️ A photo with your GPS location in it | **Remove metadata** |
 
 The result lands **next to the original** (`photo.jpg`, `clip (10MB).mp4`) and
@@ -61,8 +62,9 @@ Prefer the terminal? `roue jpg IMG_0042.heic`.
 
 - 🔒 **100% local.** No uploads, no accounts, no telemetry. Works with Wi-Fi off.
 - 🎯 **Only what fits.** A photo gets photo formats, a video gets video ones. No dead ends.
-- 📦 **27 presets** for images, video, audio and documents. Add your own in a few lines of YAML.
+- 📦 **28 presets** for images, video, audio and documents. Add your own in a few lines of YAML.
 - 🧺 **Batches.** Select 40 photos, pick **WebP**, get one notification at the end.
+- 📑 **Merge into one PDF.** PDFs, photos, scans and Word files, pages in name order.
 - 🔄 **Stays up to date** through Software Updater, from a signed update channel.
 - ⌨️ **Scriptable.** A full command line, with JSON output and clear exit codes.
 - 🖥️ **Native.** GTK 4 and libadwaita, light and dark, and the wheel works from the keyboard too.
@@ -153,6 +155,7 @@ roue gif demo.mov                  # → demo.gif
 roue share-10mb screen-recording.mp4
 roue webp ~/Pictures/export/       # whole folder, converted in parallel
 roue pdf report.docx -o ~/Desktop  # choose where results go
+roue merge-pdf cover.pdf scans/    # PDFs, photos and documents into one PDF
 ```
 
 <details>
@@ -187,14 +190,14 @@ Codex: `codex mcp add roue -- roue mcp`. Cursor, VS Code and others: see
 
 ## Presets
 
-27 built-in presets. Add your own as small YAML files: see the [preset guide](https://guilyx.github.io/roue/docs/custom-presets.html).
+28 built-in presets. Add your own as small YAML files: see the [preset guide](https://guilyx.github.io/roue/docs/custom-presets.html).
 
 | Group | Presets |
 |---|---|
 | 🟢 **Images** | `jpg` · `png` · `webp` · `avif` · `resize-half` · `resize-1080` · `resize-double` · `compress-image` · `strip-metadata` |
 | 🔴 **Video** | `mp4` · `gif` · `webm` · `share-10mb` · `share-25mb` · `compress-video` · `mute` |
 | 🟣 **Audio** | `mp3` · `opus` · `wav` · `flac` · `normalize` (audio presets also pull the sound out of videos) |
-| 🔵 **Documents** | `pdf` (Word, Excel, PowerPoint, OpenDocument, Markdown) · `docx` · `html` · `compress-pdf` · `pdf-to-png` · `pdf-to-text` |
+| 🔵 **Documents** | `pdf` (Word, Excel, PowerPoint, OpenDocument, Markdown) · `docx` · `html` · `merge-pdf` (PDFs, images and documents into one PDF) · `compress-pdf` · `pdf-to-png` · `pdf-to-text` |
 
 <details>
 <summary><b>A custom preset</b></summary>

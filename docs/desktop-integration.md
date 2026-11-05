@@ -27,6 +27,10 @@ It comes in two forms:
 After you pick a slice, the wheel closes and the conversion runs in the
 background. A notification says when it's done.
 
+With several files, the wheel also offers **Merge into PDF**, which puts them
+all in one PDF, pages in file name order. It's the first slice for several
+PDFs, and the last for several photos (their formats come first).
+
 | Key | Action |
 |---|---|
 | Arrows, Tab | Move between slices |
