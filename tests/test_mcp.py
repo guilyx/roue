@@ -304,3 +304,20 @@ def test_sigterm_stops_running_conversions(presets: Path) -> None:
     assert time.monotonic() - started < 10
     assert proc.stdout.read() == ""
     assert not presets.with_name("notes (slow).txt").exists()
+
+
+def test_agents_can_merge_files_into_one_pdf(client: Client, tmp_path: Path) -> None:
+    from .test_pdfimages import jpeg
+
+    pages = [tmp_path / "page 2.jpg", tmp_path / "page 1.jpg"]
+    for path in pages:
+        path.write_bytes(jpeg())
+    fits = client.call("list_presets", files=[str(p) for p in pages])["structuredContent"]
+    merge = next(p for p in fits["presets"] if p["id"] == "merge-pdf")
+    assert merge["combine"] is True
+    result = client.call("convert", preset="merge-pdf", files=[str(p) for p in pages])
+    assert result["isError"] is False
+    [job] = result["structuredContent"]["jobs"]
+    assert job["inputs"] == [str(p) for p in pages]  # the order the agent gave
+    assert job["outputs"] == [str(tmp_path / "page 2 (merged).pdf")]
+    assert result["structuredContent"]["summary"] == "2 files merged into one"

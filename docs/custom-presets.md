@@ -89,7 +89,7 @@ copy one as a starting point.
 |---|---|---|
 | `id` | yes | Lowercase letters, digits and dashes, like `video-to-gif`. Used on the command line. |
 | `name` | yes | The label on the wheel and the panel. Keep it short. |
-| `backend` | yes | `image`, `ffmpeg`, `document`, `ghostscript` or `command`. |
+| `backend` | yes | `image`, `ffmpeg`, `document`, `ghostscript`, `merge` or `command`. |
 | `accepts` | yes | MIME patterns this preset takes: `image/*`, `application/pdf`… |
 | `output_ext` | yes | Extension of the result, like `mp4`, or `same` to keep the original's. |
 | `description` | no | One line, shown as the tooltip and in menus. |
@@ -98,6 +98,7 @@ copy one as a starting point.
 | `rejects` | no | MIME patterns to leave out, like `image/jpeg` for a JPG preset. |
 | `suffix` | no | Added to the file name, like `" (small)"`. Needed when `output_ext` is `same`. |
 | `output` | no | `file` (default) or `folder` for presets that write several files. |
+| `combine` | no | `true` puts all the files into one result instead of one each, like **Merge into PDF**. Shown on the wheel only for two files or more. |
 | `only_if_smaller` | no | `true` throws the result away if it isn't smaller than the original. |
 | `keywords` | no | Extra words for the panel's search box. |
 | `params` | no | Settings for the backend, see below. |

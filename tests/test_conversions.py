@@ -45,6 +45,7 @@ CASES: dict[str, tuple[str, str]] = {
     "pdf": ("md", "notes.pdf"),
     "docx": ("md", "notes.docx"),
     "html": ("md", "notes.html"),
+    "merge-pdf": ("pdf", "doc (merged).pdf"),
     "compress-pdf": ("pdf", "doc (compressed).pdf"),
     "pdf-to-png": ("pdf", "doc (pages)"),
     "pdf-to-text": ("pdf", "doc.txt"),
@@ -173,3 +174,67 @@ def test_imagemagick_fallback(
     for preset_id in ("jpg", "resize-half", "strip-metadata"):
         [job] = Runner().run(REGISTRY.get(preset_id), [source]).jobs
         assert job.state == JobState.DONE, f"{preset_id}: {job.message}"
+
+
+def pdf_pages(path: Path, tmp: Path) -> int:
+    """Pages in a PDF, counted by whichever tool is around."""
+    if have("qpdf"):
+        # Exit code 3 is success with warnings (pdfunite's output gets some).
+        out = subprocess.run(
+            ["qpdf", "--show-npages", str(path)], capture_output=True, text=True, check=False
+        )
+        assert out.returncode in (0, 3), out.stderr
+        return int(out.stdout)
+    pages = tmp / "pages"
+    pages.mkdir()
+    subprocess.run(
+        [
+            "gs",
+            "-q",
+            "-dNOPAUSE",
+            "-dBATCH",
+            "-dSAFER",
+            "-sDEVICE=pnggray",
+            "-r10",
+            f"-sOutputFile={pages}/%d.png",
+            str(path),
+        ],
+        check=True,
+        capture_output=True,
+    )
+    return len(list(pages.iterdir()))
+
+
+@pytest.mark.parametrize(
+    ("joiner", "before"),
+    [("qpdf", ""), ("pdfunite", "qpdf"), ("ghostscript", "qpdf,pdfunite"), ("imagemagick", "")],
+)
+def test_merge_pdfs_and_images(
+    joiner: str,
+    before: str,
+    samples: dict[str, Path],
+    workdir: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A PDF, then photos and graphics, through each PDF joiner (and ImageMagick
+    instead of libvips for the last case)."""
+    from roue.engine import tools
+
+    image_tool = "imagemagick" if joiner == "imagemagick" else "vips"
+    monkeypatch.setenv("ROUE_DISABLE_TOOLS", "vips" if joiner == "imagemagick" else before)
+    tools.which.cache_clear()
+    if joiner != "imagemagick" and not tools.which(joiner):
+        pytest.skip(f"{joiner} isn't installed")
+    if not tools.which(image_tool) or not have("gs"):
+        pytest.skip(f"needs {image_tool} and Ghostscript")
+    names = ["pdf", "png", "jpg", "noisy", "svg"] + (["heic"] if "heic" in samples else [])
+    files = [copy_sample(samples, name, workdir) for name in names]
+    if joiner == "imagemagick":
+        files.remove(workdir / "logo.svg")  # ImageMagick 6 often lacks an SVG reader
+    [job] = Runner().run(REGISTRY.get("merge-pdf"), files).jobs
+    assert job.state == JobState.DONE, f"{job.message}\n{job.error and job.error.details}"
+    [result] = job.outputs
+    assert result == workdir / "doc (merged).pdf"
+    assert pdf_pages(result, tmp_path) == 2 + len(files) - 1
+    assert all(f.exists() for f in files), "the originals must never be touched"

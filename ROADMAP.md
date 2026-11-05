@@ -31,13 +31,30 @@ Want something here sooner? 👍 the matching issue, or open a
 
 ## 🚧 1.0 — public launch
 
+**Several files, one result** (presets with `combine: true`)
+
+- [x] Merge PDFs, images and documents → one PDF, pages in name order
+- [ ] Reorder pages before merging: drag files in the panel
+- [ ] Zip the selection into one archive (and extract archives)
+- [ ] Join videos, or audio files, into one (same format: instant)
+- [ ] Photos → slideshow video or GIF
+- [ ] Photos → collage or contact sheet (one image)
+
+**PDF tools**
+
+- [ ] Image → PDF for a single photo or scan (the PDF slice on images)
+- [ ] Split a PDF: one file per page, or a page range
+- [ ] Rotate pages (and images): left, right, upside down
+- [ ] Remove a PDF's password, or add one (qpdf)
+- [ ] OCR for scans without a text layer, into searchable PDFs (OCRmyPDF)
+
 **Conversions**
 
 - [ ] Hardware video encoding when available (VAAPI, NVENC), software fallback
 - [ ] Trim: a tiny start/end dialog, the one preset that opens a window
+- [ ] Crop to a square or 4:5 for social media
+- [ ] Extract frames from a video as images
 - [ ] Remove background (optional model download, runs offline after)
-- [ ] OCR for PDFs without a text layer (Tesseract)
-- [ ] Merge PDFs and images → one PDF (multi-file drops into one result)
 - [ ] Favicon / app icon set from one image
 
 **Wheel, panel and desktop**

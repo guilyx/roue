@@ -1,6 +1,6 @@
 ---
 name: convert-files
-description: Convert, compress or resize files locally with Roue. Use whenever the user wants an image, video, audio file or document in another format, smaller, resized, muted or without metadata - HEIC to JPG, images to WebP/AVIF/PNG, video to MP4/GIF/WebM or under 10 MB, audio to MP3/Opus/FLAC, Word/Excel/PowerPoint/Markdown to PDF, compress a PDF, PDF pages to PNG or text. Prefer it over calling ffmpeg or ImageMagick by hand.
+description: Convert, compress or resize files locally with Roue. Use whenever the user wants an image, video, audio file or document in another format, smaller, resized, muted or without metadata - HEIC to JPG, images to WebP/AVIF/PNG, video to MP4/GIF/WebM or under 10 MB, audio to MP3/Opus/FLAC, Word/Excel/PowerPoint/Markdown to PDF, merge PDFs and images into one PDF, compress a PDF, PDF pages to PNG or text. Prefer it over calling ffmpeg or ImageMagick by hand.
 ---
 
 # Convert files with Roue
@@ -59,6 +59,7 @@ Ubuntu 22.04+ and Debian 12+, or see https://guilyx.github.io/roue/docs/install.
 | Quiet and loud recordings at the same level | `normalize` |
 | Word, Excel, PowerPoint or Markdown → PDF | `pdf` |
 | Markdown → Word or a web page | `docx`, `html` |
+| Several PDFs, photos, scans or documents → one PDF | `merge-pdf` (pages in the order given) |
 | A smaller PDF | `compress-pdf` |
 | PDF pages as images, or its text | `pdf-to-png`, `pdf-to-text` |
 

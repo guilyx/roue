@@ -28,7 +28,7 @@ from .. import APP_ID, APP_NAME, ISSUES_URL, WEBSITE, __version__
 from ..engine import tools
 from ..engine.history import History
 from ..engine.presets import Preset, PresetRegistry, load_presets
-from ..engine.runner import Batch, JobState, Runner, human_size
+from ..engine.runner import Batch, JobState, Runner, human_size, natural_key
 from ..engine.settings import Settings
 from ..integrations import session, x11_drag
 from ..integrations.desktop import package_data
@@ -437,6 +437,8 @@ class RoueApplication(Adw.Application):
 
     def convert(self, preset: Preset, paths: list[Path]) -> Batch:
         self.hold()  # finish conversions even if the panel closes
+        if preset.combine:
+            paths = sorted(paths, key=natural_key)  # pages follow the file names
         batch = self.runner.submit(
             preset,
             paths,
@@ -470,7 +472,7 @@ class RoueApplication(Adw.Application):
         failed = [j for j in batch.jobs if j.state == JobState.FAILED]
         if failed and not done:
             title = (
-                f"Couldn't convert {failed[0].source.name}"
+                f"Couldn't convert {failed[0].label}"
                 if len(failed) == 1
                 else f"{len(failed)} files couldn't be converted"
             )

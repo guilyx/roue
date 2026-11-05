@@ -95,7 +95,7 @@ class History:
             preset_id=batch.preset.id,
             preset_name=batch.preset.name,
             summary=batch.summary(),
-            sources=[str(j.source) for j in batch.jobs],
+            sources=[str(s) for j in batch.jobs for s in j.inputs],
             outputs=[str(p) for p in batch.outputs],
         )
         self._write([entry, *self.entries()])

@@ -57,6 +57,15 @@ places.
 Press **Undo Last Conversion** in the panel's menu, or run `roue undo`. The
 results go to the trash; run it again to go one step further back.
 
+## How do I merge PDFs, or put photos and scans in one PDF?
+
+Select the files in Files, Ctrl+Shift+right-click one of them, and pick
+**Merge into PDF**. PDFs, images and documents can be mixed; pages follow the
+file names (`scan 2` before `scan 10`), and the result is named after the first
+one, like `scan 1 (merged).pdf`. From a terminal, `roue merge-pdf a.pdf b.jpg`
+keeps the order you type. Install `qpdf` (`sudo apt install qpdf`) to copy PDF
+pages exactly as they are; without it, Roue uses pdfunite or Ghostscript.
+
 ## HEIC photos fail with "libvips couldn't convert this image".
 
 Your libheif is missing its HEVC decoder. On Ubuntu 24.04+ and Debian 13+:

@@ -75,6 +75,22 @@ def test_choose_presets_for_a_pdf_has_no_more() -> None:
     assert not more
 
 
+def test_several_pdfs_lead_with_merge() -> None:
+    registry = load_presets(include_user=False)
+    presets, _ = choose_presets(registry, ["application/pdf"] * 3)
+    assert presets[0].id == "merge-pdf"
+
+
+def test_several_photos_keep_merge_on_the_wheel(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("roue.radial.is_available", lambda preset: True)
+    registry = load_presets(include_user=False)
+    presets, more = choose_presets(registry, ["image/heic"] * 12)
+    assert len(presets) == MAX_PRESETS and more
+    assert presets[0].id == "jpg" and presets[-1].id == "merge-pdf"
+    one, _ = choose_presets(registry, ["image/heic"])
+    assert "merge-pdf" not in [p.id for p in one]
+
+
 def test_no_presets_without_files() -> None:
     # The wheel never offers a format before it knows what it'll convert.
     registry = load_presets(include_user=False)

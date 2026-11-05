@@ -46,7 +46,24 @@ roue jpg ~/Pictures/iPhone/*.HEIC
 roue share-10mb screen-recording.mov
 roue webp -o ~/site/img -j 8 ~/photos
 roue pdf report.docx slides.pptx notes.md
+roue merge-pdf cover.pdf scan-*.jpg appendix.docx
 ```
+
+### Merging into one PDF
+
+`merge-pdf` puts all its files into **one** PDF instead of converting each:
+PDFs, images (JPG, PNG, HEIC, WebP, SVG…) and documents (Word, LibreOffice,
+Markdown). Pages follow the order you give, and a folder adds its files in name
+order (`scan 2` before `scan 10`). The result is named after the first file:
+`cover (merged).pdf`. Files that don't fit are left out and named in the
+message.
+
+- PDF pages are copied as they are with **qpdf** or **pdfunite**, or
+  rewritten by **Ghostscript** when neither is installed.
+- JPEGs go in untouched. Other images are stored without loss, except photo
+  formats like HEIC and AVIF, which become JPEG at quality 90. Each image page
+  takes the picture's shape, fitted to A4, and phone photos are turned upright.
+- Photo metadata (location, camera) isn't copied into the PDF.
 
 Output, one line per file:
 
@@ -72,7 +89,8 @@ roue convert gif clip.mov --json
   "output_bytes": 192263}]}
 ```
 
-`state` is one of `done`, `failed`, `skipped`, `cancelled`.
+`state` is one of `done`, `failed`, `skipped`, `cancelled`. A merge has one
+job, with every file it used under `inputs`.
 
 ### Exit codes
 

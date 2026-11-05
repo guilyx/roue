@@ -47,6 +47,30 @@ presets:
     backend: document
     keywords: [markdown, web, html]
 
+  - id: merge-pdf
+    name: Merge into PDF
+    description: Put PDFs, images and documents together in one PDF.
+    group: document
+    icon: edit-copy-symbolic
+    accepts:
+      - "application/pdf"
+      - "image/*"
+      - "application/msword"
+      - "application/rtf"
+      - "application/vnd.ms-*"
+      - "application/vnd.openxmlformats-officedocument.*"
+      - "application/vnd.oasis.opendocument.*"
+      - "text/markdown"
+      - "text/x-rst"
+      - "text/org"
+      - "text/plain"
+      - "text/csv"
+    output_ext: pdf
+    suffix: " (merged)"
+    backend: merge
+    combine: true
+    keywords: [combine, join, merge, scans, pages, images to pdf, photos to pdf]
+
   - id: compress-pdf
     name: Compress PDF
     description: Shrink scans and image-heavy PDFs for email. Kept only if smaller.

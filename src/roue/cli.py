@@ -124,7 +124,7 @@ class Progress:
 
     def _line(self, job: Job) -> str:
         s = self.style
-        name = job.source.name
+        name = job.label
         if job.state == JobState.DONE:
             outputs = ", ".join(p.name for p in job.outputs)
             size = s.dim(f"({human_size(job.output_bytes)})")
@@ -154,13 +154,13 @@ class Progress:
         self._last_draw = time.monotonic()
         job = next(iter(self.running.values()))
         pct = "" if job.progress is None else f" {job.progress * 100:3.0f}%"
-        status = f"[{self.finished + 1}/{self.total}] {job.source.name}{pct}"
+        status = f"[{self.finished + 1}/{self.total}] {job.label}{pct}"
         self.out.write("\r\033[K" + self.style.dim(status[:100]))
         self.out.flush()
 
 
 def _job_json(job: Job) -> dict[str, Any]:
-    return {
+    data: dict[str, Any] = {
         "source": str(job.source),
         "state": job.state.value,
         "outputs": [str(p) for p in job.outputs],
@@ -168,6 +168,9 @@ def _job_json(job: Job) -> dict[str, Any]:
         "input_bytes": job.input_bytes,
         "output_bytes": job.output_bytes,
     }
+    if job.preset.combine:
+        data["inputs"] = [str(p) for p in job.inputs]
+    return data
 
 
 def cmd_convert(args: argparse.Namespace) -> int:
@@ -218,7 +221,7 @@ def _report(batch: Batch, args: argparse.Namespace, progress: Progress) -> int:
         body = ""
         if failed:
             first = next(j for j in batch.jobs if j.state == JobState.FAILED)
-            body = f"{first.source.name}: {first.message}"
+            body = f"{first.label}: {first.message}"
         elif batch.outputs:
             body = ", ".join(p.name for p in batch.outputs[:3])
         notify.send(title, body, error=bool(failed))
@@ -238,6 +241,7 @@ def _preset_json(preset: Preset) -> dict[str, Any]:
         "accepts": list(preset.accepts),
         "rejects": list(preset.rejects),
         "output_ext": preset.output_ext,
+        "combine": preset.combine,
         "available": is_available(preset),
         "builtin": preset.builtin,
     }

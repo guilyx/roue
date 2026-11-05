@@ -28,7 +28,7 @@ GROUPS: dict[str, str] = {
     "custom": "Custom",
 }
 
-BACKENDS = ("ffmpeg", "image", "document", "ghostscript", "command")
+BACKENDS = ("ffmpeg", "image", "document", "ghostscript", "merge", "command")
 
 _ID_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,63}$")
 _EXT_RE = re.compile(r"^[a-z0-9]{1,10}$")
@@ -49,6 +49,8 @@ class Preset:
     rejects: tuple[str, ...] = ()
     suffix: str = ""
     output: str = "file"  # "file" or "folder"
+    #: All the files go into one result (a merged PDF), instead of one result each.
+    combine: bool = False
     only_if_smaller: bool = False
     keywords: tuple[str, ...] = ()
     params: Mapping[str, Any] = field(default_factory=dict)
@@ -124,6 +126,11 @@ def parse_preset(data: Mapping[str, Any], *, source: Path | None = None) -> Pres
     suffix = str(data.get("suffix", ""))
     if "/" in suffix or "\0" in suffix:
         raise PresetError(f"{where}: suffix can't contain '/'.")
+    combine = data.get("combine", False)
+    if not isinstance(combine, bool):
+        raise PresetError(f"{where}: combine must be true or false.")
+    if combine and output != "file":
+        raise PresetError(f"{where}: a preset that combines files writes one file, not a folder.")
     return Preset(
         id=preset_id,
         name=str(data["name"]),
@@ -136,6 +143,7 @@ def parse_preset(data: Mapping[str, Any], *, source: Path | None = None) -> Pres
         icon=str(data.get("icon", "")),
         suffix=suffix,
         output=output,
+        combine=combine,
         only_if_smaller=bool(data.get("only_if_smaller", False)),
         keywords=_as_tuple(data.get("keywords"), key="keywords", where=where),
         params=dict(params),
@@ -213,14 +221,22 @@ class PresetRegistry:
         return groups
 
     def matching(self, mimes: Iterable[str]) -> list[Preset]:
-        """Presets that accept every given MIME type, most relevant first."""
+        """Presets that accept every given MIME type (one per file), most relevant first.
+
+        Presets that combine files need at least two, and come first in their
+        group: with several PDFs, merging them is the likeliest wish.
+        """
         mimes = list(mimes)
         if not mimes:
             return []
         kinds = [kind_of(m) for m in mimes]
         main_kind = max(set(kinds), key=kinds.count)
-        found = [p for p in self.ordered() if all(p.accepts_mime(m) for m in mimes)]
-        return sorted(found, key=lambda p: p.group != main_kind)
+        found = [
+            p
+            for p in self.ordered()
+            if all(p.accepts_mime(m) for m in mimes) and (len(mimes) > 1 or not p.combine)
+        ]
+        return sorted(found, key=lambda p: (p.group != main_kind, not p.combine))
 
     def matching_files(self, paths: Iterable[Path]) -> list[Preset]:
         return self.matching(mime_type(p) for p in paths)

@@ -10,6 +10,7 @@ from __future__ import annotations
 import itertools
 import logging
 import os
+import re
 import sys
 import threading
 import time
@@ -59,10 +60,12 @@ _ids = itertools.count(1)
 
 @dataclass(eq=False)
 class Job:
-    """One file going through one preset."""
+    """One file going through one preset, or several combined into one result."""
 
     source: Path
     preset: Preset
+    #: Every file of a combining preset, in order. ``source`` is the first.
+    inputs: list[Path] = field(default_factory=list)
     id: int = field(default_factory=lambda: next(_ids))
     state: JobState = JobState.QUEUED
     progress: float | None = 0.0
@@ -76,10 +79,20 @@ class Job:
     _ctx: JobContext | None = field(default=None, repr=False)
     _cancel: threading.Event = field(default_factory=threading.Event, repr=False)
 
+    def __post_init__(self) -> None:
+        if not self.inputs:
+            self.inputs = [self.source]
+
     def cancel(self) -> None:
         self._cancel.set()
         if self._ctx:
             self._ctx.cancel()
+
+    @property
+    def label(self) -> str:
+        """The file's name, or "first.pdf + 3 more" for a merge."""
+        more = len(self.inputs) - 1
+        return f"{self.source.name} + {more} more" if more else self.source.name
 
     @property
     def mime(self) -> str:
@@ -134,7 +147,10 @@ class Batch:
         skipped = self.count(JobState.SKIPPED)
         cancelled = self.count(JobState.CANCELLED)
         parts = []
-        if done:
+        merged = sum(len(j.inputs) for j in self.jobs if j.state == JobState.DONE)
+        if done and self.preset.combine and merged > 1:
+            parts.append(f"{merged} files merged into one")
+        elif done:
             parts.append(f"{done} file{'s' if done != 1 else ''} converted")
             if self.bytes_saved > 0 and done > 1:
                 parts.append(f"{human_size(self.bytes_saved)} saved")
@@ -163,18 +179,27 @@ def human_size(num: float) -> str:
     return f"{num:.1f} TB"
 
 
+def natural_key(path: Path | str) -> tuple[str | int, ...]:
+    """Sort key for names the way people read them: "scan 2" before "scan 10"."""
+    parts = re.split(r"(\d+)", str(path).casefold())
+    return tuple(int(part) if index % 2 else part for index, part in enumerate(parts))
+
+
 def expand_inputs(paths: Iterable[Path], *, recursive: bool = False) -> list[Path]:
-    """Replace folders by the (non-hidden) files they contain."""
+    """Replace folders by the (non-hidden) files they contain, in name order."""
     result: list[Path] = []
     for path in map(Path.absolute, paths):
         if path.is_dir():
             pattern = "**/*" if recursive else "*"
             result.extend(
                 sorted(
-                    p
-                    for p in path.glob(pattern)
-                    if p.is_file()
-                    and not any(part.startswith(".") for part in p.relative_to(path).parts)
+                    (
+                        p
+                        for p in path.glob(pattern)
+                        if p.is_file()
+                        and not any(part.startswith(".") for part in p.relative_to(path).parts)
+                    ),
+                    key=lambda p: natural_key(p.relative_to(path)),
                 )
             )
         else:
@@ -214,7 +239,12 @@ class Runner:
         out_dir: Path | None = None,
     ) -> Batch:
         files = expand_inputs(paths, recursive=recursive)
-        batch = Batch(preset=preset, jobs=[Job(source=p, preset=preset) for p in files])
+        if preset.combine:
+            # One job for all the files, in the order given.
+            jobs = [Job(source=files[0], preset=preset, inputs=files)] if files else []
+        else:
+            jobs = [Job(source=p, preset=preset) for p in files]
+        batch = Batch(preset=preset, jobs=jobs)
         batch._remaining = len(batch.jobs)
         if not batch.jobs:
             batch._done.set()
@@ -307,30 +337,39 @@ class Runner:
             self._batch_done(batch)
 
     def _convert(self, job: Job, out_dir: Path | None) -> None:
-        source, preset = job.source, job.preset
-        if not source.exists():
-            raise RoueError("This file doesn't exist anymore.")
-        if not source.is_file():
-            raise RoueError("This isn't a regular file.")
-        mime = job.mime
-        if not preset.accepts_mime(mime):
-            raise NothingToDo(f"'{preset.name}' doesn't work on this {noun_for(mime)}.")
-        missing = missing_tools(preset, mime)
-        if missing:
-            group = missing[0]
-            raise MissingToolError(tuple(label(t) for t in group), hint=install_hint(group))
-        job.input_bytes = source.stat().st_size
+        preset = job.preset
+        notes: list[str] = []
+        if preset.combine:
+            sources = self._combined_inputs(job, notes)
+        else:
+            source = job.source
+            if not source.exists():
+                raise RoueError("This file doesn't exist anymore.")
+            if not source.is_file():
+                raise RoueError("This isn't a regular file.")
+            if not preset.accepts_mime(job.mime):
+                raise NothingToDo(f"'{preset.name}' doesn't work on this {noun_for(job.mime)}.")
+            sources = [source]
+        mimes = [mime_type(p) for p in sources]
+        for mime in dict.fromkeys(mimes):
+            missing = missing_tools(preset, mime)
+            if missing:
+                group = missing[0]
+                raise MissingToolError(tuple(label(t) for t in group), hint=install_hint(group))
+        source = sources[0]
+        job.input_bytes = sum(p.stat().st_size for p in sources)
         destination, fell_back = destination_dir(source, out_dir)
         ext = preset.output_extension(source)
         with scratch_dir(destination) as work:
             ctx = JobContext(
                 source=source,
                 preset=preset,
-                mime=mime,
+                mime=mimes[0],
                 workdir=work,
                 output=work / f"result.{ext}",
                 cancel_event=job._cancel,
                 on_progress=lambda fraction: self._progress(job, fraction),
+                inputs=sources if preset.combine else [],
             )
             job._ctx = ctx
             backend_for(preset).run(ctx)
@@ -351,7 +390,25 @@ class Runner:
                 job.output_bytes = size
                 job.outputs = [commit_file(ctx.output, destination, stem, ext)]
         if fell_back:
-            job.message = f"Saved to {destination} because the original folder is read-only."
+            notes.append(f"Saved to {destination} because the original folder is read-only.")
+        if notes:
+            job.message = " ".join(notes)
+
+    def _combined_inputs(self, job: Job, notes: list[str]) -> list[Path]:
+        """The files a combining preset can take, in order. Notes the ones left out."""
+        preset = job.preset
+        usable = [p for p in job.inputs if p.is_file() and preset.accepts_mime(mime_type(p))]
+        left_out = [p.name for p in job.inputs if p not in usable]
+        if not usable:
+            raise NothingToDo(f"'{preset.name}' can't take any of these files.")
+        if left_out:
+            names = ", ".join(left_out[:3]) + (
+                f" and {len(left_out) - 3} more" if len(left_out) > 3 else ""
+            )
+            them = "it" if len(left_out) == 1 else "them"
+            notes.append(f"Left out {names}: '{preset.name}' can't take {them}.")
+        job.inputs = usable
+        return usable
 
     def _progress(self, job: Job, fraction: float | None) -> None:
         job.progress = fraction

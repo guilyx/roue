@@ -77,6 +77,27 @@ TOOLS: dict[str, Tool] = {
             "https://www.libreoffice.org",
         ),
         Tool(
+            "qpdf",
+            "qpdf",
+            ("qpdf",),
+            "Merging PDFs, pages untouched",
+            {"apt": "qpdf", "dnf": "qpdf", "pacman": "qpdf", "zypper": "qpdf"},
+            "https://qpdf.sourceforge.io",
+        ),
+        Tool(
+            "pdfunite",
+            "pdfunite",
+            ("pdfunite",),
+            "Merging PDFs (when qpdf is missing)",
+            {
+                "apt": "poppler-utils",
+                "dnf": "poppler-utils",
+                "pacman": "poppler",
+                "zypper": "poppler-tools",
+            },
+            "https://poppler.freedesktop.org",
+        ),
+        Tool(
             "pandoc",
             "Pandoc",
             ("pandoc",),

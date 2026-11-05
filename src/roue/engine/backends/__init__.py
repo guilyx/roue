@@ -10,12 +10,14 @@ from .document import DocumentBackend
 from .ffmpeg import FFmpegBackend
 from .ghostscript import GhostscriptBackend
 from .image import ImageBackend
+from .merge import MergeBackend
 
 BACKENDS: dict[str, Backend] = {
     "ffmpeg": FFmpegBackend(),
     "image": ImageBackend(),
     "document": DocumentBackend(),
     "ghostscript": GhostscriptBackend(),
+    "merge": MergeBackend(),
     "command": CommandBackend(),
 }
 
