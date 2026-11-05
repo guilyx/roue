@@ -7,6 +7,12 @@ Every merge to `main` that contains a `feat:`, `fix:` or `perf:` commit is
 released automatically, and its section here is written from those commit
 messages; see [Releasing](docs/releasing.md).
 
+## [0.5.0] - 2026-11-05
+
+### Added
+
+- **pdf:** merge PDFs, images and documents into one PDF ([fb77989](https://github.com/guilyx/roue/commit/fb77989970c031b455c4f371ca4c6f0e4173f981))
+
 ## [0.4.0] - 2026-11-03
 
 ### Added
@@ -119,6 +125,7 @@ First public release.
 - `roue setup` checks for `python3-nautilus` with the `.deb` too, and only
   asks you to restart Files when Files started before the menu was installed.
 
+[0.5.0]: https://github.com/guilyx/roue/releases/tag/v0.5.0
 [0.4.0]: https://github.com/guilyx/roue/releases/tag/v0.4.0
 [0.3.0]: https://github.com/guilyx/roue/releases/tag/v0.3.0
 [0.2.2]: https://github.com/guilyx/roue/releases/tag/v0.2.2
